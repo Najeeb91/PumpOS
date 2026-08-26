@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PumpOS — Salesman Module Prototype</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root{
+  --ink:#101B22;
+  --ink-soft:#41545C;
+  --bg:#EDEFEA;
+  --panel:#FFFFFF;
+  --line:#DADDD5;
+  --amber:#E98A2B;
+  --amber-dark:#C46F1B;
+  --green:#2F8F5B;
+  --green-bg:#E4F3EA;
+  --red:#C1432E;
+  --red-bg:#FBE7E3;
+  --steel:#6B7B80;
+  --lock-bg:#F1EFE9;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);font-family:var(--font-body);color:var(--ink);}
+#stage{display:flex;justify-content:center;padding:24px 12px;min-height:100vh;}
+.phone{
+  width:390px;max-width:100%;background:var(--panel);border-radius:28px;
+  box-shadow:0 20px 60px rgba(16,27,34,0.18);overflow:hidden;
+  border:8px solid var(--ink);position:relative;display:flex;flex-direction:column;height:820px;
+}
+.statusbar{height:14px;background:var(--ink);}
+.screen{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--panel);}
+.screen::-webkit-scrollbar{width:0;}
+
+/* Header */
+.topbar{
+  padding:18px 18px 14px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px;background:var(--panel);position:sticky;top:0;z-index:5;
+}
+.backbtn{
+  width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);cursor:pointer;flex:none;
+}
+.topbar h1{font-family:var(--font-display);font-size:17px;margin:0;font-weight:600;letter-spacing:-0.01em;}
+.eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);}
+
+/* Designer note strip -- brief 1-2 line comment on every screen */
+.note{
+  margin:12px 18px 0;padding:10px 12px;background:var(--lock-bg);border-left:3px solid var(--amber);
+  font-size:12px;line-height:1.45;color:var(--ink-soft);border-radius:4px;
+}
+
+.content{padding:16px 18px 100px;flex:1;}
+
+/* Odometer / meter-style digit display -- signature element */
+.odo{
+  font-family:var(--font-mono);background:var(--ink);color:#F4E7D6;border-radius:8px;
+  padding:10px 14px;font-size:22px;letter-spacing:0.06em;display:inline-block;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+.odo.sm{font-size:16px;padding:7px 10px;}
+
+/* Cards / rows */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.card h3{font-family:var(--font-display);font-size:13px;margin:0 0 10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--steel);}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);}
+.row:last-child{border-bottom:none;}
+.row .label{font-size:13px;color:var(--ink-soft);}
+.row .value{font-family:var(--font-mono);font-size:14px;font-weight:600;}
+.row.locked .value{color:var(--steel);}
+.lockicon{font-size:11px;color:var(--steel);margin-left:6px;}
+
+.total-card{background:var(--ink);color:#fff;border-radius:12px;padding:16px;margin-bottom:14px;}
+.total-card .label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#C7CFC9;}
+.total-card .amt{font-family:var(--font-display);font-size:28px;font-weight:700;margin-top:4px;}
+
+/* Buttons */
+.btn{
+  width:100%;padding:14px;border-radius:10px;border:none;font-family:var(--font-body);
+  font-weight:600;font-size:14px;cursor:pointer;margin-bottom:10px;
+}
+.btn-primary{background:var(--amber);color:#fff;}
+.btn-primary:disabled{background:#E9D2AF;cursor:not-allowed;}
+.btn-primary.green{background:var(--green);}
+.btn-secondary{background:var(--panel);color:var(--ink);border:1px solid var(--line);}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #F0C3BA;}
+.btn-ghost{background:transparent;color:var(--ink-soft);border:1px dashed var(--line);}
+
+/* Form fields */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;color:var(--steel);margin-bottom:6px;font-weight:600;}
+.field input,.field select{
+  width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;
+  font-family:var(--font-mono);font-size:14px;background:#FCFBF8;
+}
+.chiprow{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{
+  padding:9px 14px;border-radius:20px;border:1px solid var(--line);font-size:13px;cursor:pointer;background:var(--panel);
+}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+/* List items (customers, transactions) */
+.listitem{
+  display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer;
+}
+.listitem:last-child{border-bottom:none;}
+.listitem .name{font-size:14px;font-weight:600;}
+.listitem .sub{font-size:11px;color:var(--steel);}
+
+/* Success screen */
+.success-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;}
+.success-icon{
+  width:64px;height:64px;border-radius:50%;background:var(--green-bg);color:var(--green);
+  display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:18px;
+}
+.success-title{font-family:var(--font-display);font-size:19px;font-weight:700;margin-bottom:6px;}
+.success-sub{font-size:13px;color:var(--ink-soft);margin-bottom:26px;}
+
+/* Bottom nav */
+.bottomnav{
+  display:flex;border-top:1px solid var(--line);background:var(--panel);position:sticky;bottom:0;
+}
+.navitem{
+  flex:1;padding:10px 4px 12px;text-align:center;font-size:10.5px;color:var(--steel);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.navitem .ic{font-size:17px;}
+.navitem.active{color:var(--amber-dark);font-weight:700;}
+.navitem.locked{color:#C9CDC6;}
+.navitem.green .ic{color:var(--green);}
+
+/* Checklist */
+.check-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+.check-row:last-child{border-bottom:none;}
+.check-left{display:flex;align-items:center;gap:10px;}
+.dot{width:9px;height:9px;border-radius:50%;background:#D9DCD4;flex:none;}
+.dot.done{background:var(--green);}
+.check-label{font-size:13.5px;}
+.check-sub{font-size:10.5px;color:var(--steel);}
+.fillbtn{
+  padding:6px 12px;border-radius:16px;font-size:11.5px;font-weight:700;border:none;cursor:pointer;
+}
+.fillbtn.todo{background:var(--amber);color:#fff;}
+.fillbtn.done{background:var(--green-bg);color:var(--green);}
+.fillbtn.locked{background:var(--lock-bg);color:var(--steel);}
+
+.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:0.04em;}
+.badge.green{background:var(--green-bg);color:var(--green);}
+.badge.amber{background:#FCEBD6;color:var(--amber-dark);}
+.badge.red{background:var(--red-bg);color:var(--red);}
+.badge.gray{background:var(--lock-bg);color:var(--steel);}
+
+/* Modal */
+.modal-overlay{
+  position:absolute;inset:0;background:rgba(16,27,34,0.55);display:flex;align-items:flex-end;z-index:20;
+}
+.modal-sheet{
+  background:var(--panel);width:100%;border-radius:18px 18px 0 0;padding:22px 20px 26px;
+}
+.modal-sheet h3{font-family:var(--font-display);margin:0 0 6px;font-size:16px;}
+.modal-sheet p{font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;line-height:1.5;}
+.pindots{display:flex;gap:10px;justify-content:center;margin:18px 0;}
+.pindots div{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--ink);}
+.pindots div.filled{background:var(--ink);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.two-col-vals{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;text-align:center;}
+.two-col-vals .colhead{font-family:var(--font-mono);font-size:11px;color:var(--steel);text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div id="stage"><div class="phone"><div class="statusbar"></div><div id="screen" class="screen"></div></div></div>
+
+<script>
+/* ---------------- STATE ---------------- */
+const state = {
+  screen:'login', modalOpen:false, pin:'', pinTarget:null, prevScreen:'home', navContext:'home',
+  shift:{type:'Morning Shift', machine:'M1 – Petrol', nozzle:'N1 – Petrol', fuel:'Petrol', opening:10000.00, start:null},
+  customers:[
+    {id:'C-1042', name:'Ramesh Traders', avail:8000, outstanding:12450.00},
+    {id:'C-1077', name:'Bhavani Transports', avail:15000, outstanding:3200.00},
+    {id:'C-1091', name:'Sri Balaji Motors', avail:5000, outstanding:0}
+  ],
+  credit:{customer:null, fuel:'Petrol', qty:10.00, rate:105.20, get amount(){return +(this.qty*this.rate).toFixed(2);}},
+  creditLog:[],
+  digital:{upi:12450, card:7850, bank:4200, saved:false},
+  digitalLog:[{date:'26 May 2024',shift:'Morning Shift',total:24500,status:'SAVED'}],
+  operations:{nat:{dispensed:10.00, actual:10.02, done:false}, expenses:[], others:[], lastSaved:''},
+  checklist:{nat:false, digital:false, expenses:false, cash:false, closingMeter:false, autoSales:true, creditRecon:false},
+  cash:{expected:38400, actual:38350},
+  closingMeterValue:null, closingMeterLocked:false,
+  restrictedUnlocked:{}
+};
+const money = n => '₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const lit = n => Number(n).toFixed(2)+' L';
+
+function nav(id){ state.prevScreen = state.screen; state.screen = id; render(); document.getElementById('screen').scrollTop=0; }
+function openPin(target){ state.modalOpen=true; state.pin=''; state.pinTarget=target; render(); }
+function pressPin(d){
+  if(state.pin.length>=4) return;
+  state.pin+=d;
+  if(state.pin.length===4){
+    if(state.pin==='1234'){ state.restrictedUnlocked[state.pinTarget]=true; state.modalOpen=false; render(); }
+    else { setTimeout(()=>{ state.pin=''; render(); },350); render(); }
+  } else render();
+}
+
+/* ---------------- REUSABLE PIECES ---------------- */
+function topbar(title, eyebrow, back){
+  return `<div class="topbar">
+    ${back?`<div class="backbtn" onclick="nav('${back}')">‹</div>`:''}
+    <div><div class="eyebrow">${eyebrow||''}</div><h1>${title}</h1></div>
+  </div>`;
+}
+function note(text){ return `<div class="note">${text}</div>`; }
+function card(title, rowsHtml){ return `<div class="card">${title?`<h3>${title}</h3>`:''}${rowsHtml}</div>`; }
+function row(label, value, locked){ return `<div class="row ${locked?'locked':''}"><span class="label">${label}</span><span class="value">${value}${locked?'<span class="lockicon">🔒</span>':''}</span></div>`; }
+function btn(label, onclick, variant){ return `<button class="btn ${variant||'btn-primary'}" onclick="${onclick}">${label}</button>`; }
+
+function bottomNav(context){
+  // context: 'home' (normal) or 'work' (inside credit/digital/ops/summary)
+  if(context==='work'){
+    return `<div class="bottomnav">
+      ${navitem('🏠','Home', state.screen==='home', "nav('home')")}
+      ${navitem('💳','Credit', ['selectCustomer','customerOverview','fuel','quantity','creditReview','newOutstanding','creditSuccess'].includes(state.screen), "nav('selectCustomer')")}
+      ${navitem('📶','Digital', ['digitalEnter','digitalReview','digitalConfirm','digitalSuccess','digitalList'].includes(state.screen), "nav('digitalEnter')")}
+      ${navitem('⚙️','Ops', ['operationsMenu','nat','expenses','others','operationsSuccess'].includes(state.screen), "nav('operationsMenu')")}
+    </div>`;
+  }
+  const closeReady = closeShiftReady();
+  return `<div class="bottomnav">
+    ${navitem('🏠','Home', state.screen==='home', "nav('home')")}
+    ${navitem('📋','Status', state.screen==='shiftStatus', "nav('shiftStatus')")}
+    ${navitem(closeReady?'🟢':'🔒','Close Shift', state.screen==='closeChecklist'||state.screen.startsWith('close'), "nav('closeChecklist')", closeReady?'green':'')}
+    ${navitem('👤','Profile', state.screen==='profile', "nav('profile')")}
+  </div>`;
+}
+function navitem(icon,label,active,onclick,extraClass){
+  return `<div class="navitem ${active?'active':''} ${extraClass||''}" onclick="${onclick}"><div class="ic">${icon}</div>${label}</div>`;
+}
+function closeShiftReady(){
+  // demo rule: closing window open after opening meter step done (always true post-shift-start for prototype)
+  return state.shift.start!==null;
+}
+
+/* ---------------- SCREENS ---------------- */
+const screens = {};
+
+screens.login = () => `
+  ${topbar('Asian Filling Station','PumpOS · Login')}
+  <div class="content">
+    ${note('Salesman signs in as Staff. Owner/Manager use the same screen with a different role toggle.')}
+    <div class="chiprow" style="margin:14px 0;">
+      <div class="chip">Owner</div><div class="chip">Manager</div><div class="chip active">Staff</div>
+    </div>
+    <div class="field"><label>User ID</label><input value="SM-0231" readonly></div>
+    <div class="field"><label>Password</label><input type="password" value="••••••••" readonly></div>
+    <div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" checked style="width:auto;"> <span style="font-size:12px;color:var(--ink-soft);">Remember me</span></div>
+    ${btn('Login','nav("selectShift")')}
+    ${btn('Use biometric login','nav("selectShift")','btn-secondary')}
+  </div>`;
+
+screens.selectShift = () => `
+  ${topbar('Select Shift','Step 1 of 6')}
+  <div class="content">
+    ${note('Salesman picks which shift window they are clocking into before touching any machine.')}
+    <div class="card">
+      ${['24 Hours Shift','12 Hours Shift','Morning Shift','Evening Shift','Night Shift'].map(s=>`
+        <div class="row" style="cursor:pointer" onclick="state.shift.type='${s}';render()">
+          <span class="label">${s}</span><span class="value">${state.shift.type===s?'●':'○'}</span>
+        </div>`).join('')}
+    </div>
+    ${btn('Next','nav("selectMachine")')}
+  </div>`;
+
+screens.selectMachine = () => `
+  ${topbar('Select Machine','Step 2 of 6','selectShift')}
+  <div class="content">
+    ${note('Machine + nozzle assignment determines which fuel this salesman can sell for the shift.')}
+    <div class="card">
+      ${[['M1 – Petrol','Active'],['M2 – Petrol','Active'],['M3 – Diesel','Active'],['M4 – Diesel','In use']].map(([m,st])=>`
+        <div class="row" style="cursor:pointer" onclick="state.shift.machine='${m}';render()">
+          <span class="label">${m}</span>
+          <span class="value" style="display:flex;align-items:center;gap:6px;">
+            <span class="badge ${st==='Active'?'green':'gray'}">${st}</span>${state.shift.machine===m?'●':'○'}
+          </span>
+        </div>`).join('')}
+    </div>
+    ${btn('Next','nav("openingMeter")')}
+  </div>`;
+
+screens.openingMeter = () => `
+  ${topbar('Opening Meter','Step 3 of 6','selectMachine')}
+  <div class="content">
+    ${note('Opening reading is pulled automatically from the previous shift\'s closing meter — never typed manually.')}
+    ${card('Machine',row('Machine',state.shift.machine)+row('Nozzle',state.shift.nozzle)+row('Fuel',state.shift.fuel))}
+    <div class="card">
+      <h3>Opening Meter</h3>
+      <div class="odo">${state.shift.opening.toFixed(2)} L</div>
+      <div style="font-size:11px;color:var(--steel);margin-top:8px;">Taken from previous closing · 25 May 2024, 22:00</div>
+    </div>
+    ${btn('Next','nav("verifyOpening")')}
+  </div>`;
+
+screens.verifyOpening = () => `
+  ${topbar('Verify Opening','Step 4 of 6','openingMeter')}
+  <div class="content">
+    ${note('Last check before the shift goes live — salesman confirms the machine and reading are correct.')}
+    ${card('',row('Shift',state.shift.type)+row('Machine',state.shift.machine)+row('Nozzle',state.shift.nozzle)+row('Fuel',state.shift.fuel)+row('Opening Meter',state.shift.opening.toFixed(2)+' L')+row('Opening Time','25 May 2024, 22:00'))}
+    <div class="field" style="display:flex;align-items:center;gap:8px;"><input id="verifychk" type="checkbox" style="width:auto;" onchange="document.getElementById('verifybtn').disabled=!this.checked"> <span style="font-size:12.5px;">I verify that the opening meter is correct</span></div>
+    <button id="verifybtn" class="btn btn-primary" disabled onclick="state.shift.start=new Date().toLocaleString();nav('shiftStarted')">Verify &amp; Start</button>
+  </div>`;
+
+screens.shiftStarted = () => `
+  <div class="success-wrap">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Shift Started Successfully!</div>
+    <div class="success-sub">${note('Shift is now live. All working sections unlock from Home.')}</div>
+    ${card('',row('Machine',state.shift.machine)+row('Nozzle',state.shift.nozzle)+row('Shift Type',state.shift.type)+row('Start Time',state.shift.start))}
+    ${btn('Go to Dashboard','nav("home")')}
+  </div>`;
+
+screens.home = () => `
+  <div class="topbar"><div><div class="eyebrow">PumpOS</div><h1>Welcome, Saleem</h1></div></div>
+  <div class="content">
+    <div class="badge green" style="margin-bottom:10px;">● Your shift is active</div>
+    ${card('',row('Shift',state.shift.type)+row('Ends in','3h 20m remaining'))}
+    ${note('Home is the salesman\'s hub — every major task branches from here and always leads back.')}
+    <div class="two-col" style="margin:14px 0;">
+      <div class="card" style="text-align:center;cursor:pointer" onclick="nav('selectCustomer')"><div style="font-size:22px;">💳</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Credit Sales</div></div>
+      <div class="card" style="text-align:center;cursor:pointer" onclick="nav('digitalEnter')"><div style="font-size:22px;">📶</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Digital Transactions</div></div>
+      <div class="card" style="text-align:center;cursor:pointer" onclick="nav('operationsMenu')"><div style="font-size:22px;">⚙️</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Operations</div></div>
+      <div class="card" style="text-align:center;cursor:pointer" onclick="nav('shiftSummary')"><div style="font-size:22px;">📊</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Shift Summary</div></div>
+    </div>
+  </div>`;
+
+/* --- CREDIT SALES FLOW --- */
+screens.selectCustomer = () => `
+  ${topbar('Credit Sales','Select Customer','home')}
+  <div class="content">
+    ${note('Salesman searches or picks the customer buying on credit before any fuel or quantity is entered.')}
+    <input placeholder="Search customer…" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;margin-bottom:12px;">
+    <div class="card">
+      ${state.customers.map(c=>`<div class="listitem" onclick='selectCustomer(${JSON.stringify(c.id)})'>
+        <div><div class="name">${c.name}</div><div class="sub">${c.id}</div></div><span>›</span></div>`).join('')}
+    </div>
+  </div>${bottomNav('work')}`;
+function selectCustomer(id){ state.credit.customer = state.customers.find(c=>c.id===id); nav('customerOverview'); }
+
+screens.customerOverview = () => `
+  ${topbar('Customer Overview','','selectCustomer')}
+  <div class="content">
+    ${note('Salesman checks available credit and existing balance before proceeding — protects against over-lending.')}
+    ${card('',row('Customer',state.credit.customer.name)+row('Customer ID',state.credit.customer.id)+row('Available Credit',money(state.credit.customer.avail))+row('Previous Outstanding',money(state.credit.customer.outstanding)))}
+    ${btn('Next','nav("fuel")')}
+  </div>${bottomNav('work')}`;
+
+screens.fuel = () => `
+  ${topbar('Select Fuel','','customerOverview')}
+  <div class="content">
+    ${note('Fuel choices stay locked to whatever the assigned nozzle actually dispenses.')}
+    <div class="chiprow">
+      ${['Petrol','Diesel','Power'].map(f=>`<div class="chip ${state.credit.fuel===f?'active':''}" onclick="state.credit.fuel='${f}';render()">${f}</div>`).join('')}
+    </div>
+    ${btn('Next','nav("quantity")','btn-primary')}
+  </div>${bottomNav('work')}`;
+
+screens.quantity = () => `
+  ${topbar('Quantity','','fuel')}
+  <div class="content">
+    ${note('Rate is system-set from the active price list and amount recalculates live — nothing here is hand-typed except litres.')}
+    <div class="field"><label>Quantity (L)</label><input type="number" step="0.01" value="${state.credit.qty}" oninput="state.credit.qty=+this.value||0;render()"></div>
+    ${card('',row('Rate',money(state.credit.rate)+'/L')+row('Amount',money(state.credit.amount)))}
+    ${btn('Next','nav("creditReview")')}
+  </div>${bottomNav('work')}`;
+
+screens.creditReview = () => `
+  ${topbar('Credit Entry Review','','quantity')}
+  <div class="content">
+    ${note('Final look before the sale posts — quantity is still editable by going back, nothing else is.')}
+    ${card('',row('Customer',state.credit.customer.name)+row('Customer ID',state.credit.customer.id)+row('Fuel',state.credit.fuel)+row('Quantity',lit(state.credit.qty))+row('Rate',money(state.credit.rate)+'/L')+row('Amount',money(state.credit.amount)))}
+    ${btn('Add Credit Sale','addCreditSale()')}
+  </div>${bottomNav('work')}`;
+function addCreditSale(){
+  state.creditLog.push({...state.credit, customer:state.credit.customer});
+  state.credit.customer.outstanding = +(state.credit.customer.outstanding + state.credit.amount).toFixed(2);
+  nav('newOutstanding');
+}
+
+screens.newOutstanding = () => `
+  ${topbar('New Outstanding','')}
+  <div class="content">
+    ${note('Shows the customer\'s balance shift caused by this one sale — outstanding updates system-side.')}
+    ${card('',row('Previous Outstanding',money(state.credit.customer.outstanding-state.credit.amount))+row('+ New Credit Sale',money(state.credit.amount))+row('New Outstanding',money(state.credit.customer.outstanding)))}
+    <div class="badge green" style="margin-bottom:14px;">Credit sale added successfully.</div>
+    ${btn('Done','nav("creditSuccess")')}
+  </div>${bottomNav('work')}`;
+
+screens.creditSuccess = () => `
+  <div class="success-wrap">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Credit sale added successfully.</div>
+    ${note('Two vertical actions on purpose — keeps "add another" and "leave the module" from being mis-tapped for each other.')}
+    ${btn('Add Another Credit Sale','nav("selectCustomer")')}
+    ${btn('Go to Home','nav("home")','btn-secondary')}
+  </div>`;
+
+/* --- DIGITAL TRANSACTIONS FLOW --- */
+screens.digitalEnter = () => `
+  ${topbar('Digital Transactions','Enter Totals','home')}
+  <div class="content">
+    ${note('This is the shift-end total entry — one number per payment channel, no line-by-line reconciliation here.')}
+    <div class="field"><label>UPI Total</label><input type="number" value="${state.digital.upi}" oninput="state.digital.upi=+this.value||0;render()"></div>
+    <div class="field"><label>Card Total</label><input type="number" value="${state.digital.card}" oninput="state.digital.card=+this.value||0;render()"></div>
+    <div class="field"><label>Bank / Fleet Total</label><input type="number" value="${state.digital.bank}" oninput="state.digital.bank=+this.value||0;render()"></div>
+    ${btn('Next','nav("digitalReview")')}
+  </div>${bottomNav('work')}`;
+
+function digitalTotal(){ return state.digital.upi+state.digital.card+state.digital.bank; }
+
+screens.digitalReview = () => `
+  ${topbar('Review Digital Totals','','digitalEnter')}
+  <div class="content">
+    ${note('Digital Total is auto-summed — nothing to type here, just confirm the three inputs were right.')}
+    ${card('',row('UPI Total',money(state.digital.upi))+row('Card Total',money(state.digital.card))+row('Bank/Fleet Total',money(state.digital.bank))+row('Digital Total',money(digitalTotal())))}
+    ${btn('Next','nav("digitalConfirm")')}
+  </div>${bottomNav('work')}`;
+
+screens.digitalConfirm = () => `
+  ${topbar('Confirm Digital Totals','','digitalReview')}
+  <div class="content">
+    ${note('Last confirmation — after this, totals save and count toward the close-shift checklist.')}
+    ${card('',row('UPI Total',money(state.digital.upi))+row('Card Total',money(state.digital.card))+row('Bank/Fleet Total',money(state.digital.bank))+row('Digital Total',money(digitalTotal())))}
+    ${btn('Confirm Digital Total','confirmDigital()')}
+  </div>${bottomNav('work')}`;
+function confirmDigital(){
+  state.digital.saved=true; state.checklist.digital=true;
+  state.digitalLog.unshift({date:new Date().toLocaleDateString(),shift:state.shift.type,total:digitalTotal(),status:'SAVED'});
+  nav('digitalSuccess');
+}
+
+screens.digitalSuccess = () => `
+  <div class="success-wrap">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Digital transactions saved successfully.</div>
+    <div class="success-sub">Shift digital totals have been recorded.</div>
+    ${btn('Done','nav("digitalList")')}
+  </div>`;
+
+screens.digitalList = () => `
+  ${topbar('Digital Transactions','History')}
+  <div class="content">
+    ${note('Past shift totals for reference — this list is read-only, editing happens only through Enter New Totals.')}
+    <div class="card">
+      ${state.digitalLog.map(d=>`
+        <div style="padding:10px 0;border-bottom:1px solid var(--line);">
+          <div style="display:flex;justify-content:space-between;"><b style="font-size:13px;">${d.date} – ${d.shift}</b><span class="badge green">${d.status}</span></div>
+          <div class="odo sm" style="margin-top:6px;">${money(d.total)}</div>
+        </div>`).join('')}
+    </div>
+    ${btn('+ Enter New Totals','nav("digitalEnter")','btn-secondary')}
+  </div>${bottomNav('work')}`;
+
+/* --- OPERATIONS FLOW --- */
+screens.operationsMenu = () => `
+  ${topbar('Operations','','home')}
+  <div class="content">
+    ${note('Three self-serve entries a salesman logs during a shift — none of them close the shift by themselves.')}
+    ${['Nozzle Accuracy Test (NAT)','Expenses','Others'].map((o,i)=>`
+      <div class="card" style="cursor:pointer" onclick="nav('${['nat','expenses','others'][i]}')">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><b style="font-size:13.5px;">${o}</b><span>›</span></div>
+      </div>`).join('')}
+  </div>${bottomNav('work')}`;
+
+screens.nat = () => `
+  ${topbar('Nozzle Accuracy Test','','operationsMenu')}
+  <div class="content">
+    ${note('Compares what the meter says it dispensed against a physically measured quantity — variance flags calibration drift.')}
+    ${card('',row('Nozzle',state.shift.nozzle)+row('Fuel',state.shift.fuel))}
+    <div class="field"><label>Dispensed Quantity (L)</label><input type="number" value="${state.operations.nat.dispensed}" oninput="state.operations.nat.dispensed=+this.value||0;render()"></div>
+    <div class="field"><label>Actual Measured Quantity (L)</label><input type="number" value="${state.operations.nat.actual}" oninput="state.operations.nat.actual=+this.value||0;render()"></div>
+    ${card('',row('Variance',(state.operations.nat.actual-state.operations.nat.dispensed>=0?'+':'')+(state.operations.nat.actual-state.operations.nat.dispensed).toFixed(2)+' L'))}
+    ${btn('Save NAT','state.operations.nat.done=true;state.checklist.nat=true;state.operations.lastSaved="NAT recorded";nav("operationsSuccess")')}
+  </div>${bottomNav('work')}`;
+
+screens.expenses = () => `
+  ${topbar('Expenses','','operationsMenu')}
+  <div class="content">
+    ${note('Any shift-time cash outflow — fuel-truck tea money, cleaning supplies — logged so it nets against cash at close.')}
+    <div class="field"><label>Expense Category</label><select><option>Maintenance</option><option>Supplies</option><option>Staff</option><option>Other</option></select></div>
+    <div class="field"><label>Amount</label><input type="number" placeholder="₹0.00" id="expamt"></div>
+    <div class="field"><label>Note (optional)</label><input placeholder="e.g., nozzle cleaning kit"></div>
+    ${btn('Save Expense','state.operations.expenses.push({amt:document.getElementById("expamt").value||0});state.checklist.expenses=true;state.operations.lastSaved="Expense recorded";nav("operationsSuccess")')}
+  </div>${bottomNav('work')}`;
+
+screens.others = () => `
+  ${topbar('Others','','operationsMenu')}
+  <div class="content">
+    ${note('Catch-all for anything that doesn\'t fit NAT or Expenses — tank dips, incident notes, and the like.')}
+    <div class="field"><label>Type</label><select><option>Tank Dip</option><option>Incident Note</option><option>Other</option></select></div>
+    <div class="field"><label>Description</label><input placeholder="Details…"></div>
+    <div class="field"><label>Amount (optional)</label><input type="number" placeholder="₹0.00"></div>
+    ${btn('Save Entry','state.operations.others.push({});state.operations.lastSaved="Entry recorded";nav("operationsSuccess")')}
+  </div>${bottomNav('work')}`;
+
+screens.operationsSuccess = () => `
+  <div class="success-wrap">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Entry saved successfully.</div>
+    <div class="success-sub">${state.operations.lastSaved||'Entry has been recorded.'}</div>
+    ${btn('Done','nav("operationsMenu")')}
+  </div>`;
+
+/* --- SHIFT SUMMARY (review only) --- */
+screens.shiftSummary = () => `
+  ${topbar('Shift Summary','Review only','home')}
+  <div class="content">
+    ${note('Read-only lens on the whole shift so far. There is no Close Shift button on this screen on purpose.')}
+    <div class="card">
+      <h3>Fuel Summary</h3>
+      <div class="two-col-vals">
+        <div class="colhead">MS</div><div class="colhead">HSD</div>
+        <div style="font-size:11px;color:var(--steel);grid-column:1/3;margin-top:2px;">Total Dispensed</div>
+        <div class="value" style="font-family:var(--font-mono);padding:2px 0;">${lit(state.operations.nat.dispensed)}</div><div class="value" style="font-family:var(--font-mono);padding:2px 0;">0.00 L</div>
+        <div style="font-size:11px;color:var(--steel);grid-column:1/3;margin-top:6px;">NAT / Test</div>
+        <div class="value" style="font-family:var(--font-mono);padding:2px 0;">${(state.operations.nat.actual-state.operations.nat.dispensed).toFixed(2)} L</div><div class="value" style="font-family:var(--font-mono);padding:2px 0;">0.00 L</div>
+        <div style="font-size:11px;color:var(--steel);grid-column:1/3;margin-top:6px;">Net Sale</div>
+        <div class="value" style="font-family:var(--font-mono);padding:2px 0;">${lit(state.operations.nat.dispensed)}</div><div class="value" style="font-family:var(--font-mono);padding:2px 0;">0.00 L</div>
+        <div style="font-size:11px;color:var(--steel);grid-column:1/3;margin-top:6px;">Sale Amount</div>
+        <div class="value" style="font-family:var(--font-mono);padding:2px 0;">${money(state.credit.customer?state.creditLog.reduce((s,c)=>s+c.amount,0):0)}</div><div class="value" style="font-family:var(--font-mono);padding:2px 0;">₹0.00</div>
+      </div>
+    </div>
+    <div class="total-card"><div class="label">Total Sale Amount</div><div class="amt">${money(state.creditLog.reduce((s,c)=>s+c.amount,0))}</div></div>
+    <div class="card"><h3>View Meters</h3>
+      <div class="row"><span class="label">View Meters – MS</span><span class="value">›</span></div>
+      <div class="row"><span class="label">View Meters – HSD</span><span class="value">›</span></div>
+    </div>
+    <div class="card" onclick="nav('collectionDetails')" style="cursor:pointer;">
+      <div style="display:flex;justify-content:space-between;"><h3 style="margin:0;">Collection</h3><span>View Details ›</span></div>
+      <div class="odo sm">${money(digitalTotal()+state.creditLog.reduce((s,c)=>s+c.amount,0))}</div>
+    </div>
+    ${card('Cash Reconciliation', row('Expected Cash',money(state.cash.expected))+row('Actual Cash',money(state.cash.actual))+row('Variance',money(state.cash.actual-state.cash.expected)))}
+  </div>${bottomNav('work')}`;
+
+screens.collectionDetails = () => `
+  ${topbar('Collection Details','','shiftSummary')}
+  <div class="content">
+    ${note('Breaks the single Collection figure into where it actually came from.')}
+    ${card('',row('Digital',money(digitalTotal()))+row('Credit',money(state.creditLog.reduce((s,c)=>s+c.amount,0)))+row('Expenses',money(state.operations.expenses.reduce((s,e)=>s+Number(e.amt||0),0)))+row('Total Collection',money(digitalTotal()+state.creditLog.reduce((s,c)=>s+c.amount,0))))}
+    ${btn('Back','nav("shiftSummary")','btn-secondary')}
+  </div>${bottomNav('work')}`;
+
+/* --- SHIFT STATUS --- */
+screens.shiftStatus = () => `
+  ${topbar('Shift Status','View only')}
+  <div class="content">
+    ${note('Live condition of the current shift — purely informational, nothing here is editable.')}
+    ${card('',row('Shift Type',state.shift.type)+row('Shift ID','SFT-88214')+row('Start Time',state.shift.start||'—')+row('Time Elapsed','2h 40m')+row('Machine',state.shift.machine)+row('Nozzle',state.shift.nozzle)+row('Status','Active','')+row('Alerts','None'))}
+  </div>${bottomNav('home')}`;
+
+/* --- CLOSE SHIFT --- */
+function checklistDone(){ return Object.values(state.checklist).every(v=>v); }
+screens.closeChecklist = () => {
+  if(!closeShiftReady()){
+    return `${topbar('Close Shift','Locked')}<div class="content">
+      ${note('Close Shift stays locked until the shift\'s permitted closing window opens — timing is system-controlled.')}
+      <div class="card" style="text-align:center;padding:30px 16px;"><div style="font-size:26px;">🔒</div><div style="margin-top:10px;font-size:13px;color:var(--ink-soft);">Closing window not open yet</div></div>
+    </div>${bottomNav('home')}`;
+  }
+  const items = [
+    ['nat','NAT / Test Recording','nat'],
+    ['digital','Digital Transactions Total','digitalEnter'],
+    ['expenses','Expenses Entry','expenses'],
+    ['cash','Cash Reconciliation','cashRecon'],
+    ['closingMeter','Closing Meter','closingMeter'],
+    ['autoSales','Auto Sales Calculation',null],
+    ['creditRecon','Credit Reconciliation','creditRecon']
+  ];
+  return `${topbar('Close Shift','Checklist')}
+  <div class="content">
+    ${note('Every step below has its own editable review screen — the salesman fixes items in place, not by re-running the whole flow.')}
+    <div class="card">
+      ${items.map(([key,label,target])=>`
+        <div class="check-row">
+          <div class="check-left"><div class="dot ${state.checklist[key]?'done':''}"></div><div><div class="check-label">${label}</div><div class="check-sub">${state.checklist[key]?'Completed':'Pending'}</div></div></div>
+          ${target? `<button class="fillbtn ${state.checklist[key]?'done':'todo'}" onclick="nav('${target}')">${state.checklist[key]?'Review':'Fill Now'}</button>` : `<span class="badge green">Auto</span>`}
+        </div>`).join('')}
+    </div>
+    ${checklistDone() ? btn('Continue to Final Reconciliation','nav("finalReconciliation")') : note('Complete every pending item to continue — "Fill Now" opens each one\'s own editable screen.')}
+  </div>${bottomNav('home')}`;
+};
+
+screens.cashRecon = () => `
+  ${topbar('Cash Reconciliation','Editable','closeChecklist')}
+  <div class="content">
+    ${note('Expected cash is calculated by the system; actual cash is counted and entered by the salesman.')}
+    ${card('',row('Expected Cash',money(state.cash.expected),true))}
+    <div class="field"><label>Actual Cash Counted</label><input type="number" value="${state.cash.actual}" oninput="state.cash.actual=+this.value||0;render()"></div>
+    ${card('',row('Variance',money(state.cash.actual-state.cash.expected)))}
+    ${Math.abs(state.cash.actual-state.cash.expected)>100 ? restrictedNotice('cashRecon','Variance over ₹100 needs manager sign-off before this can be marked complete.') : ''}
+    ${btn('Mark Complete', Math.abs(state.cash.actual-state.cash.expected)>100 && !state.restrictedUnlocked['cashRecon'] ? '' : 'state.checklist.cash=true;nav("closeChecklist")')}
+  </div>`;
+
+screens.creditRecon = () => `
+  ${topbar('Credit Reconciliation','Editable','closeChecklist')}
+  <div class="content">
+    ${note('Every credit sale logged this shift, shown for a final check against customer outstanding balances.')}
+    <div class="card">
+      ${state.creditLog.length? state.creditLog.map(c=>row(c.customer.name, money(c.amount))).join('') : '<div style="font-size:12.5px;color:var(--steel);padding:8px 0;">No credit sales this shift.</div>'}
+    </div>
+    ${restrictedNotice('creditRecon','Editing a posted credit sale requires manager approval — amounts are locked once added.')}
+    ${btn('Mark Complete','state.checklist.creditRecon=true;nav("closeChecklist")')}
+  </div>`;
+
+screens.closingMeter = () => {
+  if(state.closingMeterLocked){
+    return `${topbar('Closing Meter','Locked','closeChecklist')}<div class="content">
+      ${note('Once confirmed, the closing meter is locked — it becomes next shift\'s opening reading and protects the fuel record.')}
+      ${card('',row('Closing Meter',state.closingMeterValue.toFixed(2)+' L',true))}
+      ${restrictedNotice('closingMeter','Reopening a locked meter reading requires manager approval — this is a rare, audited action.')}
+    </div>`;
+  }
+  return `${topbar('Closing Meter','Editable','closeChecklist')}
+  <div class="content">
+    ${note('Enter the meter reading at end of shift. Once confirmed it locks — there is no casual re-edit.')}
+    ${card('',row('Opening Meter',state.shift.opening.toFixed(2)+' L',true))}
+    <div class="field"><label>Closing Meter Reading (L)</label><input type="number" step="0.01" id="closingval" placeholder="e.g. 10142.35"></div>
+    ${btn('Review','document.getElementById("closingreview").style.display="block";state.closingMeterValue=+document.getElementById("closingval").value||0;render2()')}
+    <div id="closingreview" style="display:none;">
+      ${card('Review', row('Closing Meter', (state.closingMeterValue||0).toFixed(2)+' L')+row('Total Dispensed',((state.closingMeterValue||0)-state.shift.opening).toFixed(2)+' L'))}
+      ${btn('Confirm & Lock','confirmClosingMeter()','btn-primary green')}
+    </div>
+  </div>`;
+};
+function render2(){ /* no-op helper to avoid full re-render wiping the inline reveal before confirm */ }
+function confirmClosingMeter(){
+  const v = document.getElementById('closingval')?.value;
+  if(v) state.closingMeterValue = +v;
+  state.closingMeterLocked = true; state.checklist.closingMeter = true;
+  nav('closeChecklist');
+}
+
+function restrictedNotice(key, msg){
+  const unlocked = state.restrictedUnlocked[key];
+  if(unlocked){ return `<div class="badge green" style="margin-bottom:12px;">Manager approval granted</div>`; }
+  return `<div class="card" style="border-color:#F0C3BA;background:var(--red-bg);">
+    <div style="display:flex;gap:8px;align-items:flex-start;">
+      <span>🔒</span>
+      <div><div style="font-size:12.5px;font-weight:700;color:var(--red);">Manager approval required</div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:2px;">${msg}</div>
+      <button class="fillbtn todo" style="margin-top:8px;" onclick="openPin('${key}')">Request Approval</button></div>
+    </div>
+  </div>`;
+}
+
+screens.finalReconciliation = () => `
+  ${topbar('Final Reconciliation','')}
+  <div class="content">
+    ${note('System-computed close-out figures — this is the last look before the shift is sealed.')}
+    ${card('',
+      row('Opening Meter',state.shift.opening.toFixed(2)+' L',true)+
+      row('Closing Meter',(state.closingMeterValue||0).toFixed(2)+' L',true)+
+      row('Total Dispensed',((state.closingMeterValue||0)-state.shift.opening).toFixed(2)+' L',true)+
+      row('Net Sale',((state.closingMeterValue||0)-state.shift.opening).toFixed(2)+' L',true)+
+      row('Digital Collection',money(digitalTotal()),true)+
+      row('Credit Sales',money(state.creditLog.reduce((s,c)=>s+c.amount,0)),true)+
+      row('Expenses',money(state.operations.expenses.reduce((s,e)=>s+Number(e.amt||0),0)),true)+
+      row('Cash',money(state.cash.actual),true)+
+      row('Variance',money(state.cash.actual-state.cash.expected),true)
+    )}
+    ${btn('Confirm Shift Close','nav("shiftClosed")','btn-primary green')}
+  </div>`;
+
+screens.shiftClosed = () => `
+  <div class="success-wrap">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Shift Closed Successfully.</div>
+    ${note('Meter and totals are now archived. Next shift\'s opening reading will pull from this closing figure automatically.')}
+    ${card('',row('Shift ID','SFT-88214')+row('Shift Type',state.shift.type)+row('Closing Time',new Date().toLocaleString()))}
+    ${btn('Done','nav("login")')}
+  </div>`;
+
+/* --- PROFILE --- */
+screens.profile = () => `
+  ${topbar('Profile','')}
+  <div class="content">
+    ${note('Standard account section — nothing shift-specific lives here.')}
+    ${['Salesman Profile','Employee Details','Security','Settings','Help & Support','About PumpOS'].map(x=>`<div class="listitem"><span class="name" style="font-weight:500;">${x}</span><span>›</span></div>`).join('')}
+    ${btn('Logout','nav("logoutConfirm")','btn-danger')}
+  </div>${bottomNav('home')}`;
+
+screens.logoutConfirm = () => `
+  <div class="modal-overlay" style="align-items:center;">
+    <div class="modal-sheet" style="border-radius:16px;width:88%;margin:0 auto;text-align:center;">
+      <h3>Are you sure you want to logout?</h3>
+      <p>You'll need to sign in again to resume your shift tools.</p>
+      <button class="btn btn-danger" onclick="nav('login')">Logout</button>
+      <button class="btn btn-secondary" onclick="nav('profile')">Cancel</button>
+    </div>
+  </div>`;
+
+/* ---------------- RENDER ---------------- */
+function render(){
+  const el = document.getElementById('screen');
+  el.innerHTML = screens[state.screen] ? screens[state.screen]() : '<div class="content">Not found</div>';
+  if(state.modalOpen){
+    const filled = state.pin.length;
+    el.insertAdjacentHTML('beforeend', `
+      <div class="modal-overlay">
+        <div class="modal-sheet">
+          <h3>Manager Approval</h3>
+          <p>Ask a manager to enter their 4-digit approval PIN to unlock this restricted action.</p>
+          <div class="pindots">${[0,1,2,3].map(i=>`<div class="${i<filled?'filled':''}"></div>`).join('')}</div>
+          <div class="two-col" style="grid-template-columns:repeat(3,1fr);gap:10px;">
+            ${['1','2','3','4','5','6','7','8','9','','0','⌫'].map(d=>d===''?'<div></div>':`<button class="btn btn-secondary" style="margin:0;padding:12px 0;" onclick="${d==='⌫'?'state.pin=state.pin.slice(0,-1);render()':'pressPin(\''+d+'\')'}">${d}</button>`).join('')}
+          </div>
+          <button class="btn btn-ghost" style="margin-top:12px;" onclick="state.modalOpen=false;render()">Cancel</button>
+        </div>
+      </div>`);
+  }
+}
+render();
+</script>
+</body>
+</html>
