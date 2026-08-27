@@ -1,730 +1,1261 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PumpOS — Salesman Module Prototype</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#063f4b">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PumpOS">
+<title>PumpOS — Salesman Module</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
-
 :root{
-  --ink:#101B22;
-  --ink-soft:#41545C;
-  --bg:#EDEFEA;
-  --panel:#FFFFFF;
-  --line:#DADDD5;
-  --amber:#E98A2B;
-  --amber-dark:#C46F1B;
-  --green:#2F8F5B;
-  --green-bg:#E4F3EA;
-  --red:#C1432E;
-  --red-bg:#FBE7E3;
-  --steel:#6B7B80;
-  --lock-bg:#F1EFE9;
-  --font-display:'Space Grotesk',sans-serif;
-  --font-body:'Inter',sans-serif;
-  --font-mono:'IBM Plex Mono',monospace;
+  --navy:#063f4b;--navy2:#052f38;--blue:#1257c8;--green:#159447;
+  --bg:#f5f7f8;--card:#fff;--line:#d9e3e7;--text:#132027;--muted:#68777e;
+  --soft:#eef3f5;--warning:#fff7e6;--warningText:#765716;
 }
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;background:var(--bg);font-family:var(--font-body);color:var(--ink);}
-#stage{display:flex;justify-content:center;padding:24px 12px;min-height:100vh;}
-.phone{
-  width:390px;max-width:100%;background:var(--panel);border-radius:28px;
-  box-shadow:0 20px 60px rgba(16,27,34,0.18);overflow:hidden;
-  border:8px solid var(--ink);position:relative;display:flex;flex-direction:column;height:820px;
+*{box-sizing:border-box}
+html,body{margin:0;background:#e8edef;color:var(--text);font-family:Arial,Helvetica,sans-serif}
+body{min-height:100vh}
+button,input,select{font:inherit}
+button{touch-action:manipulation}
+.app{width:100%;max-width:390px;min-height:100vh;margin:auto;background:var(--bg);position:relative;overflow:hidden}
+.header{
+  height:58px;background:var(--navy);color:#fff;display:flex;align-items:center;
+  justify-content:space-between;padding:0 15px;position:sticky;top:0;z-index:30
 }
-.statusbar{height:14px;background:var(--ink);}
-.screen{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--panel);}
-.screen::-webkit-scrollbar{width:0;}
-
-/* Header */
-.topbar{
-  padding:18px 18px 14px;border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:10px;background:var(--panel);position:sticky;top:0;z-index:5;
+.header .brand{font-weight:800;letter-spacing:.2px}
+.header .back,.header .bell{width:28px;text-align:center;font-size:22px;cursor:pointer}
+.main{padding:16px 14px 94px;min-height:calc(100vh - 58px);overflow-y:auto}
+.title{font-size:20px;line-height:1.2;font-weight:800;margin:0 0 5px}
+.sub{font-size:12px;color:var(--muted);line-height:1.45;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px;margin:10px 0}
+.item{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;
+  margin:9px 0;display:flex;align-items:center;gap:10px;cursor:pointer;min-height:60px
 }
-.backbtn{
-  width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);
-  display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);cursor:pointer;flex:none;
+.item .grow{flex:1;min-width:0}
+.item small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.radio{font-size:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;min-height:112px;
+  padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;font-weight:800;cursor:pointer
 }
-.topbar h1{font-family:var(--font-display);font-size:17px;margin:0;font-weight:600;letter-spacing:-0.01em;}
-.eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);}
-
-/* Designer note strip -- brief 1-2 line comment on every screen */
-.note{
-  margin:12px 18px 0;padding:10px 12px;background:var(--lock-bg);border-left:3px solid var(--amber);
-  font-size:12px;line-height:1.45;color:var(--ink-soft);border-radius:4px;
-}
-
-.content{padding:16px 18px 100px;flex:1;}
-
-/* Odometer / meter-style digit display -- signature element */
-.odo{
-  font-family:var(--font-mono);background:var(--ink);color:#F4E7D6;border-radius:8px;
-  padding:10px 14px;font-size:22px;letter-spacing:0.06em;display:inline-block;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);
-}
-.odo.sm{font-size:16px;padding:7px 10px;}
-
-/* Cards / rows */
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
-.card h3{font-family:var(--font-display);font-size:13px;margin:0 0 10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--steel);}
-.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);}
-.row:last-child{border-bottom:none;}
-.row .label{font-size:13px;color:var(--ink-soft);}
-.row .value{font-family:var(--font-mono);font-size:14px;font-weight:600;}
-.row.locked .value{color:var(--steel);}
-.lockicon{font-size:11px;color:var(--steel);margin-left:6px;}
-
-.total-card{background:var(--ink);color:#fff;border-radius:12px;padding:16px;margin-bottom:14px;}
-.total-card .label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#C7CFC9;}
-.total-card .amt{font-family:var(--font-display);font-size:28px;font-weight:700;margin-top:4px;}
-
-/* Buttons */
+.tile .tileicon{font-size:29px;margin-bottom:8px}
+.tile small{font-size:10px;color:var(--muted);margin-top:5px}
 .btn{
-  width:100%;padding:14px;border-radius:10px;border:none;font-family:var(--font-body);
-  font-weight:600;font-size:14px;cursor:pointer;margin-bottom:10px;
+  width:100%;border:0;border-radius:11px;padding:13px;margin-top:9px;background:var(--navy);
+  color:#fff;font-weight:800;font-size:13px;cursor:pointer;min-height:46px
 }
-.btn-primary{background:var(--amber);color:#fff;}
-.btn-primary:disabled{background:#E9D2AF;cursor:not-allowed;}
-.btn-primary.green{background:var(--green);}
-.btn-secondary{background:var(--panel);color:var(--ink);border:1px solid var(--line);}
-.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #F0C3BA;}
-.btn-ghost{background:transparent;color:var(--ink-soft);border:1px dashed var(--line);}
-
-/* Form fields */
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:12px;color:var(--steel);margin-bottom:6px;font-weight:600;}
-.field input,.field select{
-  width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;
-  font-family:var(--font-mono);font-size:14px;background:#FCFBF8;
+.btn.blue{background:var(--blue)}.btn.green{background:var(--green)}
+.btn.light{background:#fff;color:var(--navy);border:1px solid #b8cbd1}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.input,.select{
+  width:100%;height:45px;border:1px solid #cbd8dd;border-radius:10px;background:#fff;
+  padding:0 11px;margin:5px 0 11px;color:var(--text)
 }
-.chiprow{display:flex;gap:8px;flex-wrap:wrap;}
-.chip{
-  padding:9px 14px;border-radius:20px;border:1px solid var(--line);font-size:13px;cursor:pointer;background:var(--panel);
+.input:focus,.select:focus{outline:2px solid #b9cff5;outline-offset:1px}
+.label{display:block;font-size:11px;font-weight:800;margin-top:5px}
+.hint{font-size:11px;color:var(--muted);line-height:1.45}
+.row{
+  display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid #edf1f2;
+  font-size:12px;min-width:0
 }
-.chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
-
-/* List items (customers, transactions) */
-.listitem{
-  display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer;
+.row:last-child{border-bottom:0}.row .value{font-weight:800;text-align:right;overflow-wrap:anywhere}
+.success{text-align:center;padding:30px 8px 18px}
+.check{
+  width:74px;height:74px;border-radius:50%;background:var(--green);color:#fff;font-size:45px;
+  display:grid;place-items:center;margin:0 auto 14px
 }
-.listitem:last-child{border-bottom:none;}
-.listitem .name{font-size:14px;font-weight:600;}
-.listitem .sub{font-size:11px;color:var(--steel);}
-
-/* Success screen */
-.success-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;}
-.success-icon{
-  width:64px;height:64px;border-radius:50%;background:var(--green-bg);color:var(--green);
-  display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:18px;
+.success h2{font-size:19px;margin:0 0 7px}.success p{font-size:12px;color:var(--muted)}
+.count{display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap}
+.count strong{font-size:23px;margin-top:3px}.count small{font-size:10px}
+.homehead{display:flex;justify-content:space-between;gap:10px}
+.homeleft{min-width:0}.homeleft h1{margin-bottom:4px}.active{color:var(--green);font-weight:800;font-size:12px}
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100%);
+  min-height:68px;background:#fff;border-top:1px solid #d9e2e6;display:grid;grid-template-columns:repeat(4,1fr);
+  z-index:40;padding-bottom:env(safe-area-inset-bottom)
 }
-.success-title{font-family:var(--font-display);font-size:19px;font-weight:700;margin-bottom:6px;}
-.success-sub{font-size:13px;color:var(--ink-soft);margin-bottom:26px;}
-
-/* Bottom nav */
-.bottomnav{
-  display:flex;border-top:1px solid var(--line);background:var(--panel);position:sticky;bottom:0;
+.nav button{
+  border:0;background:#fff;color:#66757d;font-size:9px;font-weight:800;padding:5px 2px;cursor:pointer
 }
-.navitem{
-  flex:1;padding:10px 4px 12px;text-align:center;font-size:10.5px;color:var(--steel);cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
+.nav button.active{color:var(--blue)}.nav span{display:block;font-size:18px;margin-bottom:3px}
+.progress{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-bottom:15px}
+.step{font-size:8px;text-align:center;color:#6d7a80;line-height:1.15}
+.dot{
+  width:24px;height:24px;border-radius:50%;border:1px solid #c7d3d8;background:#fff;
+  display:grid;place-items:center;margin:0 auto 4px;font-weight:800
 }
-.navitem .ic{font-size:17px;}
-.navitem.active{color:var(--amber-dark);font-weight:700;}
-.navitem.locked{color:#C9CDC6;}
-.navitem.green .ic{color:var(--green);}
-
-/* Checklist */
-.check-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
-.check-row:last-child{border-bottom:none;}
-.check-left{display:flex;align-items:center;gap:10px;}
-.dot{width:9px;height:9px;border-radius:50%;background:#D9DCD4;flex:none;}
-.dot.done{background:var(--green);}
-.check-label{font-size:13.5px;}
-.check-sub{font-size:10.5px;color:var(--steel);}
-.fillbtn{
-  padding:6px 12px;border-radius:16px;font-size:11.5px;font-weight:700;border:none;cursor:pointer;
+.step.done .dot{background:var(--green);color:#fff;border-color:var(--green)}
+.step.current .dot{background:var(--blue);color:#fff;border-color:var(--blue)}
+.totalCard{
+  background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px;text-align:center;margin:10px 0
 }
-.fillbtn.todo{background:var(--amber);color:#fff;}
-.fillbtn.done{background:var(--green-bg);color:var(--green);}
-.fillbtn.locked{background:var(--lock-bg);color:var(--steel);}
-
-.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:0.04em;}
-.badge.green{background:var(--green-bg);color:var(--green);}
-.badge.amber{background:#FCEBD6;color:var(--amber-dark);}
-.badge.red{background:var(--red-bg);color:var(--red);}
-.badge.gray{background:var(--lock-bg);color:var(--steel);}
-
-/* Modal */
-.modal-overlay{
-  position:absolute;inset:0;background:rgba(16,27,34,0.55);display:flex;align-items:flex-end;z-index:20;
+.totalCard .label2{font-size:12px;font-weight:800}.totalCard strong{display:block;color:var(--green);font-size:23px;margin-top:5px}
+.toast{
+  background:#edf8f0;border:1px solid #cfe8d6;color:#176c38;border-radius:11px;padding:10px;
+  font-size:11px;margin-top:10px
 }
-.modal-sheet{
-  background:var(--panel);width:100%;border-radius:18px 18px 0 0;padding:22px 20px 26px;
+.lock{background:var(--warning);border:1px solid #f1ddb0;color:var(--warningText);border-radius:11px;padding:10px;font-size:11px;margin-top:10px}
+.section-title{font-size:13px;font-weight:800;margin:16px 0 8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two .btn{margin-top:0}
+.choice{
+  border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;margin:8px 0;
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer
 }
-.modal-sheet h3{font-family:var(--font-display);margin:0 0 6px;font-size:16px;}
-.modal-sheet p{font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;line-height:1.5;}
-.pindots{display:flex;gap:10px;justify-content:center;margin:18px 0;}
-.pindots div{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--ink);}
-.pindots div.filled{background:var(--ink);}
-
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.two-col-vals{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;text-align:center;}
-.two-col-vals .colhead{font-family:var(--font-mono);font-size:11px;color:var(--steel);text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:6px;}
+.choice.selected{border-color:#9bb7ea;box-shadow:0 0 0 1px #9bb7ea inset}
+.choice .left{display:flex;align-items:center;gap:10px}.choice .fuelIcon{font-size:22px}
+.review-table{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.review-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:11px;border-bottom:1px solid #edf1f2;font-size:12px}
+.review-row:last-child{border-bottom:0}.review-row strong{text-align:right}
+.muted-box{background:var(--soft);border-radius:11px;padding:12px;font-size:11px;color:#44545b}
+.search-wrap{position:relative}.search-wrap .input{padding-right:40px}.searchIcon{position:absolute;right:13px;top:16px}
+.status-ok{color:var(--green);font-weight:800}.status-pending{color:#c97800;font-weight:800}
+.meter-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px;margin:9px 0}
+.meter-card h3{margin:0 0 9px;font-size:13px}
+.small-note{font-size:10px;color:var(--muted)}
+.home-logo{
+  width:42px;height:42px;border-radius:12px;background:#eaf6ee;display:grid;place-items:center;
+  color:var(--green);font-size:22px;font-weight:900
+}
+.logout{color:#c62828!important}
+.hidden{display:none!important}
+@media(max-width:350px){.title{font-size:18px}.main{padding-left:11px;padding-right:11px}}
 </style>
+
+<style id="pumpos-premium-overrides">
+:root{
+  --pump-deep:#073b46; --pump-ink:#13252b; --pump-muted:#718087;
+  --pump-line:#e6ecee; --pump-soft:#f6f9f9; --pump-card:#ffffff;
+  --pump-shadow:0 10px 30px rgba(7,59,70,.08);
+}
+html,body{background:#f4f7f7!important}
+body{
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+button,input,select{font:inherit}
+button{
+  min-height:44px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+input,select{
+  min-height:46px;
+  border-radius:12px!important;
+  border:1px solid #dbe4e6!important;
+  background:#fff!important;
+}
+input:focus,select:focus{
+  outline:none!important;
+  border-color:#6c949d!important;
+  box-shadow:0 0 0 3px rgba(7,59,70,.08)!important;
+}
+.card,.panel,.tile,.box{
+  border:1px solid rgba(19,37,43,.07)!important;
+  box-shadow:var(--pump-shadow)!important;
+}
+.btn{
+  border-radius:12px!important;
+  font-weight:800!important;
+  letter-spacing:.01em;
+}
+.nav,.bottom-nav{
+  padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;
+  backdrop-filter:blur(14px);
+}
+.muted-box,.toast{
+  border:1px solid #e5ecee!important;
+  box-shadow:none!important;
+}
+h1,h2,h3,.title{letter-spacing:-.02em}
+.small,.sub,.muted{line-height:1.45}
+@media(max-width:420px){
+  .page,.screen,.container{max-width:390px!important}
+}
+</style>
+
+
+<style id="pumpos-owner-premium-v2">
+:root{
+  --po-deep:#073b46;
+  --po-ink:#14272d;
+  --po-muted:#708087;
+  --po-line:#e5ecee;
+  --po-bg:#f5f8f8;
+  --po-card:#ffffff;
+}
+html,body{background:var(--po-bg)!important}
+body{
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box}
+button{
+  min-height:44px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+input,select,textarea{
+  min-height:46px!important;
+  border:1px solid #dbe5e7!important;
+  border-radius:12px!important;
+  background:#fff!important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:#7898a0!important;
+  box-shadow:0 0 0 3px rgba(7,59,70,.08)!important;
+}
+.card,.panel,.tile,.box{
+  border:1px solid rgba(20,39,45,.065)!important;
+  box-shadow:0 8px 28px rgba(7,59,70,.065)!important;
+}
+.btn{border-radius:12px!important;font-weight:800!important}
+.bottom-nav,.nav{
+  padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+h1,h2,h3,.title{letter-spacing:-.02em}
+@media(max-width:420px){
+  .page,.screen,.container{max-width:390px!important}
+}
+</style>
+
+
+<style id="pumpos-final-realapp-polish">
+:root{
+  --p-deep:#073b46;--p-ink:#14272d;--p-muted:#728188;
+  --p-line:#e2eaec;--p-bg:#f4f7f7;--p-card:#fff;
+}
+html,body{background:var(--p-bg)!important}
+body{
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  padding-bottom:env(safe-area-inset-bottom);
+  overscroll-behavior-y:none;
+}
+button{
+  min-height:44px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+input,select,textarea{
+  min-height:46px!important;
+  border:1px solid #dbe5e7!important;
+  border-radius:12px!important;
+  background:#fff!important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:#6f929a!important;
+  box-shadow:0 0 0 3px rgba(7,59,70,.08)!important;
+}
+.card,.panel,.tile,.box{
+  border:1px solid rgba(20,39,45,.065)!important;
+  box-shadow:0 8px 28px rgba(7,59,70,.065)!important;
+}
+.btn{
+  border-radius:12px!important;
+  font-weight:800!important;
+}
+.bottom-nav,.nav{
+  padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+@media(max-width:420px){
+  .page,.screen,.container{max-width:390px!important}
+}
+</style>
+
+
+<style id="pumpos-best-developer-v4">
+:root{
+  --pump-deep:#073b46;
+  --pump-deeper:#052f38;
+  --pump-ink:#14272d;
+  --pump-muted:#708087;
+  --pump-line:#e1e9eb;
+  --pump-bg:#f4f7f7;
+  --pump-card:#ffffff;
+  --pump-success:#177b55;
+}
+html,body{
+  width:100%;
+  min-height:100%;
+  margin:0;
+  background:var(--pump-bg)!important;
+  overscroll-behavior-y:none;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+body{padding-bottom:env(safe-area-inset-bottom)}
+button,a,input,select,textarea{
+  -webkit-tap-highlight-color:transparent;
+}
+button{
+  min-height:44px;
+  touch-action:manipulation;
+}
+input,select,textarea{
+  min-height:46px!important;
+  border:1px solid var(--pump-line)!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  color:var(--pump-ink)!important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:#7898a0!important;
+  box-shadow:0 0 0 3px rgba(7,59,70,.08)!important;
+}
+.card,.panel,.tile,.box{
+  border:1px solid rgba(20,39,45,.065)!important;
+  box-shadow:0 8px 28px rgba(7,59,70,.065)!important;
+}
+.btn{
+  min-height:46px!important;
+  border-radius:12px!important;
+  font-weight:800!important;
+}
+.bottom-nav,.nav{
+  padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+@media(max-width:420px){
+  .page,.screen,.container{max-width:390px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+</style>
+
+
+<script id="pumposErrorBoundary">
+(function(){
+  window.addEventListener("error",function(){
+    var e=document.getElementById("pumposRuntimeNotice");
+    if(e){e.textContent="Something Went Wrong. Please Retry.";e.style.display="block";}
+  });
+  window.addEventListener("unhandledrejection",function(){
+    var e=document.getElementById("pumposRuntimeNotice");
+    if(e){e.textContent="Something Went Wrong. Please Retry.";e.style.display="block";}
+  });
+  window.addEventListener("online",function(){
+    var e=document.getElementById("pumposRuntimeNotice");
+    if(e)e.style.display="none";
+  });
+  window.addEventListener("offline",function(){
+    var e=document.getElementById("pumposRuntimeNotice");
+    if(e){e.textContent="Offline Mode — Saved Prototype Data Remains Available.";e.style.display="block";}
+  });
+})();
+</script>
+
+
+<style id="pumpos-owner-final-v5">
+:root{
+  --pump-deep:#073b46;--pump-ink:#14272d;--pump-muted:#708087;
+  --pump-line:#e1e9eb;--pump-bg:#f4f7f7;--pump-card:#fff;
+}
+html,body{
+  margin:0;width:100%;min-height:100%;
+  background:var(--pump-bg)!important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overscroll-behavior-y:none;
+}
+body{padding-bottom:env(safe-area-inset-bottom)}
+button{
+  min-height:44px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+input,select,textarea{
+  min-height:46px!important;
+  border:1px solid var(--pump-line)!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  color:var(--pump-ink)!important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:#7898a0!important;
+  box-shadow:0 0 0 3px rgba(7,59,70,.08)!important;
+}
+.card,.panel,.tile,.box{
+  border:1px solid rgba(20,39,45,.065)!important;
+  box-shadow:0 8px 28px rgba(7,59,70,.065)!important;
+}
+.btn{min-height:46px!important;border-radius:12px!important;font-weight:800!important}
+.bottom-nav,.nav{
+  padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+@media(max-width:420px){
+  .page,.screen,.container{max-width:390px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;scroll-behavior:auto!important;
+  }
+}
+</style>
+
+
+<script id="pumpos-runtime-final">
+(function(){
+  function notice(msg){
+    var e=document.getElementById("pumposRuntimeNotice");
+    if(e){e.textContent=msg;e.style.display="block";}
+  }
+  window.addEventListener("error",function(){notice("Something Went Wrong. Please Retry.");});
+  window.addEventListener("unhandledrejection",function(){notice("Something Went Wrong. Please Retry.");});
+  window.addEventListener("online",function(){
+    var e=document.getElementById("pumposRuntimeNotice");if(e)e.style.display="none";
+  });
+  window.addEventListener("offline",function(){
+    notice("Offline Mode — Saved Prototype Data Remains Available.");
+  });
+})();
+</script>
+
+
+<style id="pumpos-company-grade-final">
+:root{
+ --ps-deep:#073b46;--ps-ink:#14272d;--ps-muted:#708087;
+ --ps-line:#e1e9eb;--ps-bg:#f4f7f7;--ps-card:#fff;
+}
+*{box-sizing:border-box}
+html{background:#dfe7e8}
+body{
+ margin:0;background:var(--ps-bg)!important;color:var(--ps-ink);
+ font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+ -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+ overscroll-behavior-y:none;padding-bottom:env(safe-area-inset-bottom);
+}
+button{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+input,select,textarea{
+ min-height:46px!important;border:1px solid var(--ps-line)!important;
+ border-radius:12px!important;background:#fff!important;color:var(--ps-ink)!important;
+}
+input:focus,select:focus,textarea:focus{
+ outline:none!important;border-color:#6f929a!important;
+ box-shadow:0 0 0 3px rgba(7,59,70,.08)!important;
+}
+.card,.panel,.tile,.box{
+ border:1px solid rgba(20,39,45,.065)!important;
+ box-shadow:0 8px 28px rgba(7,59,70,.065)!important;
+}
+.btn{min-height:46px!important;border-radius:12px!important;font-weight:800!important}
+.bottom-nav,.nav{
+ padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+@media(min-width:600px){
+ body{display:grid;place-items:start center}
+ #app{width:390px;min-height:844px;box-shadow:0 18px 60px rgba(7,59,70,.18)}
+}
+@media(max-width:420px){.page,.screen,.container{max-width:390px!important}}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+
+
+<script id="pumpos-runtime-final-company">
+(function(){
+  function show(message){
+    var e=document.getElementById("pumposRuntimeNotice");
+    if(e){e.textContent=message;e.style.display="block";}
+  }
+  window.addEventListener("error",function(){show("Something Went Wrong. Please Retry.");});
+  window.addEventListener("unhandledrejection",function(){show("Something Went Wrong. Please Retry.");});
+  window.addEventListener("offline",function(){show("Offline Mode — Saved Prototype Data Remains Available.");});
+  window.addEventListener("online",function(){
+    var e=document.getElementById("pumposRuntimeNotice");if(e)e.style.display="none";
+  });
+})();
+</script>
+
+<style id="pumpos-best-final">
+:root{
+ --pump-deep:#073b46;--pump-deeper:#052f38;--pump-ink:#14272d;
+ --pump-muted:#708087;--pump-line:#e1e9eb;--pump-bg:#f4f7f7;
+ --pump-card:#fff;--pump-success:#177b55;
+}
+*{box-sizing:border-box}
+html{background:#dfe7e8}
+body{
+ margin:0;background:var(--pump-bg)!important;color:var(--pump-ink);
+ font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+ -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+ overscroll-behavior-y:none;padding-bottom:env(safe-area-inset-bottom);
+}
+button{
+ min-height:44px;touch-action:manipulation;
+ -webkit-tap-highlight-color:transparent;
+}
+input,select,textarea{
+ min-height:46px!important;width:100%;max-width:100%;
+ border:1px solid var(--pump-line)!important;border-radius:12px!important;
+ background:#fff!important;color:var(--pump-ink)!important;
+}
+input:focus,select:focus,textarea:focus{
+ outline:none!important;border-color:#6f929a!important;
+ box-shadow:0 0 0 3px rgba(7,59,70,.08)!important;
+}
+.card,.panel,.tile,.box{
+ border:1px solid rgba(20,39,45,.065)!important;
+ box-shadow:0 8px 28px rgba(7,59,70,.065)!important;
+}
+.btn{min-height:46px!important;border-radius:12px!important;font-weight:800!important}
+.bottom-nav,.nav{
+ padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+@media(min-width:600px){
+ body{display:grid;place-items:start center}
+ #app{width:390px;min-height:844px;box-shadow:0 18px 60px rgba(7,59,70,.18)}
+}
+@media(max-width:420px){.page,.screen,.container{max-width:390px!important}}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{
+  animation-duration:.01ms!important;animation-iteration-count:1!important;
+  transition-duration:.01ms!important;scroll-behavior:auto!important
+ }
+}
+</style>
+
+
+<script id="pumpos-best-runtime">
+(function(){
+ function notice(message){
+   var e=document.getElementById("pumposRuntimeNotice");
+   if(e){e.textContent=message;e.style.display="block";}
+ }
+ window.addEventListener("error",function(){notice("Something Went Wrong. Please Retry.");});
+ window.addEventListener("unhandledrejection",function(){notice("Something Went Wrong. Please Retry.");});
+ window.addEventListener("offline",function(){notice("Offline Mode — Saved Prototype Data Remains Available.");});
+ window.addEventListener("online",function(){
+   var e=document.getElementById("pumposRuntimeNotice");if(e)e.style.display="none";
+ });
+})();
+</script>
 </head>
 <body>
-<div id="stage"><div class="phone"><div class="statusbar"></div><div id="screen" class="screen"></div></div></div>
+<div id="appBoot" style="position:fixed;inset:0;background:#063f4b;color:#fff;display:grid;place-items:center;z-index:200;font:800 14px Arial">PumpOS</div>
+<div class="app" id="app"></div>
 
 <script>
-/* ---------------- STATE ---------------- */
-const state = {
-  screen:'login', modalOpen:false, pin:'', pinTarget:null, prevScreen:'home', navContext:'home',
-  shift:{type:'Morning Shift', machine:'M1 – Petrol', nozzle:'N1 – Petrol', fuel:'Petrol', opening:10000.00, start:null},
-  customers:[
-    {id:'C-1042', name:'Ramesh Traders', avail:8000, outstanding:12450.00},
-    {id:'C-1077', name:'Bhavani Transports', avail:15000, outstanding:3200.00},
-    {id:'C-1091', name:'Sri Balaji Motors', avail:5000, outstanding:0}
-  ],
-  credit:{customer:null, fuel:'Petrol', qty:10.00, rate:105.20, get amount(){return +(this.qty*this.rate).toFixed(2);}},
-  creditLog:[],
-  digital:{upi:12450, card:7850, bank:4200, saved:false},
-  digitalLog:[{date:'26 May 2024',shift:'Morning Shift',total:24500,status:'SAVED'}],
-  operations:{nat:{dispensed:10.00, actual:10.02, done:false}, expenses:[], others:[], lastSaved:''},
-  checklist:{nat:false, digital:false, expenses:false, cash:false, closingMeter:false, autoSales:true, creditRecon:false},
-  cash:{expected:38400, actual:38350},
-  closingMeterValue:null, closingMeterLocked:false,
-  restrictedUnlocked:{}
+/* PumpOS Salesman Module — Complete Re-Corrected Prototype */
+
+let screen="login";
+let flow="normal";
+let selectedCustomer=null;
+let selectedFuel="Petrol";
+let selectedNozzle="N1 — Petrol";
+let amount=1052.00;
+let rate=105.20;
+let quantity=10.00;
+
+const customers=[
+  ["AT","Aarun Traders","CUS1001","₹37,550.00","₹12,450.00"],
+  ["SS","ShaktiKiran Store","CUS1002","₹25,000.00","₹8,250.00"],
+  ["RE","Raju Enterprises","CUS1003","₹42,100.00","₹5,600.00"],
+  ["MM","Modern Market","CUS1004","₹31,500.00","₹9,850.00"],
+  ["GA","Grocery Agency","CUS1005","₹28,900.00","₹7,250.00"],
+  ["WC","White Corneral Store","CUS1006","₹22,500.00","₹4,800.00"]
+];
+
+const navNames={
+  home:"Home",shift:"Shift Status",close:"Close Shift",profile:"Profile",
+  credit:"Credit Customers",digital:"Digital Transactions",operations:"Operations",summary:"Summary"
 };
-const money = n => '₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-const lit = n => Number(n).toFixed(2)+' L';
+const navIcons={home:"⌂",shift:"◷",close:"▣",profile:"♙",credit:"♙",digital:"▣",operations:"⚙",summary:"◔"};
 
-function nav(id){ state.prevScreen = state.screen; state.screen = id; render(); document.getElementById('screen').scrollTop=0; }
-function openPin(target){ state.modalOpen=true; state.pin=''; state.pinTarget=target; render(); }
-function pressPin(d){
-  if(state.pin.length>=4) return;
-  state.pin+=d;
-  if(state.pin.length===4){
-    if(state.pin==='1234'){ state.restrictedUnlocked[state.pinTarget]=true; state.modalOpen=false; render(); }
-    else { setTimeout(()=>{ state.pin=''; render(); },350); render(); }
-  } else render();
+function contextualNav(){
+  let items;
+  if(flow==="credit") items=["home","digital","operations","summary"];
+  else if(flow==="digital") items=["home","credit","operations","summary"];
+  else if(flow==="operations") items=["home","credit","digital","summary"];
+  else if(flow==="summary") items=["home","credit","digital","operations"];
+  else items=["home","shift","close","profile"];
+  return `<div class="nav">${items.map(x=>`
+    <button class="${x===flow?'active':''}" onclick="navigate('${x}')">
+      <span>${navIcons[x]}</span>${navNames[x]}
+    </button>`).join("")}</div>`;
 }
 
-/* ---------------- REUSABLE PIECES ---------------- */
-function topbar(title, eyebrow, back){
-  return `<div class="topbar">
-    ${back?`<div class="backbtn" onclick="nav('${back}')">‹</div>`:''}
-    <div><div class="eyebrow">${eyebrow||''}</div><h1>${title}</h1></div>
+function header(title="PumpOS"){
+  return `<div class="header">
+    <span class="back" onclick="goBack()">‹</span>
+    <span class="brand">⛽ ${title}</span>
+    <span class="bell">♧</span>
   </div>`;
 }
-function note(text){ return `<div class="note">${text}</div>`; }
-function card(title, rowsHtml){ return `<div class="card">${title?`<h3>${title}</h3>`:''}${rowsHtml}</div>`; }
-function row(label, value, locked){ return `<div class="row ${locked?'locked':''}"><span class="label">${label}</span><span class="value">${value}${locked?'<span class="lockicon">🔒</span>':''}</span></div>`; }
-function btn(label, onclick, variant){ return `<button class="btn ${variant||'btn-primary'}" onclick="${onclick}">${label}</button>`; }
 
-function bottomNav(context){
-  // context: 'home' (normal) or 'work' (inside credit/digital/ops/summary)
-  if(context==='work'){
-    return `<div class="bottomnav">
-      ${navitem('🏠','Home', state.screen==='home', "nav('home')")}
-      ${navitem('💳','Credit', ['selectCustomer','customerOverview','fuel','quantity','creditReview','newOutstanding','creditSuccess'].includes(state.screen), "nav('selectCustomer')")}
-      ${navitem('📶','Digital', ['digitalEnter','digitalReview','digitalConfirm','digitalSuccess','digitalList'].includes(state.screen), "nav('digitalEnter')")}
-      ${navitem('⚙️','Ops', ['operationsMenu','nat','expenses','others','operationsSuccess'].includes(state.screen), "nav('operationsMenu')")}
-    </div>`;
+function shell(body,title="PumpOS",showNav=true){
+  document.getElementById("app").innerHTML=header(title)+`<main class="main">${body}</main>`+(showNav?contextualNav():"");
+}
+
+function button(text,action,cls=""){return `<button class="btn ${cls}" onclick="${action}">${text}</button>`}
+
+function rows(list){
+  return list.map(x=>`<div class="row"><span>${x[0]}</span><span class="value">${x[1]}</span></div>`).join("");
+}
+
+function navigate(target){
+  flow=target==="home"?"normal":target;
+  screen=target==="home"?"home":({
+    credit:"credit",digital:"digital",operations:"operations",summary:"summary",
+    shift:"shiftStatus",close:"close",profile:"profile"
+  }[target]||target);
+  render();
+}
+
+function goBack(){
+  const homeish=["home","credit","digital","operations","summary","shiftStatus","close","profile"];
+  if(screen==="home"||homeish.includes(screen)) return;
+  if(["cstatus","cfuel","cqty","creview","cout","csuccess","addCustomer"].includes(screen)) return navigate("credit");
+  if(["dreview","dconfirm","dsuccess","dlist"].includes(screen)) return navigate("digital");
+  if(["nat","expenses","others","opsuccess"].includes(screen)) return navigate("operations");
+  if(screen==="meters"||screen==="collection") return navigate("summary");
+  if(["shiftStart","machine","opening","verify","started"].includes(screen)) return screen==="shiftStart"?render():navigate("home");
+}
+
+function showToast(message, type="ok"){
+  let t=document.getElementById("globalToast");
+  if(!t){
+    t=document.createElement("div");
+    t.id="globalToast";
+    t.style.cssText="position:fixed;left:50%;bottom:82px;transform:translateX(-50%);width:min(360px,calc(100% - 28px));z-index:100;background:#123f48;color:#fff;padding:12px 14px;border-radius:12px;font-size:12px;font-weight:700;box-shadow:0 8px 28px rgba(0,0,0,.18);opacity:0;transition:opacity .18s";
+    document.body.appendChild(t);
   }
-  const closeReady = closeShiftReady();
-  return `<div class="bottomnav">
-    ${navitem('🏠','Home', state.screen==='home', "nav('home')")}
-    ${navitem('📋','Status', state.screen==='shiftStatus', "nav('shiftStatus')")}
-    ${navitem(closeReady?'🟢':'🔒','Close Shift', state.screen==='closeChecklist'||state.screen.startsWith('close'), "nav('closeChecklist')", closeReady?'green':'')}
-    ${navitem('👤','Profile', state.screen==='profile', "nav('profile')")}
-  </div>`;
+  t.textContent=message;
+  t.style.background=type==="warn" ? "#7a5a16" : "#123f48";
+  t.style.opacity="1";
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer=setTimeout(()=>t.style.opacity="0",2200);
 }
-function navitem(icon,label,active,onclick,extraClass){
-  return `<div class="navitem ${active?'active':''} ${extraClass||''}" onclick="${onclick}"><div class="ic">${icon}</div>${label}</div>`;
-}
-function closeShiftReady(){
-  // demo rule: closing window open after opening meter step done (always true post-shift-start for prototype)
-  return state.shift.start!==null;
-}
-
-/* ---------------- SCREENS ---------------- */
-const screens = {};
-
-screens.login = () => `
-  ${topbar('Asian Filling Station','PumpOS · Login')}
-  <div class="content">
-    ${note('Salesman signs in as Staff. Owner/Manager use the same screen with a different role toggle.')}
-    <div class="chiprow" style="margin:14px 0;">
-      <div class="chip">Owner</div><div class="chip">Manager</div><div class="chip active">Staff</div>
-    </div>
-    <div class="field"><label>User ID</label><input value="SM-0231" readonly></div>
-    <div class="field"><label>Password</label><input type="password" value="••••••••" readonly></div>
-    <div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" checked style="width:auto;"> <span style="font-size:12px;color:var(--ink-soft);">Remember me</span></div>
-    ${btn('Login','nav("selectShift")')}
-    ${btn('Use biometric login','nav("selectShift")','btn-secondary')}
-  </div>`;
-
-screens.selectShift = () => `
-  ${topbar('Select Shift','Step 1 of 6')}
-  <div class="content">
-    ${note('Salesman picks which shift window they are clocking into before touching any machine.')}
-    <div class="card">
-      ${['24 Hours Shift','12 Hours Shift','Morning Shift','Evening Shift','Night Shift'].map(s=>`
-        <div class="row" style="cursor:pointer" onclick="state.shift.type='${s}';render()">
-          <span class="label">${s}</span><span class="value">${state.shift.type===s?'●':'○'}</span>
-        </div>`).join('')}
-    </div>
-    ${btn('Next','nav("selectMachine")')}
-  </div>`;
-
-screens.selectMachine = () => `
-  ${topbar('Select Machine','Step 2 of 6','selectShift')}
-  <div class="content">
-    ${note('Machine + nozzle assignment determines which fuel this salesman can sell for the shift.')}
-    <div class="card">
-      ${[['M1 – Petrol','Active'],['M2 – Petrol','Active'],['M3 – Diesel','Active'],['M4 – Diesel','In use']].map(([m,st])=>`
-        <div class="row" style="cursor:pointer" onclick="state.shift.machine='${m}';render()">
-          <span class="label">${m}</span>
-          <span class="value" style="display:flex;align-items:center;gap:6px;">
-            <span class="badge ${st==='Active'?'green':'gray'}">${st}</span>${state.shift.machine===m?'●':'○'}
-          </span>
-        </div>`).join('')}
-    </div>
-    ${btn('Next','nav("openingMeter")')}
-  </div>`;
-
-screens.openingMeter = () => `
-  ${topbar('Opening Meter','Step 3 of 6','selectMachine')}
-  <div class="content">
-    ${note('Opening reading is pulled automatically from the previous shift\'s closing meter — never typed manually.')}
-    ${card('Machine',row('Machine',state.shift.machine)+row('Nozzle',state.shift.nozzle)+row('Fuel',state.shift.fuel))}
-    <div class="card">
-      <h3>Opening Meter</h3>
-      <div class="odo">${state.shift.opening.toFixed(2)} L</div>
-      <div style="font-size:11px;color:var(--steel);margin-top:8px;">Taken from previous closing · 25 May 2024, 22:00</div>
-    </div>
-    ${btn('Next','nav("verifyOpening")')}
-  </div>`;
-
-screens.verifyOpening = () => `
-  ${topbar('Verify Opening','Step 4 of 6','openingMeter')}
-  <div class="content">
-    ${note('Last check before the shift goes live — salesman confirms the machine and reading are correct.')}
-    ${card('',row('Shift',state.shift.type)+row('Machine',state.shift.machine)+row('Nozzle',state.shift.nozzle)+row('Fuel',state.shift.fuel)+row('Opening Meter',state.shift.opening.toFixed(2)+' L')+row('Opening Time','25 May 2024, 22:00'))}
-    <div class="field" style="display:flex;align-items:center;gap:8px;"><input id="verifychk" type="checkbox" style="width:auto;" onchange="document.getElementById('verifybtn').disabled=!this.checked"> <span style="font-size:12.5px;">I verify that the opening meter is correct</span></div>
-    <button id="verifybtn" class="btn btn-primary" disabled onclick="state.shift.start=new Date().toLocaleString();nav('shiftStarted')">Verify &amp; Start</button>
-  </div>`;
-
-screens.shiftStarted = () => `
-  <div class="success-wrap">
-    <div class="success-icon">✓</div>
-    <div class="success-title">Shift Started Successfully!</div>
-    <div class="success-sub">${note('Shift is now live. All working sections unlock from Home.')}</div>
-    ${card('',row('Machine',state.shift.machine)+row('Nozzle',state.shift.nozzle)+row('Shift Type',state.shift.type)+row('Start Time',state.shift.start))}
-    ${btn('Go to Dashboard','nav("home")')}
-  </div>`;
-
-screens.home = () => `
-  <div class="topbar"><div><div class="eyebrow">PumpOS</div><h1>Welcome, Saleem</h1></div></div>
-  <div class="content">
-    <div class="badge green" style="margin-bottom:10px;">● Your shift is active</div>
-    ${card('',row('Shift',state.shift.type)+row('Ends in','3h 20m remaining'))}
-    ${note('Home is the salesman\'s hub — every major task branches from here and always leads back.')}
-    <div class="two-col" style="margin:14px 0;">
-      <div class="card" style="text-align:center;cursor:pointer" onclick="nav('selectCustomer')"><div style="font-size:22px;">💳</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Credit Sales</div></div>
-      <div class="card" style="text-align:center;cursor:pointer" onclick="nav('digitalEnter')"><div style="font-size:22px;">📶</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Digital Transactions</div></div>
-      <div class="card" style="text-align:center;cursor:pointer" onclick="nav('operationsMenu')"><div style="font-size:22px;">⚙️</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Operations</div></div>
-      <div class="card" style="text-align:center;cursor:pointer" onclick="nav('shiftSummary')"><div style="font-size:22px;">📊</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Shift Summary</div></div>
+function confirmAction(message, onYes){
+  let old=document.getElementById("confirmOverlay"); if(old) old.remove();
+  const o=document.createElement("div");
+  o.id="confirmOverlay";
+  o.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:90;display:grid;place-items:end center;padding:14px";
+  o.innerHTML=`<div style="width:min(390px,100%);background:#fff;border-radius:16px;padding:18px;box-shadow:0 15px 50px rgba(0,0,0,.25)">
+    <div style="font-size:16px;font-weight:800;margin-bottom:8px">Confirm Action</div>
+    <div style="font-size:12px;color:#68777e;line-height:1.5">${message}</div>
+    <div class="two" style="margin-top:15px">
+      <button class="btn light" id="cancelConfirm">Cancel</button>
+      <button class="btn green" id="yesConfirm">Confirm</button>
     </div>
   </div>`;
-
-/* --- CREDIT SALES FLOW --- */
-screens.selectCustomer = () => `
-  ${topbar('Credit Sales','Select Customer','home')}
-  <div class="content">
-    ${note('Salesman searches or picks the customer buying on credit before any fuel or quantity is entered.')}
-    <input placeholder="Search customer…" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;margin-bottom:12px;">
-    <div class="card">
-      ${state.customers.map(c=>`<div class="listitem" onclick='selectCustomer(${JSON.stringify(c.id)})'>
-        <div><div class="name">${c.name}</div><div class="sub">${c.id}</div></div><span>›</span></div>`).join('')}
-    </div>
-  </div>${bottomNav('work')}`;
-function selectCustomer(id){ state.credit.customer = state.customers.find(c=>c.id===id); nav('customerOverview'); }
-
-screens.customerOverview = () => `
-  ${topbar('Customer Overview','','selectCustomer')}
-  <div class="content">
-    ${note('Salesman checks available credit and existing balance before proceeding — protects against over-lending.')}
-    ${card('',row('Customer',state.credit.customer.name)+row('Customer ID',state.credit.customer.id)+row('Available Credit',money(state.credit.customer.avail))+row('Previous Outstanding',money(state.credit.customer.outstanding)))}
-    ${btn('Next','nav("fuel")')}
-  </div>${bottomNav('work')}`;
-
-screens.fuel = () => `
-  ${topbar('Select Fuel','','customerOverview')}
-  <div class="content">
-    ${note('Fuel choices stay locked to whatever the assigned nozzle actually dispenses.')}
-    <div class="chiprow">
-      ${['Petrol','Diesel','Power'].map(f=>`<div class="chip ${state.credit.fuel===f?'active':''}" onclick="state.credit.fuel='${f}';render()">${f}</div>`).join('')}
-    </div>
-    ${btn('Next','nav("quantity")','btn-primary')}
-  </div>${bottomNav('work')}`;
-
-screens.quantity = () => `
-  ${topbar('Quantity','','fuel')}
-  <div class="content">
-    ${note('Rate is system-set from the active price list and amount recalculates live — nothing here is hand-typed except litres.')}
-    <div class="field"><label>Quantity (L)</label><input type="number" step="0.01" value="${state.credit.qty}" oninput="state.credit.qty=+this.value||0;render()"></div>
-    ${card('',row('Rate',money(state.credit.rate)+'/L')+row('Amount',money(state.credit.amount)))}
-    ${btn('Next','nav("creditReview")')}
-  </div>${bottomNav('work')}`;
-
-screens.creditReview = () => `
-  ${topbar('Credit Entry Review','','quantity')}
-  <div class="content">
-    ${note('Final look before the sale posts — quantity is still editable by going back, nothing else is.')}
-    ${card('',row('Customer',state.credit.customer.name)+row('Customer ID',state.credit.customer.id)+row('Fuel',state.credit.fuel)+row('Quantity',lit(state.credit.qty))+row('Rate',money(state.credit.rate)+'/L')+row('Amount',money(state.credit.amount)))}
-    ${btn('Add Credit Sale','addCreditSale()')}
-  </div>${bottomNav('work')}`;
-function addCreditSale(){
-  state.creditLog.push({...state.credit, customer:state.credit.customer});
-  state.credit.customer.outstanding = +(state.credit.customer.outstanding + state.credit.amount).toFixed(2);
-  nav('newOutstanding');
+  document.body.appendChild(o);
+  document.getElementById("cancelConfirm").onclick=()=>o.remove();
+  document.getElementById("yesConfirm").onclick=()=>{o.remove();onYes()};
 }
 
-screens.newOutstanding = () => `
-  ${topbar('New Outstanding','')}
-  <div class="content">
-    ${note('Shows the customer\'s balance shift caused by this one sale — outstanding updates system-side.')}
-    ${card('',row('Previous Outstanding',money(state.credit.customer.outstanding-state.credit.amount))+row('+ New Credit Sale',money(state.credit.amount))+row('New Outstanding',money(state.credit.customer.outstanding)))}
-    <div class="badge green" style="margin-bottom:14px;">Credit sale added successfully.</div>
-    ${btn('Done','nav("creditSuccess")')}
-  </div>${bottomNav('work')}`;
-
-screens.creditSuccess = () => `
-  <div class="success-wrap">
-    <div class="success-icon">✓</div>
-    <div class="success-title">Credit sale added successfully.</div>
-    ${note('Two vertical actions on purpose — keeps "add another" and "leave the module" from being mis-tapped for each other.')}
-    ${btn('Add Another Credit Sale','nav("selectCustomer")')}
-    ${btn('Go to Home','nav("home")','btn-secondary')}
-  </div>`;
-
-/* --- DIGITAL TRANSACTIONS FLOW --- */
-screens.digitalEnter = () => `
-  ${topbar('Digital Transactions','Enter Totals','home')}
-  <div class="content">
-    ${note('This is the shift-end total entry — one number per payment channel, no line-by-line reconciliation here.')}
-    <div class="field"><label>UPI Total</label><input type="number" value="${state.digital.upi}" oninput="state.digital.upi=+this.value||0;render()"></div>
-    <div class="field"><label>Card Total</label><input type="number" value="${state.digital.card}" oninput="state.digital.card=+this.value||0;render()"></div>
-    <div class="field"><label>Bank / Fleet Total</label><input type="number" value="${state.digital.bank}" oninput="state.digital.bank=+this.value||0;render()"></div>
-    ${btn('Next','nav("digitalReview")')}
-  </div>${bottomNav('work')}`;
-
-function digitalTotal(){ return state.digital.upi+state.digital.card+state.digital.bank; }
-
-screens.digitalReview = () => `
-  ${topbar('Review Digital Totals','','digitalEnter')}
-  <div class="content">
-    ${note('Digital Total is auto-summed — nothing to type here, just confirm the three inputs were right.')}
-    ${card('',row('UPI Total',money(state.digital.upi))+row('Card Total',money(state.digital.card))+row('Bank/Fleet Total',money(state.digital.bank))+row('Digital Total',money(digitalTotal())))}
-    ${btn('Next','nav("digitalConfirm")')}
-  </div>${bottomNav('work')}`;
-
-screens.digitalConfirm = () => `
-  ${topbar('Confirm Digital Totals','','digitalReview')}
-  <div class="content">
-    ${note('Last confirmation — after this, totals save and count toward the close-shift checklist.')}
-    ${card('',row('UPI Total',money(state.digital.upi))+row('Card Total',money(state.digital.card))+row('Bank/Fleet Total',money(state.digital.bank))+row('Digital Total',money(digitalTotal())))}
-    ${btn('Confirm Digital Total','confirmDigital()')}
-  </div>${bottomNav('work')}`;
-function confirmDigital(){
-  state.digital.saved=true; state.checklist.digital=true;
-  state.digitalLog.unshift({date:new Date().toLocaleDateString(),shift:state.shift.type,total:digitalTotal(),status:'SAVED'});
-  nav('digitalSuccess');
+function render(){const boot=document.getElementById("appBoot");if(boot)boot.remove();
+  switch(screen){
+    case "login": return login();
+    case "shiftStart": return selectShift();
+    case "machine": return selectMachine();
+    case "opening": return openingMeter();
+    case "verify": return verifyOpening();
+    case "started": return shiftStarted();
+    case "home": return home();
+    case "credit": return creditList();
+    case "addCustomer": return addCustomer();
+    case "cstatus": return customerOverview();
+    case "cfuel": return fuelNozzle();
+    case "cqty": return creditAmount();
+    case "creview": return creditReview();
+    case "cout": return newOutstanding();
+    case "csuccess": return creditSuccess();
+    case "digital": return digitalEntry();
+    case "dreview": return digitalReview();
+    case "dconfirm": return digitalConfirm();
+    case "dsuccess": return digitalSuccess();
+    case "dlist": return digitalList();
+    case "operations": return operations();
+    case "nat": return nat();
+    case "expenses": return expenses();
+    case "others": return others();
+    case "opsuccess": return operationSuccess();
+    case "summary": return summary();
+    case "meters": return meters();
+    case "collection": return collectionDetails();
+    case "shiftStatus": return shiftStatus();
+    case "close": return closeShift();
+    case "profile": return profile();
+  }
 }
 
-screens.digitalSuccess = () => `
-  <div class="success-wrap">
-    <div class="success-icon">✓</div>
-    <div class="success-title">Digital transactions saved successfully.</div>
-    <div class="success-sub">Shift digital totals have been recorded.</div>
-    ${btn('Done','nav("digitalList")')}
-  </div>`;
+/* LOGIN + SHIFT START */
 
-screens.digitalList = () => `
-  ${topbar('Digital Transactions','History')}
-  <div class="content">
-    ${note('Past shift totals for reference — this list is read-only, editing happens only through Enter New Totals.')}
-    <div class="card">
-      ${state.digitalLog.map(d=>`
-        <div style="padding:10px 0;border-bottom:1px solid var(--line);">
-          <div style="display:flex;justify-content:space-between;"><b style="font-size:13px;">${d.date} – ${d.shift}</b><span class="badge green">${d.status}</span></div>
-          <div class="odo sm" style="margin-top:6px;">${money(d.total)}</div>
-        </div>`).join('')}
+function login(){
+  shell(`
+    <div style="background:#082f73;color:#fff;border-radius:0 0 18px 18px;text-align:center;padding:25px 12px 30px">
+      <div style="font-size:52px">⛽</div>
+      <div style="font-size:28px;font-weight:900;letter-spacing:1px">ASIAN</div>
+      <div style="font-weight:800">FILLING STATION</div>
+      <div style="margin-top:5px;opacity:.9">Fueling Trust</div>
     </div>
-    ${btn('+ Enter New Totals','nav("digitalEnter")','btn-secondary')}
-  </div>${bottomNav('work')}`;
-
-/* --- OPERATIONS FLOW --- */
-screens.operationsMenu = () => `
-  ${topbar('Operations','','home')}
-  <div class="content">
-    ${note('Three self-serve entries a salesman logs during a shift — none of them close the shift by themselves.')}
-    ${['Nozzle Accuracy Test (NAT)','Expenses','Others'].map((o,i)=>`
-      <div class="card" style="cursor:pointer" onclick="nav('${['nat','expenses','others'][i]}')">
-        <div style="display:flex;justify-content:space-between;align-items:center;"><b style="font-size:13.5px;">${o}</b><span>›</span></div>
-      </div>`).join('')}
-  </div>${bottomNav('work')}`;
-
-screens.nat = () => `
-  ${topbar('Nozzle Accuracy Test','','operationsMenu')}
-  <div class="content">
-    ${note('Compares what the meter says it dispensed against a physically measured quantity — variance flags calibration drift.')}
-    ${card('',row('Nozzle',state.shift.nozzle)+row('Fuel',state.shift.fuel))}
-    <div class="field"><label>Dispensed Quantity (L)</label><input type="number" value="${state.operations.nat.dispensed}" oninput="state.operations.nat.dispensed=+this.value||0;render()"></div>
-    <div class="field"><label>Actual Measured Quantity (L)</label><input type="number" value="${state.operations.nat.actual}" oninput="state.operations.nat.actual=+this.value||0;render()"></div>
-    ${card('',row('Variance',(state.operations.nat.actual-state.operations.nat.dispensed>=0?'+':'')+(state.operations.nat.actual-state.operations.nat.dispensed).toFixed(2)+' L'))}
-    ${btn('Save NAT','state.operations.nat.done=true;state.checklist.nat=true;state.operations.lastSaved="NAT recorded";nav("operationsSuccess")')}
-  </div>${bottomNav('work')}`;
-
-screens.expenses = () => `
-  ${topbar('Expenses','','operationsMenu')}
-  <div class="content">
-    ${note('Any shift-time cash outflow — fuel-truck tea money, cleaning supplies — logged so it nets against cash at close.')}
-    <div class="field"><label>Expense Category</label><select><option>Maintenance</option><option>Supplies</option><option>Staff</option><option>Other</option></select></div>
-    <div class="field"><label>Amount</label><input type="number" placeholder="₹0.00" id="expamt"></div>
-    <div class="field"><label>Note (optional)</label><input placeholder="e.g., nozzle cleaning kit"></div>
-    ${btn('Save Expense','state.operations.expenses.push({amt:document.getElementById("expamt").value||0});state.checklist.expenses=true;state.operations.lastSaved="Expense recorded";nav("operationsSuccess")')}
-  </div>${bottomNav('work')}`;
-
-screens.others = () => `
-  ${topbar('Others','','operationsMenu')}
-  <div class="content">
-    ${note('Catch-all for anything that doesn\'t fit NAT or Expenses — tank dips, incident notes, and the like.')}
-    <div class="field"><label>Type</label><select><option>Tank Dip</option><option>Incident Note</option><option>Other</option></select></div>
-    <div class="field"><label>Description</label><input placeholder="Details…"></div>
-    <div class="field"><label>Amount (optional)</label><input type="number" placeholder="₹0.00"></div>
-    ${btn('Save Entry','state.operations.others.push({});state.operations.lastSaved="Entry recorded";nav("operationsSuccess")')}
-  </div>${bottomNav('work')}`;
-
-screens.operationsSuccess = () => `
-  <div class="success-wrap">
-    <div class="success-icon">✓</div>
-    <div class="success-title">Entry saved successfully.</div>
-    <div class="success-sub">${state.operations.lastSaved||'Entry has been recorded.'}</div>
-    ${btn('Done','nav("operationsMenu")')}
-  </div>`;
-
-/* --- SHIFT SUMMARY (review only) --- */
-screens.shiftSummary = () => `
-  ${topbar('Shift Summary','Review only','home')}
-  <div class="content">
-    ${note('Read-only lens on the whole shift so far. There is no Close Shift button on this screen on purpose.')}
     <div class="card">
-      <h3>Fuel Summary</h3>
-      <div class="two-col-vals">
-        <div class="colhead">MS</div><div class="colhead">HSD</div>
-        <div style="font-size:11px;color:var(--steel);grid-column:1/3;margin-top:2px;">Total Dispensed</div>
-        <div class="value" style="font-family:var(--font-mono);padding:2px 0;">${lit(state.operations.nat.dispensed)}</div><div class="value" style="font-family:var(--font-mono);padding:2px 0;">0.00 L</div>
-        <div style="font-size:11px;color:var(--steel);grid-column:1/3;margin-top:6px;">NAT / Test</div>
-        <div class="value" style="font-family:var(--font-mono);padding:2px 0;">${(state.operations.nat.actual-state.operations.nat.dispensed).toFixed(2)} L</div><div class="value" style="font-family:var(--font-mono);padding:2px 0;">0.00 L</div>
-        <div style="font-size:11px;color:var(--steel);grid-column:1/3;margin-top:6px;">Net Sale</div>
-        <div class="value" style="font-family:var(--font-mono);padding:2px 0;">${lit(state.operations.nat.dispensed)}</div><div class="value" style="font-family:var(--font-mono);padding:2px 0;">0.00 L</div>
-        <div style="font-size:11px;color:var(--steel);grid-column:1/3;margin-top:6px;">Sale Amount</div>
-        <div class="value" style="font-family:var(--font-mono);padding:2px 0;">${money(state.credit.customer?state.creditLog.reduce((s,c)=>s+c.amount,0):0)}</div><div class="value" style="font-family:var(--font-mono);padding:2px 0;">₹0.00</div>
+      <h1 class="title" style="text-align:center">Login</h1>
+      <div class="two">
+        <button class="btn blue" type="button">Owner</button>
+        <button class="btn light" type="button">Manager</button>
+      </div>
+      <div style="height:2px"></div>
+      <label class="label">User ID</label>
+      <input class="input" placeholder="User ID" value="SALEEM01">
+      <label class="label">Password</label>
+      <input class="input" type="password" placeholder="Password" value="123456">
+      <label style="font-size:11px"><input type="checkbox"> Remember Me</label>
+      ${button("Login","screen='shiftStart';render()","blue")}
+      <div style="text-align:center;font-size:28px;color:#1257c8;margin-top:14px">◉</div>
+    </div>`,`Asian Filling Station`,false);
+}
+
+function progress(current){
+  const labels=["Select Shift","Select Machine","Opening Meter","Verify Opening","Shift Started"];
+  return `<div class="progress">${labels.map((x,i)=>{
+    const n=i+1,cls=n<current?"done":n===current?"current":"";
+    return `<div class="step ${cls}"><div class="dot">${n<current?"✓":n}</div>${x}</div>`;
+  }).join("")}</div>`;
+}
+
+function selectShift(){
+  shell(progress(1)+`
+    <h1 class="title">Select Shift</h1>
+    <p class="sub">Choose Your Shift Type to Start the Day.</p>
+    ${[
+      ["24 Hours Shift","Full Day 24 Hours"],
+      ["12 Hours Shift","Custom 12 Hours"],
+      ["Morning Shift","06:00 AM – 02:00 PM"],
+      ["Evening Shift","02:00 PM – 10:00 PM"],
+      ["Night Shift","10:00 PM – 06:00 AM"]
+    ].map((x,i)=>`
+      <div class="item ${i===0?'selected':''}" onclick="selectShiftUI(this)">
+        <span class="radio">${i===0?'◉':'○'}</span>
+        <div class="grow"><b>${x[0]}</b><small>${x[1]}</small></div>
+      </div>`).join("")}
+    ${button("Next","screen='machine';render()","blue")}
+  `,"PumpOS",false);
+}
+
+function selectShiftUI(el){
+  document.querySelectorAll(".item").forEach(x=>{x.classList.remove("selected");x.querySelector(".radio").textContent="○"});
+  el.classList.add("selected");el.querySelector(".radio").textContent="◉";
+}
+
+function selectMachine(){
+  shell(progress(2)+`
+    <h1 class="title">Select Machine</h1>
+    <p class="sub">Choose the Machine You Will Operate.</p>
+    ${[
+      ["M1","Petrol","2 Nozzles"],["M2","Petrol","2 Nozzles"],
+      ["M3","Diesel","2 Nozzles"],["M4","Diesel","2 Nozzles"]
+    ].map((x,i)=>`
+      <div class="item" onclick="selectMachineUI(this)">
+        <span style="font-size:21px">⛽</span>
+        <div class="grow"><b>${x[0]} — ${x[1]}</b><small>${x[2]} • Active</small></div>
+        <span class="radio">${i===0?'◉':'○'}</span>
+      </div>`).join("")}
+    ${button("Next","screen='opening';render()","blue")}
+  `,"PumpOS",false);
+}
+function selectMachineUI(el){
+  document.querySelectorAll(".item").forEach(x=>{x.classList.remove("selected");x.querySelector(".radio").textContent="○"});
+  el.classList.add("selected");el.querySelector(".radio").textContent="◉";
+}
+
+function openingMeter(){
+  shell(progress(3)+`
+    <h1 class="title">Opening Meter</h1>
+    <p class="sub">Opening Meter Is Auto-Filled From Last Closing.</p>
+    <div class="card">${rows([
+      ["Machine","M1 — Petrol"],
+      ["Nozzle","N1 — Petrol"],
+      ["Opening Meter","10,000.00 L"],
+      ["Opening Meter Time","27 Aug 2026, 09:00 AM"]
+    ])}</div>
+    <div class="toast">Opening Meter Is Taken From the Last Closing of This Nozzle.</div>
+    ${button("Next","screen='verify';render()","blue")}
+  `,"PumpOS",false);
+}
+
+function verifyOpening(){
+  shell(progress(4)+`
+    <h1 class="title">Verify Opening</h1>
+    <p class="sub">Please Verify All Details Before Starting the Shift.</p>
+    <div class="card">${rows([
+      ["Shift Type","24 Hours Shift"],
+      ["Machine","M1 — Petrol"],
+      ["Nozzle","N1 — Petrol"],
+      ["Opening Meter","10,000.00 L"]
+    ])}</div>
+    <label style="font-size:11px"><input id="verifyCheck" type="checkbox" checked> I Verify That the Opening Meter Is Correct.</label>
+    ${button("Confirm","startAfterVerify()","blue")}
+  `,"PumpOS",false);
+}
+function startAfterVerify(){
+  if(!document.getElementById("verifyCheck").checked){showToast('Please Verify the Opening Meter.','warn');return}
+  screen="started";render();
+}
+function shiftStarted(){
+  shell(progress(5)+`
+    <div class="success"><div class="check">✓</div><h2>Shift Started Successfully!</h2><p>Your Shift Has Been Started.</p></div>
+    <div class="card">${rows([
+      ["Machine","M1 — Petrol"],["Nozzle","N1 — Petrol"],
+      ["Shift Type","24 Hours Shift"],["Start Time","27 Aug 2026, 09:00 AM"]
+    ])}</div>
+    ${button("Next","screen='home';flow='normal';render()","blue")}
+  `,"PumpOS",false);
+}
+
+/* HOME */
+
+function home(){
+  shell(`
+    <div class="homehead">
+      <div class="homeleft">
+        <h1 class="title">Hello, Saleem</h1>
+        <div class="active">Your Shift Is Active</div>
+        <p class="sub" style="margin-top:10px;margin-bottom:3px">27 Aug 2026</p>
+        <b style="font-size:12px">09:00 AM – 09:00 AM</b>
+      </div>
+      <div class="count">
+        <small>24H</small><small>ENDS IN</small><strong>08h 42m</strong>
       </div>
     </div>
-    <div class="total-card"><div class="label">Total Sale Amount</div><div class="amt">${money(state.creditLog.reduce((s,c)=>s+c.amount,0))}</div></div>
-    <div class="card"><h3>View Meters</h3>
-      <div class="row"><span class="label">View Meters – MS</span><span class="value">›</span></div>
-      <div class="row"><span class="label">View Meters – HSD</span><span class="value">›</span></div>
+
+    <div class="grid" style="margin-top:17px">
+      <div class="tile" onclick="navigate('credit')"><span class="tileicon">♙</span>Credit Customers</div>
+      <div class="tile" onclick="navigate('digital')"><span class="tileicon">▣</span>Digital Transactions</div>
+      <div class="tile" onclick="navigate('operations')"><span class="tileicon">⚙</span>Operations</div>
+      <div class="tile" onclick="navigate('summary')"><span class="tileicon">◔</span>Summary</div>
     </div>
-    <div class="card" onclick="nav('collectionDetails')" style="cursor:pointer;">
-      <div style="display:flex;justify-content:space-between;"><h3 style="margin:0;">Collection</h3><span>View Details ›</span></div>
-      <div class="odo sm">${money(digitalTotal()+state.creditLog.reduce((s,c)=>s+c.amount,0))}</div>
+
+    <div class="card">${rows([
+      ["Machine / Nozzle","M1 / N1 — Petrol"],
+      ["Opening Meter","10,000.00 L"]
+    ])}</div>
+  `,"PumpOS",true);
+}
+
+/* CREDIT CUSTOMERS */
+
+function creditList(){
+  shell(`
+    <h1 class="title">Credit Customers</h1>
+    <p class="sub">Search and Select a Customer.</p>
+    <div class="search-wrap">
+      <input id="customerSearch" class="input" placeholder="Search Customer..." oninput="filterCustomers(this.value)">
+      <span class="searchIcon">⌕</span>
     </div>
-    ${card('Cash Reconciliation', row('Expected Cash',money(state.cash.expected))+row('Actual Cash',money(state.cash.actual))+row('Variance',money(state.cash.actual-state.cash.expected)))}
-  </div>${bottomNav('work')}`;
+    <div id="customerList">${customerCards(customers)}</div>
+    ${button("Add Customers","screen='addCustomer';render()","green")}
+  `,"Credit Customers",true);
+}
 
-screens.collectionDetails = () => `
-  ${topbar('Collection Details','','shiftSummary')}
-  <div class="content">
-    ${note('Breaks the single Collection figure into where it actually came from.')}
-    ${card('',row('Digital',money(digitalTotal()))+row('Credit',money(state.creditLog.reduce((s,c)=>s+c.amount,0)))+row('Expenses',money(state.operations.expenses.reduce((s,e)=>s+Number(e.amt||0),0)))+row('Total Collection',money(digitalTotal()+state.creditLog.reduce((s,c)=>s+c.amount,0))))}
-    ${btn('Back','nav("shiftSummary")','btn-secondary')}
-  </div>${bottomNav('work')}`;
-
-/* --- SHIFT STATUS --- */
-screens.shiftStatus = () => `
-  ${topbar('Shift Status','View only')}
-  <div class="content">
-    ${note('Live condition of the current shift — purely informational, nothing here is editable.')}
-    ${card('',row('Shift Type',state.shift.type)+row('Shift ID','SFT-88214')+row('Start Time',state.shift.start||'—')+row('Time Elapsed','2h 40m')+row('Machine',state.shift.machine)+row('Nozzle',state.shift.nozzle)+row('Status','Active','')+row('Alerts','None'))}
-  </div>${bottomNav('home')}`;
-
-/* --- CLOSE SHIFT --- */
-function checklistDone(){ return Object.values(state.checklist).every(v=>v); }
-screens.closeChecklist = () => {
-  if(!closeShiftReady()){
-    return `${topbar('Close Shift','Locked')}<div class="content">
-      ${note('Close Shift stays locked until the shift\'s permitted closing window opens — timing is system-controlled.')}
-      <div class="card" style="text-align:center;padding:30px 16px;"><div style="font-size:26px;">🔒</div><div style="margin-top:10px;font-size:13px;color:var(--ink-soft);">Closing window not open yet</div></div>
-    </div>${bottomNav('home')}`;
-  }
-  const items = [
-    ['nat','NAT / Test Recording','nat'],
-    ['digital','Digital Transactions Total','digitalEnter'],
-    ['expenses','Expenses Entry','expenses'],
-    ['cash','Cash Reconciliation','cashRecon'],
-    ['closingMeter','Closing Meter','closingMeter'],
-    ['autoSales','Auto Sales Calculation',null],
-    ['creditRecon','Credit Reconciliation','creditRecon']
-  ];
-  return `${topbar('Close Shift','Checklist')}
-  <div class="content">
-    ${note('Every step below has its own editable review screen — the salesman fixes items in place, not by re-running the whole flow.')}
-    <div class="card">
-      ${items.map(([key,label,target])=>`
-        <div class="check-row">
-          <div class="check-left"><div class="dot ${state.checklist[key]?'done':''}"></div><div><div class="check-label">${label}</div><div class="check-sub">${state.checklist[key]?'Completed':'Pending'}</div></div></div>
-          ${target? `<button class="fillbtn ${state.checklist[key]?'done':'todo'}" onclick="nav('${target}')">${state.checklist[key]?'Review':'Fill Now'}</button>` : `<span class="badge green">Auto</span>`}
-        </div>`).join('')}
-    </div>
-    ${checklistDone() ? btn('Continue to Final Reconciliation','nav("finalReconciliation")') : note('Complete every pending item to continue — "Fill Now" opens each one\'s own editable screen.')}
-  </div>${bottomNav('home')}`;
-};
-
-screens.cashRecon = () => `
-  ${topbar('Cash Reconciliation','Editable','closeChecklist')}
-  <div class="content">
-    ${note('Expected cash is calculated by the system; actual cash is counted and entered by the salesman.')}
-    ${card('',row('Expected Cash',money(state.cash.expected),true))}
-    <div class="field"><label>Actual Cash Counted</label><input type="number" value="${state.cash.actual}" oninput="state.cash.actual=+this.value||0;render()"></div>
-    ${card('',row('Variance',money(state.cash.actual-state.cash.expected)))}
-    ${Math.abs(state.cash.actual-state.cash.expected)>100 ? restrictedNotice('cashRecon','Variance over ₹100 needs manager sign-off before this can be marked complete.') : ''}
-    ${btn('Mark Complete', Math.abs(state.cash.actual-state.cash.expected)>100 && !state.restrictedUnlocked['cashRecon'] ? '' : 'state.checklist.cash=true;nav("closeChecklist")')}
-  </div>`;
-
-screens.creditRecon = () => `
-  ${topbar('Credit Reconciliation','Editable','closeChecklist')}
-  <div class="content">
-    ${note('Every credit sale logged this shift, shown for a final check against customer outstanding balances.')}
-    <div class="card">
-      ${state.creditLog.length? state.creditLog.map(c=>row(c.customer.name, money(c.amount))).join('') : '<div style="font-size:12.5px;color:var(--steel);padding:8px 0;">No credit sales this shift.</div>'}
-    </div>
-    ${restrictedNotice('creditRecon','Editing a posted credit sale requires manager approval — amounts are locked once added.')}
-    ${btn('Mark Complete','state.checklist.creditRecon=true;nav("closeChecklist")')}
-  </div>`;
-
-screens.closingMeter = () => {
-  if(state.closingMeterLocked){
-    return `${topbar('Closing Meter','Locked','closeChecklist')}<div class="content">
-      ${note('Once confirmed, the closing meter is locked — it becomes next shift\'s opening reading and protects the fuel record.')}
-      ${card('',row('Closing Meter',state.closingMeterValue.toFixed(2)+' L',true))}
-      ${restrictedNotice('closingMeter','Reopening a locked meter reading requires manager approval — this is a rare, audited action.')}
+function customerCards(list){
+  if(!list.length) return `<div class="muted-box">No Customer Found.</div>`;
+  return list.map(c=>{
+    const idx=customers.indexOf(c);
+    return `<div class="item" onclick="selectedCustomer=customers[${idx}];screen='cstatus';render()">
+      <span style="font-weight:800">${c[0]}</span>
+      <div class="grow"><b>${c[1]}</b><small>${c[2]}</small></div><span>›</span>
     </div>`;
-  }
-  return `${topbar('Closing Meter','Editable','closeChecklist')}
-  <div class="content">
-    ${note('Enter the meter reading at end of shift. Once confirmed it locks — there is no casual re-edit.')}
-    ${card('',row('Opening Meter',state.shift.opening.toFixed(2)+' L',true))}
-    <div class="field"><label>Closing Meter Reading (L)</label><input type="number" step="0.01" id="closingval" placeholder="e.g. 10142.35"></div>
-    ${btn('Review','document.getElementById("closingreview").style.display="block";state.closingMeterValue=+document.getElementById("closingval").value||0;render2()')}
-    <div id="closingreview" style="display:none;">
-      ${card('Review', row('Closing Meter', (state.closingMeterValue||0).toFixed(2)+' L')+row('Total Dispensed',((state.closingMeterValue||0)-state.shift.opening).toFixed(2)+' L'))}
-      ${btn('Confirm & Lock','confirmClosingMeter()','btn-primary green')}
-    </div>
-  </div>`;
-};
-function render2(){ /* no-op helper to avoid full re-render wiping the inline reveal before confirm */ }
-function confirmClosingMeter(){
-  const v = document.getElementById('closingval')?.value;
-  if(v) state.closingMeterValue = +v;
-  state.closingMeterLocked = true; state.checklist.closingMeter = true;
-  nav('closeChecklist');
+  }).join("");
+}
+function filterCustomers(q){
+  const l=customers.filter(c=>(c[1]+" "+c[2]).toLowerCase().includes(q.toLowerCase()));
+  document.getElementById("customerList").innerHTML=customerCards(l);
 }
 
-function restrictedNotice(key, msg){
-  const unlocked = state.restrictedUnlocked[key];
-  if(unlocked){ return `<div class="badge green" style="margin-bottom:12px;">Manager approval granted</div>`; }
-  return `<div class="card" style="border-color:#F0C3BA;background:var(--red-bg);">
-    <div style="display:flex;gap:8px;align-items:flex-start;">
-      <span>🔒</span>
-      <div><div style="font-size:12.5px;font-weight:700;color:var(--red);">Manager approval required</div>
-      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:2px;">${msg}</div>
-      <button class="fillbtn todo" style="margin-top:8px;" onclick="openPin('${key}')">Request Approval</button></div>
-    </div>
-  </div>`;
+function addCustomer(){
+  shell(`
+    <h1 class="title">Add Customers</h1>
+    <p class="sub">Enter the Customer Details.</p>
+    <label class="label">Customer Name</label><input class="input" placeholder="Customer Name">
+    <label class="label">Customer Code</label><input class="input" placeholder="Customer Code">
+    <label class="label">Mobile Number</label><input class="input" placeholder="Mobile Number">
+    ${button("Save","showToast('Customer Saved Successfully.');screen='credit';render()","green")}
+  `,"Credit Customers",true);
 }
 
-screens.finalReconciliation = () => `
-  ${topbar('Final Reconciliation','')}
-  <div class="content">
-    ${note('System-computed close-out figures — this is the last look before the shift is sealed.')}
-    ${card('',
-      row('Opening Meter',state.shift.opening.toFixed(2)+' L',true)+
-      row('Closing Meter',(state.closingMeterValue||0).toFixed(2)+' L',true)+
-      row('Total Dispensed',((state.closingMeterValue||0)-state.shift.opening).toFixed(2)+' L',true)+
-      row('Net Sale',((state.closingMeterValue||0)-state.shift.opening).toFixed(2)+' L',true)+
-      row('Digital Collection',money(digitalTotal()),true)+
-      row('Credit Sales',money(state.creditLog.reduce((s,c)=>s+c.amount,0)),true)+
-      row('Expenses',money(state.operations.expenses.reduce((s,e)=>s+Number(e.amt||0),0)),true)+
-      row('Cash',money(state.cash.actual),true)+
-      row('Variance',money(state.cash.actual-state.cash.expected),true)
-    )}
-    ${btn('Confirm Shift Close','nav("shiftClosed")','btn-primary green')}
-  </div>`;
-
-screens.shiftClosed = () => `
-  <div class="success-wrap">
-    <div class="success-icon">✓</div>
-    <div class="success-title">Shift Closed Successfully.</div>
-    ${note('Meter and totals are now archived. Next shift\'s opening reading will pull from this closing figure automatically.')}
-    ${card('',row('Shift ID','SFT-88214')+row('Shift Type',state.shift.type)+row('Closing Time',new Date().toLocaleString()))}
-    ${btn('Done','nav("login")')}
-  </div>`;
-
-/* --- PROFILE --- */
-screens.profile = () => `
-  ${topbar('Profile','')}
-  <div class="content">
-    ${note('Standard account section — nothing shift-specific lives here.')}
-    ${['Salesman Profile','Employee Details','Security','Settings','Help & Support','About PumpOS'].map(x=>`<div class="listitem"><span class="name" style="font-weight:500;">${x}</span><span>›</span></div>`).join('')}
-    ${btn('Logout','nav("logoutConfirm")','btn-danger')}
-  </div>${bottomNav('home')}`;
-
-screens.logoutConfirm = () => `
-  <div class="modal-overlay" style="align-items:center;">
-    <div class="modal-sheet" style="border-radius:16px;width:88%;margin:0 auto;text-align:center;">
-      <h3>Are you sure you want to logout?</h3>
-      <p>You'll need to sign in again to resume your shift tools.</p>
-      <button class="btn btn-danger" onclick="nav('login')">Logout</button>
-      <button class="btn btn-secondary" onclick="nav('profile')">Cancel</button>
-    </div>
-  </div>`;
-
-/* ---------------- RENDER ---------------- */
-function render(){
-  const el = document.getElementById('screen');
-  el.innerHTML = screens[state.screen] ? screens[state.screen]() : '<div class="content">Not found</div>';
-  if(state.modalOpen){
-    const filled = state.pin.length;
-    el.insertAdjacentHTML('beforeend', `
-      <div class="modal-overlay">
-        <div class="modal-sheet">
-          <h3>Manager Approval</h3>
-          <p>Ask a manager to enter their 4-digit approval PIN to unlock this restricted action.</p>
-          <div class="pindots">${[0,1,2,3].map(i=>`<div class="${i<filled?'filled':''}"></div>`).join('')}</div>
-          <div class="two-col" style="grid-template-columns:repeat(3,1fr);gap:10px;">
-            ${['1','2','3','4','5','6','7','8','9','','0','⌫'].map(d=>d===''?'<div></div>':`<button class="btn btn-secondary" style="margin:0;padding:12px 0;" onclick="${d==='⌫'?'state.pin=state.pin.slice(0,-1);render()':'pressPin(\''+d+'\')'}">${d}</button>`).join('')}
-          </div>
-          <button class="btn btn-ghost" style="margin-top:12px;" onclick="state.modalOpen=false;render()">Cancel</button>
-        </div>
-      </div>`);
-  }
+function customerOverview(){
+  shell(`
+    <h1 class="title">Customer Overview</h1>
+    <p class="sub">Selected Customer: <b>${selectedCustomer[1]}</b> (${selectedCustomer[2]})</p>
+    <div class="card">${rows([
+      ["Available Credit",selectedCustomer[3]],
+      ["Previous Outstanding",selectedCustomer[4]]
+    ])}</div>
+    <div class="muted-box">Available Credit Is the Credit That Can Be Given to This Customer.</div>
+    ${button("Next","screen='cfuel';render()","blue")}
+  `,"Credit Customers",true);
 }
+
+function fuelNozzle(){
+  shell(`
+    <h1 class="title">Fuel & Nozzle</h1>
+    <p class="sub">Select Fuel and Nozzle Accordingly.</p>
+    ${["Petrol","Diesel","Power"].map((x,i)=>`
+      <div class="choice ${i===0?'selected':''}" onclick="chooseFuel('${x}',this)">
+        <div class="left"><span class="fuelIcon">⛽</span><b>${x}</b></div>
+        <span class="radio">${i===0?'◉':'○'}</span>
+      </div>`).join("")}
+    <label class="label">Nozzle</label>
+    <select class="select" onchange="selectedNozzle=this.value">
+      <option>N1 — Petrol</option><option>N2 — Petrol</option>
+      <option>N3 — Diesel</option><option>N4 — Diesel</option>
+    </select>
+    ${button("Next","screen='cqty';render()","blue")}
+  `,"Credit Customers",true);
+}
+function chooseFuel(fuel,el){
+  selectedFuel=fuel;
+  document.querySelectorAll(".choice").forEach(x=>{x.classList.remove("selected");x.querySelector(".radio").textContent="○"});
+  el.classList.add("selected");el.querySelector(".radio").textContent="◉";
+  const s=document.querySelector(".select");
+  if(fuel==="Diesel"){s.innerHTML="<option>N3 — Diesel</option><option>N4 — Diesel</option>"}
+  else if(fuel==="Power"){s.innerHTML="<option>N5 — Power</option>"}
+  else{s.innerHTML="<option>N1 — Petrol</option><option>N2 — Petrol</option>"}
+  selectedNozzle=s.value;
+}
+
+function recalcFromAmount(){
+  const a=parseFloat(document.getElementById("amount").value);
+  amount=isFinite(a)?a:0;
+  quantity=rate?amount/rate:0;
+  document.getElementById("quantity").value=quantity.toFixed(2);
+}
+function recalcFromQuantity(){
+  const q=parseFloat(document.getElementById("quantity").value);
+  quantity=isFinite(q)?q:0;
+  amount=quantity*rate;
+  document.getElementById("amount").value=amount.toFixed(2);
+}
+
+function creditAmount(){
+  shell(`
+    <h1 class="title">Amount / Rate / Quantity</h1>
+    <p class="sub">Amount and Quantity Are Both Open to Fill. Filling One Automatically Adjusts the Other.</p>
+    <label class="label">Amount (₹)</label>
+    <input id="amount" class="input" inputmode="decimal" value="${amount.toFixed(2)}" oninput="recalcFromAmount()">
+    <label class="label">Rate (₹ / L)</label>
+    <input class="input" value="${rate.toFixed(2)}" readonly>
+    <label class="label">Quantity (L)</label>
+    <input id="quantity" class="input" inputmode="decimal" value="${quantity.toFixed(2)}" oninput="recalcFromQuantity()">
+    ${button("Save & Continue","screen='creview';render()","blue")}
+  `,"Credit Customers",true);
+}
+
+function creditReview(){
+  shell(`
+    <h1 class="title">Credit Customer Sale Review</h1>
+    <p class="sub">Review the Credit Customer Sale Before Saving.</p>
+    <div class="review-table">
+      ${[
+        ["Customer",selectedCustomer[1]+" ("+selectedCustomer[2]+")"],
+        ["Fuel",selectedFuel],["Nozzle",selectedNozzle],
+        ["Amount","₹ "+amount.toFixed(2)],
+        ["Rate","₹ "+rate.toFixed(2)],
+        ["Quantity",quantity.toFixed(2)+" L"]
+      ].map(x=>`<div class="review-row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}
+    </div>
+    ${button("Confirm","confirmAction('This Credit Customer Sale Will Be Added to the Customer Account.',()=>{screen='cout';render()})","green")}
+  `,"Credit Customers",true);
+}
+
+function newOutstanding(){
+  const previous=12450,newOut=previous+amount;
+  shell(`
+    <h1 class="title">New Outstanding</h1>
+    <div class="card">${rows([
+      ["Previous Outstanding","₹ "+previous.toFixed(2)],
+      ["+ New Credit Customer Sale","₹ "+amount.toFixed(2)],
+      ["New Outstanding","₹ "+newOut.toFixed(2)]
+    ])}</div>
+    <div class="toast">Credit Customer Sale Added Successfully.</div>
+    ${button("Confirm & Close","screen='csuccess';render()","green")}
+  `,"Credit Customers",true);
+}
+
+function creditSuccess(){
+  shell(`
+    <div class="success"><div class="check">✓</div><h2>Credit Customer Sale Added Successfully.</h2><p>The Credit Customer Sale Has Been Recorded.</p></div>
+    ${button("Return to Customers","screen='credit';flow='credit';render()","green")}
+    ${button("Go to Home","screen='home';flow='normal';render()","blue")}
+  `,"Credit Customers",true);
+}
+
+/* DIGITAL TRANSACTIONS */
+
+function digitalEntry(){
+  shell(`
+    <h1 class="title">Digital Transactions</h1>
+    <p class="sub">Enter Shift-End Digital Collection Totals.</p>
+    <div class="card">
+      <label class="label">UPI Total (₹)</label><input class="input" value="12,450.00" inputmode="decimal">
+      <label class="label">Card Total (₹)</label><input class="input" value="7,850.00" inputmode="decimal">
+      <label class="label">Bank / Fleet Total (₹)</label><input class="input" value="4,200.00" inputmode="decimal">
+    </div>
+    ${button("Next","screen='dreview';render()","blue")}
+  `,"Digital Transactions",true);
+}
+function digitalReview(){
+  shell(`
+    <h1 class="title">Review Digital Totals</h1>
+    <p class="sub">Please Review the Totals Before Confirming.</p>
+    <div class="card">${rows([
+      ["UPI Total","₹ 12,450.00"],["Card Total","₹ 7,850.00"],["Bank / Fleet Total","₹ 4,200.00"]
+    ])}</div>
+    <div class="totalCard"><div class="label2">Digital Total</div><strong>₹ 24,500.00</strong></div>
+    ${button("Next","screen='dconfirm';render()","blue")}
+  `,"Digital Transactions",true);
+}
+function digitalConfirm(){
+  shell(`
+    <h1 class="title">Confirm Digital Totals</h1>
+    <p class="sub">Are You Sure You Want to Save These Digital Totals for This Shift?</p>
+    <div class="totalCard"><div class="label2">Digital Total</div><strong>₹ 24,500.00</strong></div>
+    ${button("Confirm","confirmAction('The Digital Transaction Totals Will Be Saved for This Shift.',()=>{screen='dsuccess';render()})","green")}
+  `,"Digital Transactions",true);
+}
+function digitalSuccess(){
+  shell(`
+    <div class="success"><div class="check">✓</div><h2>Digital Transactions Saved Successfully.</h2><p>Your Shift-End Digital Totals Have Been Recorded.</p></div>
+    ${button("Next","screen='dlist';render()","blue")}
+  `,"Digital Transactions",true);
+}
+function digitalList(){
+  shell(`
+    <h1 class="title">Digital Transactions</h1>
+    <p class="sub">Saved Shift Transactions.</p>
+    <div class="card"><b>27 Aug 2026 — 24 Hours Shift</b>${rows([
+      ["Digital Total","₹ 24,500.00"],["UPI Total","₹ 12,450.00"],
+      ["Card Total","₹ 7,850.00"],["Bank / Fleet Total","₹ 4,200.00"]
+    ])}</div>
+    ${button("Go to Home","screen='home';flow='normal';render()","blue")}
+  `,"Digital Transactions",true);
+}
+
+/* OPERATIONS */
+
+function operations(){
+  shell(`
+    <h1 class="title">Operations</h1>
+    <p class="sub">Select an Operation.</p>
+    ${[
+      ["Nozzle Accuracy Test (NAT)","nat"],
+      ["Expenses","expenses"],
+      ["Others","others"]
+    ].map(x=>`<div class="item" onclick="screen='${x[1]}';render()"><div class="grow"><b>${x[0]}</b></div><span>›</span></div>`).join("")}
+  `,"Operations",true);
+}
+function nat(){
+  shell(`
+    <h1 class="title">Nozzle Accuracy Test (NAT)</h1>
+    <label class="label">Nozzle</label><select class="select"><option>N1 — Petrol</option><option>N2 — Petrol</option></select>
+    <label class="label">Fuel</label><select class="select"><option>Petrol</option><option>Diesel</option></select>
+    <label class="label">Dispensed Quantity (L)</label><input class="input" value="10.00" inputmode="decimal">
+    <label class="label">Actual Measured Quantity (L)</label><input class="input" value="10.02" inputmode="decimal">
+    <label class="label">Variance (L)</label><input class="input" value="+0.02" readonly>
+    ${button("Save","screen='opsuccess';render()","green")}
+  `,"Operations",true);
+}
+function expenses(){
+  shell(`
+    <h1 class="title">Expenses</h1>
+    <label class="label">Expense Category</label><select class="select"><option>Select Category</option><option>Station Expense</option><option>Maintenance</option><option>Transport</option></select>
+    <label class="label">Amount (₹)</label><input class="input" placeholder="Enter Amount" inputmode="decimal">
+    <label class="label">Note (Optional)</label><input class="input" placeholder="Enter Note">
+    ${button("Save","screen='opsuccess';render()","green")}
+  `,"Operations",true);
+}
+function others(){
+  shell(`
+    <h1 class="title">Others</h1>
+    <label class="label">Type</label><select class="select"><option>Select Type</option><option>Other Entry</option><option>Adjustment</option></select>
+    <label class="label">Description</label><input class="input" placeholder="Enter Details">
+    <label class="label">Amount (₹) (Optional)</label><input class="input" placeholder="Enter Amount" inputmode="decimal">
+    ${button("Save","screen='opsuccess';render()","green")}
+  `,"Operations",true);
+}
+function operationSuccess(){
+  shell(`
+    <div class="success"><div class="check">✓</div><h2>Entry Saved Successfully.</h2><p>Your Entry Has Been Recorded.</p></div>
+    ${button("Return to Operations","screen='operations';flow='operations';render()","green")}
+    ${button("Go to Home","screen='home';flow='normal';render()","blue")}
+  `,"Operations",true);
+}
+
+/* SHIFT SUMMARY — LOCKED TWO-COLUMN STRUCTURE */
+
+function summary(){
+  shell(`
+    <h1 class="title">Summary</h1>
+    <p class="sub">Shift Review Only. This Screen Will Not Close the Shift.</p>
+
+    <div class="card">
+      <div class="section-title" style="margin-top:0">Fuel Summary</div>
+
+      <!-- ONLY TWO VALUE COLUMNS -->
+      <div class="two" style="border-bottom:1px solid #edf1f2;padding:10px 0;font-size:12px;font-weight:800">
+        <div>MS</div><div style="text-align:right">HSD</div>
+      </div>
+
+      <!-- Shared Label; MS/HSD values stay inside their respective columns -->
+      <div style="padding:10px 0;border-bottom:1px solid #edf1f2">
+        <div style="font-size:11px;font-weight:800;margin-bottom:8px">TOTAL DISPENSED</div>
+        <div class="two"><strong>1,250.00 L</strong><strong style="text-align:right">980.00 L</strong></div>
+      </div>
+
+      <div style="padding:10px 0;border-bottom:1px solid #edf1f2">
+        <div style="font-size:11px;font-weight:800;margin-bottom:8px">NAT / TEST</div>
+        <div class="two"><strong>10.02 L</strong><strong style="text-align:right">5.01 L</strong></div>
+      </div>
+
+      <div style="padding:10px 0;border-bottom:1px solid #edf1f2">
+        <div style="font-size:11px;font-weight:800;margin-bottom:8px">NET SALE</div>
+        <div class="two"><strong>1,239.98 L</strong><strong style="text-align:right">974.99 L</strong></div>
+      </div>
+
+      <div style="padding:10px 0 2px">
+        <div style="font-size:11px;font-weight:800;margin-bottom:8px">SALE AMOUNT</div>
+        <div class="two"><strong>₹ 1,30,197.90</strong><strong style="text-align:right">₹ 91,123.80</strong></div>
+      </div>
+    </div>
+
+    <div class="totalCard">
+      <div class="label2">TOTAL SALE AMOUNT</div>
+      <strong>₹ 2,21,321.70</strong>
+    </div>
+
+    <!-- MS and HSD are explicitly mapped to their own meter buttons -->
+    <div class="two">
+      ${button("View MS Meters ›","screen='meters';render()","light")}
+      ${button("View HSD Meters ›","screen='meters';render()","light")}
+    </div>
+
+    <div class="card">
+      <b>COLLECTION</b>
+      <div style="font-size:22px;font-weight:900;margin-top:8px">₹ 2,24,871.70</div>
+      ${button("View Details ›","screen='collection';render()","light")}
+    </div>
+
+    <div class="card">
+      <b>CASH RECONCILIATION</b>
+      <div class="two" style="margin-top:10px">
+        <div><div class="small-note">EXPECTED CASH</div><strong>₹ 75,000.00</strong></div>
+        <div><div class="small-note">ACTUAL CASH</div><strong>₹ 74,500.00</strong></div>
+      </div>
+      <div style="margin-top:12px"><div class="small-note">VARIANCE</div><strong>– ₹ 500.00</strong></div>
+    </div>
+  `,"Summary",true);
+}
+
+function meters(){
+  shell(`
+    <h1 class="title">Meter Details</h1>
+    <p class="sub">View Meter Readings for the Current Shift.</p>
+    <div class="meter-card"><h3>MS</h3>${rows([
+      ["Opening Meter","10,000.00 L"],["Closing Meter","11,250.00 L"],["Total Dispensed","1,250.00 L"]
+    ])}</div>
+    <div class="meter-card"><h3>HSD</h3>${rows([
+      ["Opening Meter","8,000.00 L"],["Closing Meter","8,980.00 L"],["Total Dispensed","980.00 L"]
+    ])}</div>
+  `,"Summary",true);
+}
+
+function collectionDetails(){
+  shell(`
+    <h1 class="title">Collection Details</h1>
+    <p class="sub">Collection Breakup for the Current Shift.</p>
+    <div class="card">${rows([
+      ["Digital","₹ 24,500.00"],["Credit","₹ 12,450.00"],
+      ["Expenses","₹ 3,500.00"],["Total Collection","₹ 2,24,871.70"]
+    ])}</div>
+  `,"Summary",true);
+}
+
+/* SHIFT STATUS / CLOSE SHIFT / PROFILE */
+
+function shiftStatus(){
+  shell(`
+    <h1 class="title">Shift Status</h1>
+    <div class="toast">SHIFT ONGOING</div>
+    <div class="card">${rows([
+      ["Shift Type","24 Hours Shift"],["Shift ID","MS-270826-01"],
+      ["Start Time","27 Aug 2026, 09:00 AM"],["End Time","28 Aug 2026, 09:00 AM"],
+      ["Machine / Nozzle","M1, N1"],["Machine Status","All Machines Online"],
+      ["Pending Action / Alert","None"]
+    ])}</div>
+  `,"Shift Status",true);
+}
+
+function closeShift(){
+  shell(`
+    <h1 class="title">Close Shift</h1>
+    <p class="sub">Complete All Required Items Before Closing the Shift.</p>
+    <div class="lock"><b>Close Shift Is Locked</b> Until the Final 15 Minutes of the Shift. Required Review Items Remain Protected Until Permitted.</div>
+    <div class="card">
+      ${[
+        ["NAT / Test Recording","Completed","status-ok"],
+        ["Digital Transactions Total","Completed","status-ok"],
+        ["Expenses Entry","Completed","status-ok"],
+        ["Cash Reconciliation","Pending","status-pending"],
+        ["Closing Meter","Pending","status-pending"],
+        ["Auto Sales Calculation","Completed","status-ok"],
+        ["Credit Reconciliation","Completed","status-ok"]
+      ].map(x=>`<div class="row"><span>${x[0]}</span><span class="${x[2]}">${x[1]}</span></div>`).join("")}
+    </div>
+    ${button("Close Shift","showToast('Close Shift Is Locked Until the Final 15 Minutes.','warn')","green")}
+  `,"Close Shift",true);
+}
+
+function profile(){
+  shell(`
+    <h1 class="title">Profile</h1>
+    <div class="card">
+      <div style="display:flex;gap:11px;align-items:center">
+        <div class="home-logo">♙</div>
+        <div><b>Salesman</b><div class="small-note">Employee ID: EMP00123</div><div class="small-note">Role: Salesman</div></div>
+      </div>
+    </div>
+    ${["Salesman Profile","Employee Details","Security","Settings","Help & Support","About PumpOS"].map(x=>
+      `<div class="item"><div class="grow"><b>${x}</b></div><span>›</span></div>`).join("")}
+    <button class="btn light logout" onclick="screen='login';flow='normal';render()">Logout</button>
+  `,"Profile",true);
+}
+
 render();
+if("serviceWorker" in navigator && location.protocol!=="file:"){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
 </script>
 </body>
 </html>
