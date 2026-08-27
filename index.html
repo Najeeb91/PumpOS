@@ -1,45 +1,35 @@
-<!doctype html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PumpOS Owner</title>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PumpOS Owner Summary</title>
 <style>
 :root{--bg:#F8F7F2;--n:#1a2332;--g:#5FA83E;--s:#5a6472;--l:#e5e3da;--w:#fff}
-*{box-sizing:border-box}body{margin:0;background:#e7e5df;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:var(--n)}
-.app{max-width:390px;min-height:100vh;margin:auto;background:var(--bg);position:relative}.screen{min-height:100vh;padding-bottom:86px}
-header{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--l);position:sticky;top:0;background:#faf9f5;z-index:5}
+*{box-sizing:border-box}body{margin:0;background:#e6e4de;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:var(--n)}
+.app{max-width:390px;min-height:100vh;margin:auto;background:var(--bg)}.screen{min-height:100vh;padding-bottom:84px}
+header{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--l);background:#faf9f5;position:sticky;top:0;z-index:5}
 header b{font-size:17px}header button{border:0;background:none;font-size:22px;color:var(--n)}
 main{padding:18px 16px}h1{font-size:25px;margin:0 0 5px;font-weight:800}h2{font-size:16px;margin:0}.sub{font-size:11px;color:var(--s);margin:0;line-height:1.5}
-.period{display:flex;gap:6px;margin:14px 0;overflow:auto}.period button{background:#fff;border:1px solid var(--l);border-radius:10px;padding:8px 11px;font-size:10px;font-weight:700;white-space:nowrap}.period .on{background:var(--n);color:#fff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric,.card,.tile,.row{background:#fff;border:1px solid var(--l);border-radius:14px;box-shadow:0 2px 10px #1a23320a}.metric{padding:13px}.metric small{font-size:10px;color:var(--s)}.metric strong{display:block;font-size:17px;margin-top:5px}.green{color:var(--g)}
-.card{padding:14px;margin-top:12px}.row{padding:11px 12px;display:flex;justify-content:space-between;align-items:center;margin:8px 0;font-size:11px}.row small{display:block;color:var(--s);font-size:9px;margin-top:3px}.row strong{text-align:right}
-.tile{min-height:86px;padding:13px;cursor:pointer}.tile span{display:block;font-size:21px;margin-bottom:8px}.tile b{font-size:11px}.section{font-size:12px;font-weight:800;margin:18px 0 8px}.alert{padding:12px;border-radius:12px;background:#fff8ef;border:1px solid #efdcc3;font-size:11px;margin:8px 0}
+.period{display:flex;gap:6px;margin:14px 0;overflow:auto}.period button{background:#fff;border:1px solid var(--l);border-radius:10px;padding:8px 11px;font-size:10px;font-weight:750;white-space:nowrap}.period .on{background:var(--n);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric,.card,.row{background:#fff;border:1px solid var(--l);border-radius:14px;box-shadow:0 2px 10px #1a23320a}.metric{padding:13px}.metric small{font-size:10px;color:var(--s)}.metric strong{display:block;font-size:17px;margin-top:5px}.green{color:var(--g)}
+.card{padding:14px;margin-top:12px}.section{font-size:12px;font-weight:800;margin:18px 0 8px}.row{padding:11px 12px;margin:8px 0;font-size:11px;display:flex;justify-content:space-between;align-items:center}.row small{display:block;color:var(--s);font-size:9px;margin-top:3px}.row strong{text-align:right}
+input{width:100%;height:46px;border:1px solid var(--l);border-radius:12px;background:#fff;padding:0 12px;font-size:12px;color:var(--n)}
+.btn{width:100%;height:48px;border-radius:13px;margin-top:10px;font-weight:800}.primary{background:var(--g);color:#fff;border:0}.outline{background:#fff;color:var(--n);border:1px solid #aeb4b2}
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100%);height:78px;background:#fff;border-top:1px solid var(--l);display:grid;grid-template-columns:repeat(5,1fr);z-index:20}.nav button{border:0;background:#fff;color:#69727c;font-size:8px;font-weight:750}.nav span{display:block;font-size:17px;line-height:22px}.nav .on{color:var(--g)}
-.btn{width:100%;height:48px;border:0;border-radius:13px;margin-top:10px;font-weight:800}.primary{background:var(--g);color:#fff}.outline{background:#fff;border:1px solid #aeb4b2;color:var(--n)}
-@media(min-width:700px){body{padding:20px 0}.app{min-height:844px;border-radius:28px;box-shadow:0 20px 60px #0002}}
+.note{font-size:10px;color:var(--s);margin-top:7px}.bar{height:8px;background:#eeeDE8;border-radius:20px;overflow:hidden;margin-top:9px}.bar i{display:block;height:100%;background:var(--g);border-radius:20px}
 </style></head><body><div class="app" id="app"></div>
 <script>
-let state={page:"home",period:"Today"};
+let period="Today";
 const nav=[["home","⌂","Home"],["reports","▥","Reports"],["alerts","!","Alerts"],["settings","⚙","Settings"],["profile","♙","Profile"]];
-function money(n){return"₹"+n.toLocaleString("en-IN",{minimumFractionDigits:2})}
-function periods(){return'<div class="period">'+["Today","This Week","This Month","Custom"].map(x=>`<button class="${state.period==x?"on":""}" onclick="state.period='${x}';render()">${x}</button>`).join("")+"</div>"}
-function navBar(){return'<nav class="nav">'+nav.map(x=>`<button class="${state.page==x[0]?"on":""}" onclick="go('${x[0]}')"><span>${x[1]}</span>${x[2]}</button>`).join("")+"</nav>"}
-function header(t,back=true){return`<header><button onclick="${back?'go("home")':''}">${back?"‹":""}</button><b>${t}</b><button>♙</button></header>`}
-function shell(t,body,back=true){document.getElementById("app").innerHTML=`<div class="screen">${header(t,back)}<main>${body}</main></div>${navBar()}`}
-function go(p){state.page=p;render()}
-function home(){shell("",`
-<div><h2>Hello, Owner</h2><p class="sub">Asian Filling Station · Command Center</p></div>
-${periods()}<div class="grid">
-${[["Total Sales",money(486250)],["Fuel Volume","4,386.70 L"],["Cash",money(212450)],["Digital",money(186300)],["Credit",money(87500)],["Expenses",money(12400)]].map(x=>`<div class="metric"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join("")}</div>
-<div class="card"><div style="display:flex;justify-content:space-between"><h2>Station Status</h2><b class="green" style="font-size:10px">Operational</b></div>
-<div class="row"><span>Active Shifts<small>2 Salesmen · 1 Manager</small></span><strong>3</strong></div>
-<div class="row"><span>Pumps<small>All Connected</small></span><strong class="green">4 / 4</strong></div>
-<div class="row"><span>Pending Alerts<small>Requires Attention</small></span><strong style="color:#b87931">2</strong></div></div>
-<div class="section">Quick Access</div><div class="grid">
-${[["sales","▤","Sales"],["credit","♙","Credit Customers"],["digital","▣","Digital Transactions"],["operations","◫","Operations"],["pumps","♨","Pumps & Meter"],["staff","♙","Staff & Shifts"]].map(x=>`<div class="tile" onclick="go('${x[0]}')"><span>${x[1]}</span><b>${x[2]}</b></div>`).join("")}</div>`,false)}
-function reports(){shell("Reports",`<h1>Reports</h1><p class="sub">Choose A Reporting Period</p>${periods()}<div class="section">Reports</div>${["Daily Sales Report","Fuel Summary","Cash Summary","Digital Reconciliation","Credit Report","Expense Report","Shift Report","Meter Report","Staff Performance"].map(x=>`<div class="row"><span>${x}<small>View Report</small></span><strong>›</strong></div>`).join("")}`)}
-function alerts(){shell("Alerts",`<h1>Alerts</h1><p class="sub">Exceptions That Need Attention</p><div class="alert"><b>Meter Variance</b><br>Machine M2 · 1.75 L variance</div><div class="alert"><b>Digital Reconciliation Pending</b><br>3 transactions require review</div><div class="section">Resolved</div><div class="row"><span>Credit Limit Exception<small>Resolved · Today</small></span><strong class="green">✓</strong></div>`)}
-function settings(){shell("Settings",`<h1>Settings</h1><p class="sub">Owner Control Center</p><div class="section">Organization</div>${["Station Details","Fuel & Pricing","Financial Settings"].map(x=>`<div class="row"><span>${x}</span><strong>›</strong></div>`).join("")}<div class="section">Users & Permissions</div>${["Users","Role Permissions","Approval Rules"].map(x=>`<div class="row"><span>${x}<small>View And Edit</small></span><strong>›</strong></div>`).join("")}<div class="section">Controls</div>${["Sales Controls","Credit Controls","Meter Controls","Shift Controls","Digital Controls"].map(x=>`<div class="row"><span>${x}<small>Enable · Disable · Lock</small></span><strong>›</strong></div>`).join("")}<div class="section">Security</div><div class="row"><span>Audit Log</span><strong>›</strong></div>`)}
-function profile(){shell("Profile",`<h1>Owner Profile</h1><div class="card">${[["Name","Owner"],["Role","Owner"],["Station","Asian Filling Station"]].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div><button class="btn outline">Security</button><button class="btn outline">Login Activity</button><button class="btn primary">Log Out</button>`)}
-function detail(t){shell(t,`<h1>${t}</h1><p class="sub">Owner Monitoring</p>${periods()}<div class="grid"><div class="metric"><small>Today</small><strong class="green">${money(486250)}</strong></div><div class="metric"><small>Transactions</small><strong>1,248</strong></div></div><div class="section">Recent Activity</div>${["Sale Recorded","Digital Transaction","Expense Added","Shift Started"].map(x=>`<div class="row"><span>${x}<small>View Details</small></span><strong>›</strong></div>`).join("")}<button class="btn outline" onclick="go('home')">Back to Home</button>`)}
-function render(){if(state.page=="home")home();else if(state.page=="reports")reports();else if(state.page=="alerts")alerts();else if(state.page=="settings")settings();else if(state.page=="profile")profile();else detail(state.page=="pumps"?"Pumps & Meter":state.page.replace(/^\w/,c=>c.toUpperCase()))}
+const data={Today:{sales:"₹4,86,250.00",vol:"4,386.70 L",cash:"₹2,12,450.00",digital:"₹1,86,300.00",credit:"₹87,500.00",expense:"₹12,400.00",tx:"1,248"}, "This Week":{sales:"₹21,84,500.00",vol:"19,840.40 L",cash:"₹9,12,800.00",digital:"₹8,31,200.00",credit:"₹4,40,500.00",expense:"₹58,700.00",tx:"5,712"}, "This Month":{sales:"₹82,46,500.00",vol:"74,910.20 L",cash:"₹34,82,450.00",digital:"₹31,20,300.00",credit:"₹16,43,750.00",expense:"₹2,16,900.00",tx:"21,436"}};
+function navBar(){return'<nav class="nav">'+nav.map(x=>`<button class="${x[0]=="home"?"on":""}" onclick="alert('This prototype keeps Owner navigation focused on monitoring.')"><span>${x[1]}</span>${x[2]}</button>`).join("")+'</nav>'}
+function periods(){return'<div class="period">'+["Today","This Week","This Month","Custom"].map(x=>`<button class="${period==x?"on":""}" onclick="setPeriod('${x}')">${x}</button>`).join("")+'</div>'}
+function setPeriod(x){if(x=="Custom"){custom();return}period=x;render()}
+function header(){return'<header><button onclick="render()">‹</button><b>Summary</b><button>♙</button></header>'}
+function shell(body){document.getElementById("app").innerHTML='<div class="screen">'+header()+'<main>'+body+'</main></div>'+navBar()}
+function custom(){shell(`<h1>Custom Summary</h1><p class="sub">Select A Date Range</p><div class="card"><label class="section">From Date</label><input type="date" id="from"><label class="section">To Date</label><input type="date" id="to"><button class="btn primary" onclick="applyCustom()">Apply Date Range</button></div>`)}
+function applyCustom(){period="Custom";shell(`<h1>Custom Summary</h1><p class="sub">01 Aug 2026 – 27 Aug 2026</p><div class="grid"><div class="metric"><small>Total Sales</small><strong class="green">₹74,28,650.00</strong></div><div class="metric"><small>Fuel Volume</small><strong>67,420.50 L</strong></div><div class="metric"><small>Cash</small><strong>₹31,22,400.00</strong></div><div class="metric"><small>Digital</small><strong>₹28,46,800.00</strong></div><div class="metric"><small>Credit</small><strong>₹14,59,450.00</strong></div><div class="metric"><small>Expenses</small><strong>₹1,94,300.00</strong></div></div><button class="btn outline" onclick="render()">Change Date Range</button>`)}
+function render(){let d=data[period]||data.Today;shell(`<h1>Owner Summary</h1><p class="sub">Station Performance · ${period}</p>${periods()}<div class="grid"><div class="metric"><small>Total Sales</small><strong class="green">${d.sales}</strong></div><div class="metric"><small>Fuel Volume</small><strong>${d.vol}</strong></div><div class="metric"><small>Cash</small><strong>${d.cash}</strong></div><div class="metric"><small>Digital</small><strong>${d.digital}</strong></div><div class="metric"><small>Credit</small><strong>${d.credit}</strong></div><div class="metric"><small>Expenses</small><strong>${d.expense}</strong></div></div>
+<div class="card"><h2>Collection Mix</h2><div class="row"><span>Cash<small>Recorded Collections</small></span><strong>${d.cash}</strong></div><div class="row"><span>Digital<small>UPI · Card · Bank</small></span><strong>${d.digital}</strong></div><div class="row"><span>Credit<small>Customer Credit</small></span><strong>${d.credit}</strong></div></div>
+<div class="section">Operational Snapshot</div><div class="row"><span>Transactions<small>All Recorded Transactions</small></span><strong>${d.tx}</strong></div><div class="row"><span>Active Shifts<small>Current Station Activity</small></span><strong>3</strong></div><div class="row"><span>Pumps<small>Connected</small></span><strong class="green">4 / 4</strong></div>
+<div class="section">Owner Attention</div><div class="card"><div class="row"><span>Meter Variance<small>Machine M2 · 1.75 L</small></span><strong style="color:#b87931">Review</strong></div><div class="row"><span>Digital Reconciliation<small>3 Transactions Pending</small></span><strong style="color:#b87931">Review</strong></div></div>`)}
 render();
 </script></body></html>
