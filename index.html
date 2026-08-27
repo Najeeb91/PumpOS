@@ -1,82 +1,534 @@
 <!doctype html>
-<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PumpOS Salesman Module</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F8F7F2">
+<title>PumpOS — Salesman Module</title>
 <style>
-:root{--n:#073f4b;--b:#0b56c9;--g:#159447;--bg:#f5f7f8;--line:#dce5e9}
-*{box-sizing:border-box}body{margin:0;background:#e8edef;font-family:Arial,sans-serif;color:#132027}.app{max-width:430px;min-height:100vh;margin:auto;background:var(--bg)}
-header{height:62px;background:var(--n);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:5}
-main{padding:18px 15px 92px}h1{font-size:22px;margin:0 0 6px}h2{font-size:18px}p{font-size:13px;color:#66757d}.card,.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}.item{display:flex;align-items:center;gap:10px;cursor:pointer}.item b{flex:1}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 8px;text-align:center;font-weight:800;cursor:pointer}.ico{font-size:27px;display:block;margin-bottom:7px}.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #edf1f2;font-size:13px}.row:last-child{border:0}.v{font-weight:800;text-align:right}.btn{width:100%;border:0;border-radius:11px;padding:13px;margin-top:10px;background:var(--n);color:#fff;font-weight:800;font-size:14px;cursor:pointer}.blue{background:var(--b)}.green{background:var(--g)}.light{background:#fff;color:var(--n);border:1px solid #b9cbd1}.input{width:100%;height:46px;border:1px solid #ccd8dd;border-radius:10px;padding:0 12px;margin:5px 0 11px;font-size:15px}.label{font-size:12px;font-weight:800}.success{text-align:center;padding:40px 8px}.check{width:74px;height:74px;border-radius:50%;background:var(--g);color:#fff;font-size:46px;display:grid;place-items:center;margin:auto}.nav{position:fixed;bottom:0;width:min(100%,430px);height:70px;background:#fff;border-top:1px solid #d9e1e5;display:grid;grid-template-columns:repeat(4,1fr);z-index:8}.nav button{border:0;background:#fff;font-size:10px;font-weight:700;color:#65747b}.nav .active{color:var(--b)}.nav span{display:block;font-size:19px;margin-bottom:3px}.homehead{display:flex;justify-content:space-between}.count{text-align:right}.count strong{display:block;font-size:24px;margin-top:4px}.summaryTotal{background:#edf8f0;border:1px solid #cce6d3;border-radius:14px;text-align:center;padding:15px}.summaryTotal b{display:block;font-size:25px;color:var(--g);margin-top:5px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.muted{color:#6d7b82;font-size:12px}
-</style></head><body><div class="app" id="app"></div>
+:root{
+  --bg:#F8F7F2;
+  --navy:#1a2332;
+  --green:#5FA83E;
+  --green-dark:#4d8f32;
+  --gray:#5a6472;
+  --line:#e5e3da;
+  --white:#fff;
+  --soft:#f1f4ef;
+  --danger:#b94b43;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#e7e5df;color:var(--navy);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif}
+body{min-height:100vh}
+button,input{font:inherit}
+button{touch-action:manipulation}
+.app{
+  width:100%;max-width:390px;min-height:100vh;margin:auto;background:var(--bg);
+  position:relative;overflow:hidden
+}
+.screen{
+  min-height:100vh;padding-bottom:88px;overflow-y:auto;
+  scrollbar-width:none
+}
+.screen::-webkit-scrollbar{display:none}
+.header{
+  height:64px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;border-bottom:1px solid rgba(229,227,218,.65);
+  background:rgba(248,247,242,.96);position:sticky;top:0;z-index:20
+}
+.header-title{font-size:17px;font-weight:750;letter-spacing:-.2px}
+.icon-btn{
+  width:34px;height:34px;border:0;background:transparent;color:var(--navy);
+  display:grid;place-items:center;font-size:22px;padding:0
+}
+.content{padding:18px 16px 12px}
+h1{font-size:25px;line-height:1.12;margin:0 0 5px;font-weight:780;letter-spacing:-.55px}
+h2{font-size:18px;margin:0;font-weight:750}
+h3{font-size:14px;margin:0 0 8px;font-weight:750}
+.sub{margin:0;color:var(--gray);font-size:12px;line-height:1.45}
+.active{color:var(--green);font-weight:750}
+.card,.field,.list-row,.tile,.success-card{
+  background:var(--white);border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 2px 10px rgba(26,35,50,.035)
+}
+.card{padding:14px;margin-top:12px}
+.shift-card{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.shift-left{min-width:0}.shift-date{font-size:14px;font-weight:750;margin-bottom:5px}
+.shift-time{font-size:11px;color:var(--gray)}
+.count{text-align:right;white-space:nowrap}
+.count small{display:block;color:var(--gray);font-size:10px}
+.count strong{display:block;color:var(--green);font-size:13px;margin-top:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.tile{
+  min-height:108px;padding:14px 9px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;cursor:pointer
+}
+.tile.selected{border-color:var(--green);box-shadow:0 0 0 1px rgba(95,168,62,.35) inset}
+.tile-icon{font-size:24px;margin-bottom:8px;color:var(--navy)}
+.tile strong{font-size:12px;line-height:1.25}
+.tile small{font-size:10px;color:var(--gray);margin-top:5px}
+.search{
+  width:100%;height:44px;border:1px solid var(--line);border-radius:12px;
+  background:#fff;padding:0 13px 0 38px;color:var(--navy);outline:none
+}
+.search:focus{border-color:#a9c99b;box-shadow:0 0 0 3px rgba(95,168,62,.10)}
+.search-wrap{position:relative;margin:14px 0 10px}
+.search-icon{position:absolute;left:13px;top:11px;color:var(--gray);font-size:16px}
+.section-label{font-size:12px;font-weight:780;margin:16px 0 8px}
+.list-row{
+  min-height:62px;padding:10px 11px;display:flex;align-items:center;gap:10px;
+  margin:8px 0;cursor:pointer
+}
+.avatar{
+  width:32px;height:32px;border-radius:50%;background:#eef1ec;display:grid;place-items:center;
+  color:var(--green);font-size:15px;flex:none
+}
+.grow{flex:1;min-width:0}
+.name{font-size:12px;font-weight:750}.code{font-size:10px;color:var(--gray);margin-top:3px}
+.money{text-align:right;font-size:12px;font-weight:780;white-space:nowrap}
+.money small{display:block;color:#c66b3b;font-size:9px;margin-top:3px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #efeee9;font-size:12px}
+.row:last-child{border-bottom:0}
+.row strong{text-align:right}
+.btn{
+  width:100%;min-height:48px;border-radius:13px;border:1px solid transparent;
+  font-size:13px;font-weight:780;cursor:pointer;margin-top:10px
+}
+.btn.primary{background:var(--green);color:#fff}
+.btn.primary:active{background:var(--green-dark)}
+.btn.outline{background:#fff;color:var(--navy);border-color:#aeb4b2}
+.btn.ghost{background:transparent;color:var(--green);border-color:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.notice{
+  background:#f0f3f0;border:1px solid #e1e7df;border-radius:12px;
+  padding:11px 12px;font-size:11px;color:var(--gray);line-height:1.45;margin-top:10px
+}
+.balance{
+  display:grid;grid-template-columns:1fr 1fr;background:#f5f7f2;border:1px solid #e7eadf;
+  border-radius:12px;overflow:hidden;margin-top:12px
+}
+.balance>div{padding:13px}.balance>div+div{border-left:1px solid #e0e4db}
+.balance small{display:block;color:var(--gray);font-size:10px;margin-bottom:4px}
+.balance strong{font-size:14px}
+.balance .green{color:var(--green)}
+.balance .orange{color:#c66b3b}
+.choice{
+  border:1px solid var(--line);background:#fff;border-radius:13px;padding:13px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0;cursor:pointer
+}
+.choice.selected{border-color:#9cc28d;box-shadow:0 0 0 1px rgba(95,168,62,.25) inset}
+.choice-left{display:flex;align-items:center;gap:11px}
+.fuel-icon{width:35px;height:35px;border-radius:10px;background:#f0f4ed;display:grid;place-items:center;color:var(--green)}
+.choice strong{font-size:13px}.choice small{display:block;font-size:10px;color:var(--gray);margin-top:3px}
+.check{color:var(--green);font-size:18px}
+.select-box{
+  height:48px;border:1px solid var(--line);border-radius:12px;background:#fff;
+  display:flex;align-items:center;justify-content:space-between;padding:0 13px;
+  font-size:12px;font-weight:700;margin-top:7px
+}
+.field-label{font-size:11px;font-weight:780;margin-top:13px;display:block}
+.field{
+  width:100%;height:54px;margin-top:7px;padding:0 13px;border-radius:12px;
+  outline:none;font-size:17px;color:var(--navy)
+}
+.field:focus{border-color:#a9c99b;box-shadow:0 0 0 3px rgba(95,168,62,.10)}
+.field.readonly{background:#f7f8f5;color:var(--gray)}
+.amount-field{font-size:20px;font-weight:720}
+.helper{font-size:10px;color:var(--gray);line-height:1.4;margin-top:8px}
+.review-card{margin-top:14px}
+.review-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #efeee9;font-size:12px}
+.review-row:last-child{border-bottom:0}
+.review-row strong{text-align:right}
+.total{color:var(--green);font-size:15px}
+.outstanding{
+  text-align:center;padding:20px 12px
+}
+.outstanding .circle,.success .circle{
+  width:66px;height:66px;border-radius:50%;margin:0 auto 12px;
+  border:2px solid var(--green);color:var(--green);display:grid;place-items:center;font-size:31px;
+  background:#f0f7ed
+}
+.outstanding h2,.success h2{color:var(--green);font-size:16px;margin-bottom:5px}
+.success{text-align:center;padding:22px 12px 12px}
+.success-card{padding:14px;margin-top:14px;text-align:left}
+.success-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.success-actions .btn{margin-top:0}
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100%);
+  height:76px;background:#fff;border-top:1px solid var(--line);display:grid;
+  grid-template-columns:repeat(4,1fr);z-index:50;padding-bottom:env(safe-area-inset-bottom)
+}
+.nav button{border:0;background:#fff;color:#69727c;font-size:9px;font-weight:720;cursor:pointer;padding:5px 2px}
+.nav button span{display:block;font-size:18px;line-height:22px;margin-bottom:2px}
+.nav button.active{color:var(--green)}
+.nav button.active span{font-weight:800}
+.home-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.home-name{font-size:20px;font-weight:780;margin:0 0 3px}
+.add-customer{margin-top:10px}
+.hidden{display:none}
+@media(min-width:700px){
+  body{padding:20px 0}
+  .app{min-height:844px;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.10)}
+  .screen{min-height:844px}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
 <script>
-let screenName='login',flow='normal',customer=null;
-const customers=[['AT','Aarun Traders','CUS1001','₹37,550','₹12,450'],['SS','ShaktiKiran Store','CUS1002','₹25,000','₹8,250'],['RE','Raju Enterprises','CUS1003','₹42,100','₹5,600'],['MM','Modern Market','CUS1004','₹31,500','₹9,850']];
+const state = {
+  screen:"home",
+  customer:"Arun Traders",
+  customerCode:"AT-001",
+  fuel:"Petrol",
+  rate:105.20,
+  nozzle:"N1",
+  amount:1052,
+  quantity:10,
+  search:"",
+  previousOutstanding:12450
+};
+
+const customers = [
+  ["Arun Traders","AT-001","₹37,550.00"],
+  ["Sharma Transport","ST-002","₹12,450.00"],
+  ["Kumar Enterprises","KE-003","₹8,760.00"],
+  ["R.K. Industries","RK-004","₹25,000.00"]
+];
+
+function navItems(){
+  if(["credit","summary","overview","fuel","sale","review","outstanding","success","addCustomer"].includes(state.screen))
+    return [["home","⌂","Home"],["digital","▣","Digital Transactions"],["operations","▤","Operations"],["summary","◔","Summary"]];
+  return [["home","⌂","Home"],["shift","◷","Shift Status"],["close","▣","Close Shift"],["profile","♙","Profile"]];
+}
+
 function nav(){
- let a=flow==='credit'?['home','digital','operations','summary']:
- flow==='digital'?['home','credit','operations','summary']:
- flow==='operations'?['home','credit','digital','summary']:
- flow==='summary'?['home','credit','digital','operations']:
- ['home','shift','close','profile'];
- let names={home:'Home',shift:'Shift Status',close:'Close Shift',profile:'Profile',credit:'Credit Customers',digital:'Digital Transactions',operations:'Operations',summary:'Summary'};
- return '<div class="nav">'+a.map(x=>'<button class="'+(x===flow?'active':'')+'" onclick="go(\''+x+'\')"><span>'+({home:'⌂',shift:'◷',close:'▣',profile:'♙',credit:'♙',digital:'▣',operations:'⚙',summary:'◔'}[x])+'</span>'+names[x]+'</button>').join('')+'</div>'
+  return `<nav class="nav">${navItems().map(([key,icon,label])=>{
+    const active = (key==="home" && state.screen==="home") ||
+      (key==="digital" && state.screen==="digital") ||
+      (key==="operations" && state.screen==="operations") ||
+      (key==="summary" && ["summary","overview","fuel","sale","review","outstanding","success","addCustomer","credit"].includes(state.screen));
+    return `<button class="${active?'active':''}" onclick="go('${key}')"><span>${icon}</span>${label}</button>`;
+  }).join("")}</nav>`;
 }
-function head(t='PumpOS'){return '<header><span>‹</span><b>⛽ '+t+'</b><span>♧</span></header>'}
-function frame(body,title='PumpOS'){document.getElementById('app').innerHTML=head(title)+'<main>'+body+'</main>'+((screenName==='login'||['shiftStart','machine','opening','verify','started'].includes(screenName))?'':nav())}
-function btn(t,f,c=''){return '<button class="btn '+c+'" onclick="'+f+'">'+t+'</button>'}
-function rows(a){return a.map(x=>'<div class="row"><span>'+x[0]+'</span><span class="v">'+x[1]+'</span></div>').join('')}
-function go(x){flow=x==='home'?'normal':x;screenName=x==='home'?'home':({credit:'credit',digital:'digital',operations:'operations',summary:'summary',shift:'shiftStatus',close:'close',profile:'profile'}[x]||x);render()}
+
+function header(title, back=true){
+  return `<header class="header">
+    <button class="icon-btn" onclick="${back?'back()':''}">${back?'‹':''}</button>
+    <div class="header-title">${title}</div>
+    <button class="icon-btn">♧</button>
+  </header>`;
+}
+
+function shell(body,title,back=true){
+  document.getElementById("app").innerHTML =
+    `<div class="screen">${header(title,back)}<main class="content">${body}</main></div>${nav()}`;
+}
+
+function money(n){return "₹"+Number(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function qty(n){return Number(n).toFixed(2)+" L"}
+
+function go(key){
+  const map={home:"home",digital:"digital",operations:"operations",summary:"summary",shift:"shift",close:"close",profile:"profile"};
+  state.screen=map[key]||"home"; render();
+}
+function back(){
+  const map={credit:"home",summary:"credit",overview:"credit",fuel:"overview",sale:"fuel",review:"sale",outstanding:"review",success:"credit",addCustomer:"credit"};
+  state.screen=map[state.screen]||"home"; render();
+}
+
 function render(){
- if(screenName==='login')return frame('<div style="text-align:center;padding:35px 0;color:white;background:#082f73;border-radius:0 0 20px 20px"><div style="font-size:55px">⛽</div><b style="font-size:28px">ASIAN</b><div>FILLING STATION</div></div><div class="card" style="margin-top:18px"><h1 style="text-align:center">Login</h1><div class="grid"><button class="btn blue">Owner</button><button class="btn light">Manager</button></div><label class="label">User ID</label><input class="input" placeholder="User ID"><label class="label">Password</label><input class="input" type="password" placeholder="Password">'+btn('Login',"screenName='shiftStart';render()",'blue')+'</div>');
- if(screenName==='shiftStart')return frame('<h1>Select Shift</h1><p>Choose Your Shift Type to Start the Day.</p>'+['24 Hours Shift','12 Hours Shift','Morning Shift','Evening Shift','Night Shift'].map((x,i)=>'<div class="item"><b>'+x+'</b><span>○</span></div>').join('')+btn('Next',"screenName='machine';render()",'blue'));
- if(screenName==='machine')return frame('<h1>Select Machine</h1><p>Choose The Machine You Will Operate.</p>'+['M1 — Petrol — 2 Nozzles','M2 — Petrol — 2 Nozzles','M3 — Diesel — 2 Nozzles','M4 — Diesel — 2 Nozzles'].map((x,i)=>'<div class="item"><b>'+x+'</b><span>○</span></div>').join('')+btn('Next',"screenName='opening';render()",'blue'));
- if(screenName==='opening')return frame('<h1>Opening Meter</h1><p>Opening Meter Is Auto-Filled From Last Closing.</p><div class="card">'+rows([['Machine','M1 — Petrol'],['Nozzle','N1 — Petrol'],['Opening Meter','10,000.00 L'],['Opening Meter Time','27 Aug 2026, 09:00 AM']])+'</div>'+btn('Next',"screenName='verify';render()",'blue'));
- if(screenName==='verify')return frame('<h1>Verify Opening</h1><p>Please Verify All Details Before Starting The Shift.</p><div class="card">'+rows([['Shift Type','24 Hours Shift'],['Machine','M1 — Petrol'],['Nozzle','N1 — Petrol'],['Opening Meter','10,000.00 L']])+'</div>'+btn('Verify & Start',"screenName='started';render()",'blue'));
- if(screenName==='started')return frame('<div class="success"><div class="check">✓</div><h2>Shift Started Successfully!</h2><p>Your Shift Has Been Started.</p></div>'+btn('Go to Dashboard',"screenName='home';flow='normal';render()",'blue'));
- if(screenName==='home')return home();
- if(screenName==='credit')return creditList();
- if(screenName==='cstatus')return cstatus();
- if(screenName==='cfuel')return cfuel();
- if(screenName==='cqty')return cqty();
- if(screenName==='creview')return creview();
- if(screenName==='cout')return cout();
- if(screenName==='csuccess')return csuccess();
- if(screenName==='digital')return digital();
- if(screenName==='dreview')return dreview();
- if(screenName==='dconfirm')return dconfirm();
- if(screenName==='dsuccess')return dsuccess();
- if(screenName==='dlist')return dlist();
- if(screenName==='operations')return operations();
- if(screenName==='nat')return nat();
- if(screenName==='expenses')return expenses();
- if(screenName==='others')return others();
- if(screenName==='opsuccess')return opsuccess();
- if(screenName==='summary')return summary();
- if(screenName==='meters')return meters();
- if(screenName==='shiftStatus')return shiftStatus();
- if(screenName==='close')return closeShift();
- if(screenName==='profile')return profile();
+  switch(state.screen){
+    case "home": return home();
+    case "credit": return credit();
+    case "summary": return summary();
+    case "overview": return overview();
+    case "fuel": return fuel();
+    case "sale": return sale();
+    case "review": return review();
+    case "outstanding": return outstanding();
+    case "success": return success();
+    case "addCustomer": return addCustomer();
+    case "digital": return placeholder("Digital Transactions");
+    case "operations": return placeholder("Operations");
+    case "shift": return shift();
+    case "close": return closeShift();
+    case "profile": return profile();
+  }
 }
-function home(){frame('<div class="homehead"><div><h1>Hello, Saleem</h1><b style="color:#159447">Your Shift Is Active</b><p>27 Aug 2026</p><b>09:00 AM – 09:00 AM</b></div><div class="count"><small>24H</small><small>ENDS IN</small><strong>08h 42m</strong></div></div><div class="card"><b>Current Shift</b>'+rows([['Machine / Nozzle','M1 / N1 — Petrol'],['Opening Meter','10,000.00 L']])+'</div><div class="grid"><div class="tile" onclick="go(\'credit\')"><span class="ico">♙</span>Credit Customers</div><div class="tile" onclick="go(\'digital\')"><span class="ico">▣</span>Digital Transactions</div><div class="tile" onclick="go(\'operations\')"><span class="ico">⚙</span>Operations</div><div class="tile" onclick="go(\'summary\')"><span class="ico">◔</span>Summary</div></div>')}
-function creditList(){frame('<h1>Credit Customers</h1><p>Search And Select A Customer.</p><input class="input" placeholder="Search Customer...">'+customers.map((c,i)=>'<div class="item" onclick="customer=customers['+i+'];screenName=\'cstatus\';render()"><span>'+c[0]+'</span><b>'+c[1]+'<small class="muted">'+c[2]+'</small></b><span>›</span></div>').join('')+btn('Add Customers',"alert('Add Customer Form')",'green'),'Credit Customers')}
-function cstatus(){frame('<h1>Customer Overview</h1><p>Selected Customer: <b>'+customer[1]+'</b> ('+customer[2]+')</p><div class="card">'+rows([['Available Credit',customer[3]],['Previous Outstanding',customer[4]]])+'</div>'+btn('Next',"screenName='cfuel';render()",'blue'),'Credit Customers')}
-function cfuel(){frame('<h1>Fuel & Nozzle</h1><p>Select Fuel And Nozzle Accordingly.</p>'+['Petrol','Diesel','Power'].map(x=>'<div class="item"><b>⛽ '+x+'</b><span>○</span></div>').join('')+'<label class="label">Nozzle</label><select class="input"><option>N1 — Petrol</option><option>N2 — Petrol</option></select>'+btn('Next',"screenName='cqty';render()",'blue'),'Credit Customers')}
-function cqty(){frame('<h1>Amount / Rate / Quantity</h1><p>Amount Is Above Rate And Quantity. Fill Either Amount Or Quantity; The Other Adjusts Automatically.</p><label class="label">Amount (₹)</label><input class="input" value="1052.00"><label class="label">Rate (₹ / L)</label><input class="input" value="105.20"><label class="label">Quantity (L)</label><input class="input" value="10.00">'+btn('Save & Continue',"screenName='creview';render()",'blue'),'Credit Customers')}
-function creview(){frame('<h1>Credit Entry Review</h1><div class="card">'+rows([['Customer',customer[1]],['Fuel','Petrol'],['Nozzle','N1 — Petrol'],['Amount','₹ 1,052.00'],['Rate','₹ 105.20'],['Quantity','10.00 L']])+'</div>'+btn('Confirm & Close',"screenName='cout';render()",'green'),'Credit Customers')}
-function cout(){frame('<h1>New Outstanding</h1><div class="card">'+rows([['Previous Outstanding','₹ 12,450.00'],['+ New Credit Sale','₹ 1,052.00'],['New Outstanding','₹ 13,502.00']])+'</div>'+btn('Confirm & Close',"screenName='csuccess';render()",'green'),'Credit Customers')}
-function csuccess(){frame('<div class="success"><div class="check">✓</div><h2>Credit Sale Added Successfully.</h2><p>The Credit Sale Has Been Recorded.</p></div>'+btn('Return to Customers',"screenName='credit';render()",'green')+btn('Go to Home',"screenName='home';flow='normal';render()",'blue'),'Credit Customers')}
-function digital(){frame('<h1>Digital Transactions</h1><p>Enter Shift-End Digital Collection Totals.</p><div class="card">'+['UPI Total','Card Total','Bank / Fleet Total'].map((x,i)=>'<label class="label">'+x+' (₹)</label><input class="input" value="'+[12450,7850,4200][i].toLocaleString()+'">').join('')+'</div>'+btn('Next',"screenName='dreview';render()",'blue'),'Digital Transactions')}
-function dreview(){frame('<h1>Review Digital Totals</h1><div class="card">'+rows([['UPI Total','₹ 12,450.00'],['Card Total','₹ 7,850.00'],['Bank / Fleet Total','₹ 4,200.00']])+'</div><div class="summaryTotal">Digital Total<b>₹ 24,500.00</b></div>'+btn('Next',"screenName='dconfirm';render()",'blue'),'Digital Transactions')}
-function dconfirm(){frame('<h1>Confirm Digital Totals</h1><p>Are You Sure You Want to Save These Digital Totals for This Shift?</p><div class="summaryTotal">Digital Total<b>₹ 24,500.00</b></div>'+btn('Confirm & Close',"screenName='dsuccess';render()",'green'),'Digital Transactions')}
-function dsuccess(){frame('<div class="success"><div class="check">✓</div><h2>Digital Transactions Saved Successfully.</h2></div>'+btn('Done',"screenName='dlist';render()",'blue'),'Digital Transactions')}
-function dlist(){frame('<h1>Digital Transactions</h1><div class="card"><b>27 Aug 2026 — 24 Hours Shift</b>'+rows([['Digital Total','₹ 24,500.00'],['UPI Total','₹ 12,450.00'],['Card Total','₹ 7,850.00'],['Bank / Fleet Total','₹ 4,200.00']])+'</div>'+btn('Go to Home',"screenName='home';flow='normal';render()",'blue'),'Digital Transactions')}
-function operations(){frame('<h1>Operations</h1><p>Select An Operation.</p>'+[['NAT','nat'],['Expenses','expenses'],['Others','others']].map(x=>'<div class="item" onclick="screenName=\''+x[1]+'\';render()"><b>'+x[0]+'</b><span>›</span></div>').join(''),'Operations')}
-function nat(){frame('<h1>Nozzle Accuracy Test (NAT)</h1><label class="label">Nozzle</label><select class="input"><option>N1 — Petrol</option></select><label class="label">Dispensed Quantity (L)</label><input class="input" value="10.00"><label class="label">Actual Measured Quantity (L)</label><input class="input" value="10.02">'+btn('Save',"screenName='opsuccess';render()",'green'),'Operations')}
-function expenses(){frame('<h1>Expenses</h1><label class="label">Expense Category</label><select class="input"><option>Select Category</option></select><label class="label">Amount (₹)</label><input class="input" placeholder="Enter Amount"><label class="label">Note (Optional)</label><input class="input" placeholder="Enter Note">'+btn('Save',"screenName='opsuccess';render()",'green'),'Operations')}
-function others(){frame('<h1>Others</h1><label class="label">Type</label><select class="input"><option>Select Type</option></select><label class="label">Description</label><input class="input" placeholder="Enter Details"><label class="label">Amount (₹) (Optional)</label><input class="input" placeholder="Enter Amount">'+btn('Save',"screenName='opsuccess';render()",'green'),'Operations')}
-function opsuccess(){frame('<div class="success"><div class="check">✓</div><h2>Entry Saved Successfully.</h2><p>Your Entry Has Been Recorded.</p></div>'+btn('Return to Operations',"screenName='operations';render()",'green')+btn('Go to Home',"screenName='home';flow='normal';render()",'blue'),'Operations')}
-function summary(){frame('<h1>Summary</h1><p>This Is A Shift Review. It Does Not Close The Shift.</p><div class="card"><b>Fuel Summary</b><div class="two"><b>MS</b><b style="text-align:right">HSD</b></div>'+['Total Dispensed','NAT / Test','Net Sale','Sale Amount'].map((x,i)=>'<div class="row"><span>'+x+'</span><span></span></div><div class="two"><b>'+['1,250.00 L','10.02 L','1,239.98 L','₹ 1,30,197.90'][i]+'</b><b style="text-align:right">'+['980.00 L','5.01 L','974.99 L','₹ 91,123.80'][i]+'</b></div>').join('')+'</div><div class="summaryTotal">Total Sale Amount<b>₹ 2,21,321.70</b></div><div class="two"><button class="btn light" onclick="screenName=\'meters\';render()">View Meters ›</button><button class="btn light" onclick="screenName=\'meters\';render()">View Meters ›</button></div><div class="card"><b>Collection</b><h2>₹ 2,24,871.70</h2>'+btn('View Details ›',"alert('Digital • Credit • Expenses • Total Collection')",'light')+'</div><div class="card"><b>Cash Reconciliation</b>'+rows([['Expected Cash','₹ 75,000.00'],['Actual Cash','₹ 74,500.00'],['Variance','– ₹ 500.00']])+'</div>','Summary')}
-function meters(){frame('<h1>Meter Details</h1><div class="card"><b>MS</b>'+rows([['Opening Meter','10,000.00 L'],['Closing Meter','11,250.00 L'],['Total Dispensed','1,250.00 L']])+'</div><div class="card"><b>HSD</b>'+rows([['Opening Meter','8,000.00 L'],['Closing Meter','8,980.00 L'],['Total Dispensed','980.00 L']])+'</div>','Summary')}
-function shiftStatus(){frame('<h1>Shift Status</h1><div class="card"><b style="color:#159447">SHIFT ONGOING</b>'+rows([['Shift Type','24 Hours Shift'],['Shift ID','MS-270826-01'],['Start Time','27 Aug 2026, 09:00 AM'],['End Time','28 Aug 2026, 09:00 AM'],['Machine / Nozzle','M1, N1'],['Machine Status','All Machines Online'],['Pending Action / Alert','None']])+'</div>','Shift Status')}
-function closeShift(){frame('<h1>Close Shift – Checklist</h1><p>Please Complete All Pending Items Before Closing The Shift.</p><div class="card">'+rows([['NAT / Test Recording','Completed'],['Digital Transactions Total','Completed'],['Expenses Entry','Completed'],['Cash Reconciliation','Completed'],['Closing Meter','Completed'],['Auto Sales Calculation','Completed'],['Credit Reconciliation','Completed']])+'</div>'+btn('Confirm & Close',"alert('Closing Meter Is Locked After Reading Is Filled and Done.')",'green'),'Close Shift')}
-function profile(){frame('<h1>Profile</h1><div class="card"><h2>Salesman</h2><p>Employee ID: EMP00123</p><p>Role: Salesman</p></div>'+['Salesman Profile','Employee Details','Security','Settings','Help & Support','About PumpOS'].map(x=>'<div class="item"><b>'+x+'</b><span>›</span></div>').join('')+btn('Logout',"screenName='login';flow='normal';render()",'light'),'Profile')}
+
+function home(){
+  shell(`
+    <div class="home-top">
+      <div>
+        <div class="home-name">Hello, Saleem</div>
+        <div class="active">Your Shift Is Active</div>
+      </div>
+      <div style="font-size:21px">♧</div>
+    </div>
+
+    <div class="card shift-card">
+      <div class="shift-left">
+        <div class="shift-date">27 Aug 2026</div>
+        <div class="shift-time">09:00 AM – 09:00 PM</div>
+      </div>
+      <div class="count"><small>Ends In</small><strong>08h 42m</strong></div>
+    </div>
+
+    <div class="grid2">
+      <div class="tile" onclick="state.screen='credit';render()"><div class="tile-icon">♙</div><strong>Credit Customers</strong></div>
+      <div class="tile" onclick="go('digital')"><div class="tile-icon">▣</div><strong>Digital Transactions</strong></div>
+      <div class="tile" onclick="go('operations')"><div class="tile-icon">▤</div><strong>Operations</strong></div>
+      <div class="tile" onclick="go('summary')"><div class="tile-icon">◔</div><strong>Summary</strong></div>
+    </div>
+  `,"",false);
+}
+
+function credit(){
+  const q=state.search.toLowerCase();
+  const filtered=customers.filter(c=>(c[0]+" "+c[1]).toLowerCase().includes(q));
+  shell(`
+    <h1>Credit Customers</h1>
+    <p class="sub">Search And Select A Customer.</p>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input class="search" placeholder="Search Customer By Name Or Code" value="${state.search}" oninput="state.search=this.value;credit()">
+    </div>
+
+    <div class="card" style="border-color:#a9c99b;cursor:pointer" onclick="state.screen='summary';render()">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong style="font-size:12px;color:var(--green)">Today's Summary</strong><div class="code">View Credit Sales Summary</div></div>
+        <span style="font-size:20px;color:var(--green)">›</span>
+      </div>
+    </div>
+
+    <div class="section-label">Recent Customers</div>
+    ${filtered.map(c=>`
+      <div class="list-row" onclick="state.customer='${c[0]}';state.customerCode='${c[1]}';state.screen='overview';render()">
+        <div class="avatar">♙</div>
+        <div class="grow"><div class="name">${c[0]}</div><div class="code">${c[1]}</div></div>
+        <div class="money">${c[2]}<small>Outstanding</small></div>
+      </div>`).join("")}
+
+    <button class="btn primary add-customer" onclick="state.screen='addCustomer';render()">+ Add Customer</button>
+  `,"Credit Customers");
+}
+
+function summary(){
+  shell(`
+    <h1>Today's Credit Summary</h1>
+    <p class="sub">Credit Sales Recorded During The Current Shift.</p>
+    <div class="card" style="text-align:center">
+      <div class="code">Total Credit Sales</div>
+      <div style="font-size:23px;font-weight:800;color:var(--green);margin-top:5px">${money(124850)}</div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="code">Total Transactions</div><strong style="font-size:17px">18</strong></div>
+      <div class="card"><div class="code">Total Quantity</div><strong style="font-size:17px">1,248.65 L</strong></div>
+    </div>
+    <div class="section-label">Top Customers</div>
+    ${[["Arun Traders","₹45,600.00"],["Sharma Transport","₹32,450.00"],["Kumar Enterprises","₹18,760.00"],["Others","₹28,040.00"]].map(x=>`
+      <div class="list-row" style="cursor:default"><div class="grow"><div class="name">${x[0]}</div></div><div class="money">${x[1]}</div></div>
+    `).join("")}
+    <button class="btn outline" onclick="state.screen='credit';render()">View All Customers</button>
+  `,"Today's Credit Summary");
+}
+
+function overview(){
+  shell(`
+    <h1>${state.customer}</h1>
+    <p class="sub">${state.customerCode}</p>
+    <div class="balance">
+      <div><small>Available Credit</small><strong class="green">${money(37550)}</strong></div>
+      <div><small>Credit Limit</small><strong>${money(50000)}</strong></div>
+    </div>
+    <div class="card">
+      ${[
+        ["Current Outstanding",money(state.previousOutstanding)],
+        ["Last Transaction","25 Aug 2026"],
+        ["Total Sales (All Time)",money(124850)],
+        ["Payments Made",money(112400)]
+      ].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}
+    </div>
+    <button class="btn primary" onclick="state.screen='fuel';render()">New Sale</button>
+  `,"Customer Overview");
+}
+
+function fuel(){
+  shell(`
+    <h1>New Sale</h1>
+    <p class="sub">${state.customer} (${state.customerCode})</p>
+    <div class="section-label">Select Fuel</div>
+    <div class="choice ${state.fuel==='Petrol'?'selected':''}" onclick="state.fuel='Petrol';state.rate=105.20;render()">
+      <div class="choice-left"><div class="fuel-icon">♨</div><div><strong>Petrol</strong><small>₹105.20 / L</small></div></div><div class="check">${state.fuel==='Petrol'?'●':'○'}</div>
+    </div>
+    <div class="choice ${state.fuel==='Diesel'?'selected':''}" onclick="state.fuel='Diesel';state.rate=92.35;render()">
+      <div class="choice-left"><div class="fuel-icon">♨</div><div><strong>Diesel</strong><small>₹92.35 / L</small></div></div><div class="check">${state.fuel==='Diesel'?'●':'○'}</div>
+    </div>
+
+    <div class="section-label">Select Nozzle</div>
+    <div class="select-box"><span>${state.nozzle} - ${state.fuel}</span><span>⌄</span></div>
+
+    <button class="btn primary" onclick="state.screen='sale';render()">Continue</button>
+  `,"New Sale");
+}
+
+function recalcFromAmount(){
+  const v=parseFloat(document.getElementById("amount").value)||0;
+  state.amount=v;state.quantity=state.rate? v/state.rate:0;
+  render();
+}
+function recalcFromQuantity(){
+  const v=parseFloat(document.getElementById("quantity").value)||0;
+  state.quantity=v;state.amount=v*state.rate;
+  render();
+}
+
+function sale(){
+  shell(`
+    <h1>New Sale</h1>
+    <p class="sub">${state.customer} (${state.customerCode})</p>
+    <p class="sub">${state.fuel} · ${state.nozzle}</p>
+
+    <label class="field-label">Amount</label>
+    <input id="amount" class="field amount-field" type="number" step="0.01" value="${state.amount.toFixed(2)}" oninput="state.amount=parseFloat(this.value)||0;state.quantity=state.rate?state.amount/state.rate:0;syncSaleFields()">
+
+    <label class="field-label">Rate (Per Litre)</label>
+    <input class="field readonly" value="${money(state.rate)} / L" readonly>
+
+    <label class="field-label">Quantity</label>
+    <input id="quantity" class="field" type="number" step="0.01" value="${state.quantity.toFixed(2)}" oninput="state.quantity=parseFloat(this.value)||0;state.amount=state.quantity*state.rate;syncSaleFields()">
+
+    <div class="helper">You Can Edit Amount Or Quantity. The Other Value Adjusts Automatically.</div>
+
+    <button class="btn primary" onclick="state.screen='review';render()">Continue</button>
+  `,"New Sale");
+}
+
+function syncSaleFields(){
+  const a=document.getElementById("amount"),q=document.getElementById("quantity");
+  if(a)a.value=Number(state.amount).toFixed(2);
+  if(q)q.value=Number(state.quantity).toFixed(2);
+}
+
+function review(){
+  shell(`
+    <h1>Review Sale</h1>
+    <p class="sub">${state.customer} (${state.customerCode})</p>
+    <p class="sub">${state.fuel} · ${state.nozzle}</p>
+    <div class="card review-card">
+      ${[
+        ["Amount",money(state.amount)],
+        ["Rate (Per Litre)",money(state.rate)+" / L"],
+        ["Quantity",qty(state.quantity)],
+        ["Payment Type","Credit"],
+        ["Date & Time","27 Aug 2026, 10:15 AM"],
+        ["Operator","Saleem"],
+        ["Shift","Current Shift"]
+      ].map(x=>`<div class="review-row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}
+    </div>
+    <div class="grid2">
+      <button class="btn outline" onclick="state.screen='sale';render()">Back</button>
+      <button class="btn primary" onclick="state.screen='outstanding';render()">Confirm Sale</button>
+    </div>
+  `,"Review Sale");
+}
+
+function outstanding(){
+  const newOutstanding=state.previousOutstanding+state.amount;
+  shell(`
+    <div class="outstanding">
+      <div class="circle">♧</div>
+      <h2>New Outstanding</h2>
+      <p class="sub">This Sale Will Be Added To The Customer's Outstanding Balance.</p>
+    </div>
+    <div class="card">
+      <div class="row"><span>Previous Outstanding</span><strong>${money(state.previousOutstanding)}</strong></div>
+      <div class="row"><span>Sale Amount</span><strong>+ ${money(state.amount)}</strong></div>
+      <div class="row"><span>New Outstanding</span><strong style="color:#c66b3b">${money(newOutstanding)}</strong></div>
+    </div>
+    <div class="notice">The New Outstanding Amount Will Be Added To ${state.customer}'s Outstanding Balance.</div>
+    <button class="btn primary" onclick="state.screen='success';render()">Continue</button>
+  `,"New Outstanding");
+}
+
+function success(){
+  const newOutstanding=state.previousOutstanding+state.amount;
+  shell(`
+    <div class="success">
+      <div class="circle">✓</div>
+      <h2>Sale Completed</h2>
+      <p class="sub">The Credit Sale Has Been Recorded Successfully.</p>
+      <div class="success-card">
+        ${[
+          ["Transaction ID","TX-270826-1001"],
+          ["Amount",money(state.amount)],
+          ["Fuel",state.fuel],
+          ["Quantity",qty(state.quantity)],
+          ["Nozzle",state.nozzle],
+          ["Date & Time","27 Aug 2026, 10:15 AM"]
+        ].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}
+      </div>
+    </div>
+    <div class="success-actions">
+      <button class="btn outline" onclick="state.screen='credit';render()">Return to Customers</button>
+      <button class="btn primary" onclick="state.screen='home';render()">Go to Home</button>
+    </div>
+  `,"Credit Customers");
+}
+
+function addCustomer(){
+  shell(`
+    <h1>Add Customer</h1>
+    <p class="sub">Create A New Credit Customer.</p>
+    <label class="field-label">Customer Name</label>
+    <input class="field" placeholder="Enter Customer Name">
+    <label class="field-label">Customer Code</label>
+    <input class="field" placeholder="Enter Customer Code">
+    <label class="field-label">Credit Limit</label>
+    <input class="field" type="number" placeholder="₹0.00">
+    <button class="btn primary" onclick="state.screen='credit';render()">Save</button>
+  `,"Add Customer");
+}
+
+function placeholder(title){
+  shell(`
+    <h1>${title}</h1>
+    <p class="sub">This Screen Is Connected To The Salesman Module Navigation.</p>
+    <div class="notice">The Detailed ${title} Flow Can Be Connected Here Without Changing The Locked Bottom Navigation.</div>
+  `,title);
+}
+
+function shift(){
+  shell(`
+    <h1>Shift Status</h1>
+    <div class="notice"><strong style="color:var(--green)">Shift Is Active</strong></div>
+    <div class="card">${[
+      ["Date","27 Aug 2026"],["Shift Time","09:00 AM – 09:00 PM"],["Status","Active"]
+    ].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div>
+  `,"Shift Status");
+}
+function closeShift(){
+  shell(`
+    <h1>Close Shift</h1>
+    <p class="sub">Closing Is Available Only When Permitted.</p>
+    <div class="notice">Closing Meter And Required Reconciliation Items Must Be Completed Before The Shift Can Be Closed.</div>
+    <button class="btn primary" disabled>Close Shift</button>
+  `,"Close Shift");
+}
+function profile(){
+  shell(`
+    <h1>Profile</h1>
+    <div class="card">${[
+      ["Name","Saleem"],["Role","Salesman"],["Employee ID","EMP00123"]
+    ].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div>
+    <button class="btn outline">Security</button>
+    <button class="btn outline">Help & Support</button>
+  `,"Profile");
+}
+
 render();
-</script></body></html>
+</script>
+</body>
+</html>
