@@ -1,104 +1,1071 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F8F7F2">
-<title>PumpOS — Salesman Credit Customers</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fuel Station Credit App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-:root{--bg:#F8F7F2;--navy:#1a2332;--green:#5FA83E;--green2:#4f9335;--gray:#5a6472;--line:#e5e3da;--white:#fff;--soft:#f1f4ef;--danger:#c45c50;--amber:#c97a35}
-*{box-sizing:border-box}
-html,body{margin:0;background:#e9e7e1;color:var(--navy);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif}
-button,input{font:inherit}button{touch-action:manipulation}
-.app{width:100%;max-width:390px;min-height:100vh;margin:auto;background:var(--bg);position:relative;overflow:hidden}
-.screen{min-height:100vh;padding-bottom:86px;overflow-y:auto;scrollbar-width:none}.screen::-webkit-scrollbar{display:none}
-.header{height:64px;display:grid;grid-template-columns:38px 1fr 38px;align-items:center;padding:0 12px;border-bottom:1px solid rgba(229,227,218,.72);background:rgba(248,247,242,.97);position:sticky;top:0;z-index:20}
-.header-title{text-align:center;font-size:17px;font-weight:760;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.icon-btn{width:36px;height:36px;border:0;background:transparent;color:var(--navy);display:grid;place-items:center;font-size:23px;padding:0}
-.content{padding:18px 16px 12px}h1{font-size:24px;line-height:1.12;margin:0 0 5px;font-weight:790;letter-spacing:-.55px}h2{font-size:18px;margin:0;font-weight:760}h3{font-size:13px;margin:0 0 8px;font-weight:760}.sub{margin:0;color:var(--gray);font-size:12px;line-height:1.45}.active{color:var(--green);font-weight:760}
-.card,.field,.list-row,.tile,.success-card{background:var(--white);border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 10px rgba(26,35,50,.035)}.card{padding:14px;margin-top:12px}
-.shift-card{display:flex;justify-content:space-between;gap:10px;align-items:center}.shift-date{font-size:14px;font-weight:760;margin-bottom:5px}.shift-time{font-size:11px;color:var(--gray)}.count{text-align:right;white-space:nowrap}.count small{display:block;color:var(--gray);font-size:10px}.count strong{display:block;color:var(--green);font-size:13px;margin-top:2px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.tile{min-height:106px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer}.tile:hover{border-color:#b6cfaa}.tile.selected{border-color:var(--green);box-shadow:0 0 0 1px rgba(95,168,62,.3) inset}.tile-icon{font-size:23px;margin-bottom:8px}.tile strong{font-size:12px;line-height:1.25}.tile small{font-size:10px;color:var(--gray);margin-top:5px}
-.search-wrap{position:relative;margin:14px 0 10px}.search{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 13px 0 38px;color:var(--navy);outline:none}.search:focus{border-color:#a9c99b;box-shadow:0 0 0 3px rgba(95,168,62,.1)}.search-icon{position:absolute;left:13px;top:11px;color:var(--gray);font-size:16px}
-.section-label{font-size:12px;font-weight:790;margin:16px 0 8px}.list-row{min-height:62px;padding:10px 11px;display:flex;align-items:center;gap:10px;margin:8px 0;cursor:pointer}.avatar{width:32px;height:32px;border-radius:50%;background:#eef1ec;display:grid;place-items:center;color:var(--green);font-size:15px;flex:none}.grow{flex:1;min-width:0}.name{font-size:12px;font-weight:760}.code{font-size:10px;color:var(--gray);margin-top:3px}.money{text-align:right;font-size:12px;font-weight:790;white-space:nowrap}.money small{display:block;color:var(--danger);font-size:9px;margin-top:3px}
-.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #efeee9;font-size:12px}.row:last-child{border-bottom:0}.row strong{text-align:right}
-.btn{width:100%;min-height:48px;border-radius:13px;border:1px solid transparent;font-size:13px;font-weight:790;cursor:pointer;margin-top:10px}.btn.primary{background:var(--green);color:#fff}.btn.primary:active{background:var(--green2)}.btn.outline{background:#fff;color:var(--navy);border-color:#aeb4b2}.btn.ghost{background:transparent;color:var(--green);border-color:transparent}.btn:disabled{opacity:.45;cursor:not-allowed}
-.notice{background:#f0f3f0;border:1px solid #e1e7df;border-radius:12px;padding:11px 12px;font-size:11px;color:var(--gray);line-height:1.45;margin-top:10px}.success-note{color:var(--green);font-weight:700}
-.balance{display:grid;grid-template-columns:1fr 1fr;background:#f5f7f2;border:1px solid #e7eadf;border-radius:12px;overflow:hidden;margin-top:12px}.balance>div{padding:13px}.balance>div+div{border-left:1px solid #e0e4db}.balance small{display:block;color:var(--gray);font-size:10px;margin-bottom:4px}.balance strong{font-size:14px}.green{color:var(--green)}.orange{color:var(--amber)}
-.choice{border:1px solid var(--line);background:#fff;border-radius:13px;padding:13px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0;cursor:pointer}.choice.selected{border-color:#9cc28d;box-shadow:0 0 0 1px rgba(95,168,62,.25) inset}.choice-left{display:flex;align-items:center;gap:11px}.fuel-icon{width:35px;height:35px;border-radius:10px;background:#f0f4ed;display:grid;place-items:center;color:var(--green)}.choice strong{font-size:13px}.choice small{display:block;font-size:10px;color:var(--gray);margin-top:3px}.check{color:var(--green);font-size:18px}
-.select-box{height:48px;border:1px solid var(--line);border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-size:12px;font-weight:700;margin-top:7px}.field-label{font-size:11px;font-weight:790;margin-top:13px;display:block}.field{width:100%;height:54px;margin-top:7px;padding:0 13px;border-radius:12px;outline:none;font-size:17px;color:var(--navy)}.field:focus{border-color:#a9c99b;box-shadow:0 0 0 3px rgba(95,168,62,.1)}.field.readonly{background:#f7f8f5;color:var(--gray)}.amount-field{font-size:20px;font-weight:730}.helper{font-size:10px;color:var(--gray);line-height:1.4;margin-top:8px}
-.review-card{margin-top:14px}.review-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #efeee9;font-size:12px}.review-row:last-child{border-bottom:0}.total{color:var(--green);font-size:15px}
-.outstanding{text-align:center;padding:20px 12px}.outstanding .circle,.success .circle{width:66px;height:66px;border-radius:50%;margin:0 auto 12px;border:2px solid var(--green);color:var(--green);display:grid;place-items:center;font-size:31px;background:#f0f7ed}.outstanding h2,.success h2{color:var(--green);font-size:16px;margin-bottom:5px}.success{text-align:center;padding:22px 12px 12px}.success-card{padding:14px;margin-top:14px;text-align:left}.success-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.success-actions .btn{margin-top:0}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100%);height:76px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:50;padding-bottom:env(safe-area-inset-bottom)}.nav button{border:0;background:#fff;color:#69727c;font-size:9px;font-weight:720;cursor:pointer;padding:5px 2px}.nav button span{display:block;font-size:18px;line-height:22px;margin-bottom:2px}.nav button.active{color:var(--green)}
-.home-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.home-name{font-size:20px;font-weight:790;margin:0 0 3px}.empty{padding:22px;text-align:center;color:var(--gray);font-size:12px}.top-total{text-align:center}.top-total .label{font-size:10px;color:var(--gray)}.top-total .value{font-size:23px;font-weight:810;color:var(--green);margin-top:5px}.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}.stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px}.stat small{display:block;color:var(--gray);font-size:10px}.stat strong{display:block;font-size:16px;margin-top:4px}
-@media(min-width:700px){body{padding:20px 0}.app{min-height:844px;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.1)}.screen{min-height:844px}}
+  :root{
+    --green:#1E8A3C;
+    --green-dark:#146B2E;
+    --green-light:#E7F5EA;
+    --orange:#E07A1F;
+    --ink:#1B2430;
+    --ink-soft:#5B6472;
+    --line:#E7EAEE;
+    --bg:#F4F6F8;
+    --white:#FFFFFF;
+    --danger:#D64545;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',system-ui,sans-serif;
+    background:#dfe3e7;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:32px 12px;
+    min-height:100vh;
+  }
+  .phone{
+    width:390px;
+    background:var(--bg);
+    border-radius:36px;
+    overflow:hidden;
+    box-shadow:0 30px 60px rgba(0,0,0,0.25);
+    border:8px solid #14181f;
+    position:relative;
+    min-height:820px;
+    display:flex;
+    flex-direction:column;
+  }
+  .statusbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 22px 4px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink);
+    background:var(--bg);
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 18px 14px;
+    background:var(--bg);
+  }
+  .topbar .back{
+    width:34px;height:34px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--white);border:1px solid var(--line);
+    cursor:pointer;font-size:16px;color:var(--ink);
+  }
+  .topbar .title-wrap{flex:1;padding:0 12px;}
+  .topbar h1{margin:0;font-size:17px;font-weight:700;color:var(--ink);}
+  .topbar .sub{margin:2px 0 0;font-size:12px;color:var(--ink-soft);}
+  .topbar .icon-btn{
+    width:34px;height:34px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--white);border:1px solid var(--line);
+    font-size:15px;color:var(--ink);
+  }
+  .content{
+    flex:1;
+    overflow-y:auto;
+    padding:0 18px 18px;
+  }
+  .greeting{padding:6px 18px 14px;}
+  .greeting h2{margin:0;font-size:20px;color:var(--ink);}
+  .greeting .status{
+    display:flex;align-items:center;gap:6px;margin-top:4px;
+    font-size:13px;color:var(--green-dark);font-weight:600;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;}
+  .bell{
+    width:38px;height:38px;border-radius:12px;background:var(--white);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+    position:absolute;top:44px;right:18px;font-size:16px;
+  }
+  .shift-card{
+    background:var(--white);border-radius:16px;border:1px solid var(--line);
+    padding:16px;margin-bottom:16px;
+  }
+  .shift-card .row{display:flex;justify-content:space-between;align-items:center;}
+  .shift-card .date{font-weight:700;color:var(--ink);font-size:15px;}
+  .shift-card .time{color:var(--ink-soft);font-size:13px;margin-top:2px;}
+  .shift-card .ends{
+    background:var(--green-light);color:var(--green-dark);
+    font-size:12px;font-weight:700;padding:6px 10px;border-radius:20px;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .tile{
+    background:var(--white);border:1px solid var(--line);border-radius:16px;
+    padding:18px 14px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+    cursor:pointer;font-family:inherit;text-align:left;
+  }
+  .tile .ic{
+    width:34px;height:34px;border-radius:10px;background:var(--green-light);
+    display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--green-dark);
+  }
+  .tile span{font-size:14px;font-weight:600;color:var(--ink);}
+  .bottomnav{
+    display:flex;justify-content:space-around;align-items:center;
+    background:var(--white);border-top:1px solid var(--line);
+    padding:10px 6px 14px;
+  }
+  .navitem{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-size:11px;color:var(--ink-soft);background:none;border:none;cursor:pointer;font-family:inherit;
+  }
+  .navitem.active{color:var(--green-dark);font-weight:700;}
+  .navitem .navic{font-size:17px;}
+  .search{
+    display:flex;align-items:center;gap:8px;background:var(--white);
+    border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:14px;color:var(--ink-soft);font-size:13px;
+  }
+  .summary-banner{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--green-light);border:1px solid #cfeed7;border-radius:14px;
+    padding:14px 16px;margin-bottom:18px;cursor:pointer;
+  }
+  .summary-banner .left{display:flex;align-items:center;gap:12px;}
+  .summary-banner .ic{
+    width:36px;height:36px;border-radius:10px;background:var(--white);
+    display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--green-dark);
+  }
+  .summary-banner .t1{font-weight:700;font-size:14px;color:var(--green-dark);}
+  .summary-banner .t2{font-size:12px;color:var(--green-dark);opacity:.8;}
+  .section-label{font-size:13px;font-weight:700;color:var(--ink-soft);margin:6px 0 10px;}
+  .cust-row{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--white);border:1px solid var(--line);border-radius:14px;
+    padding:13px 14px;margin-bottom:10px;cursor:pointer;
+  }
+  .cust-row .left{display:flex;align-items:center;gap:12px;}
+  .cust-row .avatar{
+    width:38px;height:38px;border-radius:10px;background:var(--green-light);
+    display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--green-dark);
+  }
+  .cust-row .name{font-weight:700;font-size:14px;color:var(--ink);}
+  .cust-row .code{font-size:12px;color:var(--ink-soft);margin-top:1px;}
+  .cust-row .amt{font-weight:700;font-size:14px;color:var(--ink);text-align:right;}
+  .cust-row .tag{font-size:11px;color:var(--orange);font-weight:700;margin-top:2px;text-align:right;}
+  .btn-primary{
+    width:100%;background:var(--green);color:var(--white);border:none;
+    border-radius:14px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-secondary{
+    flex:1;background:var(--white);color:var(--ink);border:1px solid var(--line);
+    border-radius:14px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;
+  }
+  .row-btns{display:flex;gap:12px;}
+  .stat-card{
+    background:var(--white);border:1px solid var(--line);border-radius:16px;
+    padding:20px;text-align:center;margin-bottom:16px;
+  }
+  .stat-card .label{font-size:13px;color:var(--ink-soft);margin-bottom:6px;}
+  .stat-card .value{font-size:26px;font-weight:800;color:var(--green-dark);}
+  .grid2-stat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .mini-stat{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:16px;}
+  .mini-stat .label{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
+  .mini-stat .value{font-size:17px;font-weight:800;color:var(--ink);}
+  .top-cust-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;
+  }
+  .top-cust-row:last-child{border-bottom:none;}
+  .top-cust-row .n{font-weight:600;color:var(--ink);}
+  .top-cust-row .v{font-weight:700;color:var(--ink);}
+  .list-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:6px 16px;margin-bottom:16px;}
+  .info-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:4px 16px;margin-bottom:16px;}
+  .info-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:13px 0;border-bottom:1px solid var(--line);font-size:14px;
+  }
+  .info-row:last-child{border-bottom:none;}
+  .info-row .k{color:var(--ink-soft);}
+  .info-row .v{font-weight:700;color:var(--ink);}
+  .info-row .v.credit{color:var(--green-dark);}
+  .info-row .v.locked{display:flex;align-items:center;gap:6px;}
+  .fuel-card{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--white);border:2px solid var(--line);border-radius:14px;
+    padding:16px;margin-bottom:12px;cursor:pointer;
+  }
+  .fuel-card.selected{border-color:var(--green);background:var(--green-light);}
+  .fuel-card .left{display:flex;align-items:center;gap:12px;}
+  .fuel-card .ic{
+    width:38px;height:38px;border-radius:10px;background:var(--white);
+    display:flex;align-items:center;justify-content:center;font-size:17px;
+  }
+  .fuel-card .name{font-weight:700;font-size:14px;color:var(--ink);}
+  .fuel-card .price{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .radio{
+    width:22px;height:22px;border-radius:50%;border:2px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .radio.on{border-color:var(--green);background:var(--green);color:white;font-size:13px;}
+  .field-label{font-size:13px;color:var(--ink-soft);margin:0 0 8px;font-weight:600;}
+  .field-box{
+    background:var(--white);border:1px solid var(--line);border-radius:14px;
+    padding:15px 16px;margin-bottom:14px;
+  }
+  .field-box.locked{background:#F5F6F7;}
+  .field-row{display:flex;justify-content:space-between;align-items:center;}
+  .field-row .lbl{font-size:13px;color:var(--ink-soft);}
+  .field-row input{
+    border:none;background:transparent;text-align:right;font-size:17px;font-weight:700;
+    color:var(--ink);width:150px;outline:none;font-family:inherit;
+  }
+  .field-row .static{font-size:17px;font-weight:700;color:var(--ink);}
+  .hint{font-size:12px;color:var(--ink-soft);margin:6px 2px 18px;line-height:1.5;}
+  .select-box{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--white);border:1px solid var(--line);border-radius:14px;
+    padding:15px 16px;margin-bottom:14px;font-size:14px;font-weight:600;color:var(--ink);
+  }
+  .center-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:30px;}
+  .status-icon{
+    width:84px;height:84px;border-radius:50%;background:var(--green-light);
+    display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--green-dark);
+    margin-bottom:16px;
+  }
+  .status-icon.orange{background:#FCE9D6;color:var(--orange);}
+  .status-title{font-size:19px;font-weight:800;color:var(--ink);margin:0 0 4px;}
+  .status-sub{font-size:13px;color:var(--ink-soft);margin-bottom:22px;}
+  .txn-id{font-size:12px;color:var(--ink-soft);font-weight:700;background:var(--white);border:1px solid var(--line);
+    padding:6px 12px;border-radius:20px;margin-bottom:22px;}
+  .outstanding-note{
+    background:#FFF7EC;border:1px solid #F5DCB0;border-radius:12px;
+    padding:12px 14px;font-size:12px;color:#8A5A11;line-height:1.5;margin:10px 0 20px;text-align:left;
+  }
+  .plus{color:var(--green-dark);}
+  a.reset{display:block;text-align:center;font-size:12px;color:var(--ink-soft);margin-top:10px;cursor:pointer;text-decoration:underline;}
+
+  .select-box{cursor:pointer;position:relative;}
+  .dropdown-list{
+    background:var(--white);border:1px solid var(--line);border-radius:14px;
+    margin:-6px 0 14px;overflow:hidden;
+  }
+  .dropdown-item{
+    padding:13px 16px;font-size:14px;font-weight:600;color:var(--ink);
+    border-bottom:1px solid var(--line);cursor:pointer;display:flex;justify-content:space-between;
+  }
+  .dropdown-item:last-child{border-bottom:none;}
+  .dropdown-item.active{color:var(--green-dark);background:var(--green-light);}
+
+  .form-input{
+    width:100%;background:var(--white);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;font-size:14px;font-family:inherit;color:var(--ink);outline:none;margin-bottom:14px;
+  }
+  .form-input:focus{border-color:var(--green);}
+
+  .menu-tile{
+    display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--line);
+    border-radius:14px;padding:15px 16px;margin-bottom:10px;cursor:pointer;
+  }
+  .menu-tile .ic{width:38px;height:38px;border-radius:10px;background:var(--green-light);
+    display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--green-dark);}
+  .menu-tile .txt{flex:1;}
+  .menu-tile .name{font-weight:700;font-size:14px;color:var(--ink);}
+  .menu-tile .desc{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+
+  .profile-head{display:flex;flex-direction:column;align-items:center;padding:16px 0 22px;}
+  .profile-avatar{width:76px;height:76px;border-radius:50%;background:var(--green-light);
+    display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--green-dark);margin-bottom:12px;}
+  .profile-name{font-size:18px;font-weight:800;color:var(--ink);}
+  .profile-role{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+
+  .segment-row{display:flex;gap:10px;margin-bottom:16px;}
+  .segment{flex:1;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .segment.on{border-color:var(--green);color:var(--green-dark);background:var(--green-light);}
+
+  .breakdown-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);}
+  .breakdown-row:last-child{border-bottom:none;}
+  .breakdown-row .swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+  .breakdown-row .lbl{flex:1;font-size:13px;color:var(--ink);font-weight:600;}
+  .breakdown-row .val{font-size:13px;font-weight:700;color:var(--ink);}
 </style>
 </head>
 <body>
-<div class="app" id="app"></div>
-<script>
-const state={screen:"home",customer:"Arun Traders",customerCode:"AT-001",fuel:"Petrol",rate:105.20,nozzle:"N1",amount:1052,quantity:10,search:"",previousOutstanding:12450};
-const customers=[
-  ["Arun Traders","AT-001",37550],
-  ["Sharma Transport","ST-002",12450],
-  ["Kumar Enterprises","KE-003",8760],
-  ["R.K. Industries","RK-004",25000]
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useMemo } = React;
+
+/* ---------- Fixed data (kept exactly as shown in mockups) ---------- */
+const CUSTOMERS_INITIAL = [
+  { code: "AT-001", name: "Arun Traders",     outstanding: 37550.00, limit: 50000.00, lastTxn: "25 Aug 2026", totalSales: 124850.00, paymentsMade: 112400.00 },
+  { code: "ST-002", name: "Sharma Transport", outstanding: 12450.00, limit: 40000.00, lastTxn: "24 Aug 2026", totalSales: 98200.00,  paymentsMade: 85750.00 },
+  { code: "KE-003", name: "Kumar Enterprises",outstanding: 8760.00,  limit: 20000.00, lastTxn: "23 Aug 2026", totalSales: 41200.00,  paymentsMade: 32440.00 },
+  { code: "RK-004", name: "R.K. Industries",  outstanding: 25000.00, limit: 45000.00, lastTxn: "22 Aug 2026", totalSales: 76300.00,  paymentsMade: 51300.00 },
 ];
-const money=n=>"₹"+Number(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
-const qty=n=>Number(n).toFixed(2)+" L";
-const titleCase=s=>s.split(" ").map(w=>["to","of","or"].includes(w.toLowerCase())?w.toLowerCase():w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ");
 
-function moduleType(){
-  if(["credit","creditSummary","overview","fuel","sale","review","outstanding","success","addCustomer"].includes(state.screen))return "credit";
-  if(["digital","digitalAdd","digitalReview","digitalSuccess"].includes(state.screen))return "digital";
-  if(["operations","nat","expenses","others","operationSuccess"].includes(state.screen))return "operations";
-  if(["summary"].includes(state.screen))return "summary";
-  return "normal";
+const TODAY_SUMMARY = {
+  totalCreditSales: 124850.00,
+  totalTransactions: 18,
+  totalQuantity: 1248.65,
+  topCustomers: [
+    { name: "Arun Traders", value: 45600.00 },
+    { name: "Sharma Transport", value: 32450.00 },
+    { name: "Kumar Enterprises", value: 18760.00 },
+    { name: "Others", value: 28040.00 },
+  ],
+};
+
+const FUELS = [
+  { key: "petrol", name: "Petrol", rate: 105.20, icon: "⛽" },
+  { key: "diesel", name: "Diesel", rate: 92.35, icon: "⛽" },
+];
+
+// Each fuel can be dispensed from more than one nozzle — this is now real,
+// selectable data instead of a single hardcoded string.
+const NOZZLES_BY_FUEL = {
+  petrol: [
+    { id: "N1", label: "N1 - Petrol" },
+    { id: "N3", label: "N3 - Petrol" },
+  ],
+  diesel: [
+    { id: "N2", label: "N2 - Diesel" },
+    { id: "N4", label: "N4 - Diesel" },
+  ],
+};
+
+const OPERATOR = "Saleem";
+const SHIFT = "Morning Shift";
+const SHIFT_WINDOW = "09:00 AM - 09:00 PM";
+
+const inr = (n) => "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// Real date/time helpers — replace the hardcoded "27 Aug 2026, 10:15 AM" values.
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function formatDate(d) {
+  return `${String(d.getDate()).padStart(2,"0")} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
-function navItems(){
-  switch(moduleType()){
-    case "credit":return [["home","⌂","Home"],["digital","▣","Digital Transactions"],["operations","▤","Operations"],["summary","◔","Summary"]];
-    case "digital":return [["home","⌂","Home"],["credit","♙","Credit Customers"],["operations","▤","Operations"],["summary","◔","Summary"]];
-    case "operations":return [["home","⌂","Home"],["credit","♙","Credit Customers"],["digital","▣","Digital Transactions"],["summary","◔","Summary"]];
-    case "summary":return [["home","⌂","Home"],["credit","♙","Credit Customers"],["digital","▣","Digital Transactions"],["operations","▤","Operations"]];
-    default:return [["home","⌂","Home"],["shift","◷","Shift Status"],["close","▣","Close Shift"],["profile","♙","Profile"]];
+function formatTime(d) {
+  let h = d.getHours();
+  const m = String(d.getMinutes()).padStart(2,"0");
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12; if (h === 0) h = 12;
+  return `${h}:${m} ${ampm}`;
+}
+function formatDateTime(d) {
+  return `${formatDate(d)}, ${formatTime(d)}`;
+}
+// Transaction ID format: TX-DDMMYY-#### (sequence resets conceptually per day; kept simple with an in-session counter)
+function makeTxnId(d, seq) {
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const yy = String(d.getFullYear()).slice(-2);
+  return `TX-${dd}${mm}${yy}-${String(1000 + seq)}`;
+}
+
+/* ---------- Shared shell ---------- */
+function Phone({ children }) {
+  return (
+    <div className="phone">
+      <div className="statusbar">
+        <span>9:41</span>
+        <span>📶 🛜 🔋</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function TopBar({ title, sub, onBack, right }) {
+  return (
+    <div className="topbar">
+      {onBack ? <button className="back" onClick={onBack}>‹</button> : <div style={{width:34}}></div>}
+      <div className="title-wrap">
+        <h1>{title}</h1>
+        {sub && <p className="sub">{sub}</p>}
+      </div>
+      {right ? right : <div style={{width:34}}></div>}
+    </div>
+  );
+}
+
+function BottomNav({ active, onHome, onOps, onSummary, onDigital }) {
+  const items = [
+    { key: "home", label: "Home", icon: "🏠", onClick: onHome },
+    { key: "digital", label: "Digital Transactions", icon: "📇", onClick: onDigital },
+    { key: "ops", label: "Operations", icon: "🗂️", onClick: onOps },
+    { key: "summary", label: "Summary", icon: "📊", onClick: onSummary },
+  ];
+  return (
+    <div className="bottomnav">
+      {items.map(it => (
+        <button key={it.key} className={"navitem" + (active === it.key ? " active" : "")} onClick={it.onClick}>
+          <span className="navic">{it.icon}</span>
+          <span>{it.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- 1. Home ---------- */
+/* Note: Home screen's own bottom nav in the mockup is Home / Shift Status / Close Shift / Profile,
+   distinct from the other screens' nav (Home / Digital Transactions / Operations / Summary). */
+function HomeBottomNav({ go }) {
+  return (
+    <div className="bottomnav">
+      <button className="navitem active"><span className="navic">🏠</span><span>Home</span></button>
+      <button className="navitem" onClick={() => go("shift-status")}><span className="navic">🕒</span><span>Shift Status</span></button>
+      <button className="navitem" onClick={() => go("close-shift")}><span className="navic">🔒</span><span>Close Shift</span></button>
+      <button className="navitem" onClick={() => go("profile")}><span className="navic">👤</span><span>Profile</span></button>
+    </div>
+  );
+}
+function HomeScreenFixed({ go }) {
+  return (
+    <Phone>
+      <div className="bell">🔔</div>
+      <div className="greeting">
+        <h2>Hello, Saleem</h2>
+        <div className="status"><span className="dot"></span>Your Shift Is Active</div>
+      </div>
+      <div className="content" style={{paddingTop:4}}>
+        <div className="shift-card">
+          <div className="row">
+            <div>
+              <div className="date">📅 {formatDate(new Date())}</div>
+              <div className="time">{SHIFT_WINDOW}</div>
+            </div>
+            <div className="ends">Ends In<br/>08h 42m</div>
+          </div>
+        </div>
+
+        <div className="grid2">
+          <button className="tile" onClick={() => go("credit-customers")}>
+            <div className="ic">👥</div>
+            <span>Credit Customers</span>
+          </button>
+          <button className="tile" onClick={() => go("digital")}>
+            <div className="ic">💳</div>
+            <span>Digital Transactions</span>
+          </button>
+          <button className="tile" onClick={() => go("ops")}>
+            <div className="ic">📋</div>
+            <span>Operations</span>
+          </button>
+          <button className="tile" onClick={() => go("summary")}>
+            <div className="ic">📈</div>
+            <span>Summary</span>
+          </button>
+        </div>
+      </div>
+      <HomeBottomNav go={go} />
+    </Phone>
+  );
+}
+
+/* ---------- 2 / 10. Credit Customers ---------- */
+function CreditCustomersScreen({ go, customers }) {
+  return (
+    <Phone>
+      <TopBar title="Credit Customers" onBack={() => go("home")} right={<button className="icon-btn">🔔</button>} />
+      <div className="content">
+        <div className="search">🔍 Search customer by name or code</div>
+
+        <div className="summary-banner" onClick={() => go("today-summary")}>
+          <div className="left">
+            <div className="ic">📊</div>
+            <div>
+              <div className="t1">Today's Summary</div>
+              <div className="t2">View credit sales summary</div>
+            </div>
+          </div>
+          <span>›</span>
+        </div>
+
+        <div className="section-label">Recent Customers</div>
+        {customers.map(c => (
+          <div key={c.code} className="cust-row" onClick={() => go("customer-overview", { code: c.code })}>
+            <div className="left">
+              <div className="avatar">👤</div>
+              <div>
+                <div className="name">{c.name}</div>
+                <div className="code">{c.code}</div>
+              </div>
+            </div>
+            <div>
+              <div className="amt">{inr(c.outstanding)}</div>
+              <div className="tag">Outstanding</div>
+            </div>
+          </div>
+        ))}
+
+        <button className="btn-primary" style={{marginTop:8}} onClick={() => go("add-customer")}>+ Add Customer</button>
+      </div>
+      <BottomNav active="credit" onHome={() => go("home")} onDigital={() => go("digital")} onOps={() => go("ops")} onSummary={() => go("summary")} />
+    </Phone>
+  );
+}
+
+/* ---------- 3. Today's Credit Summary ---------- */
+function TodaySummaryScreen({ go }) {
+  return (
+    <Phone>
+      <TopBar title="Today's Credit Summary" onBack={() => go("credit-customers")} />
+      <div className="content">
+        <div className="stat-card">
+          <div className="label">Total Credit Sales</div>
+          <div className="value">{inr(TODAY_SUMMARY.totalCreditSales)}</div>
+        </div>
+
+        <div className="grid2-stat">
+          <div className="mini-stat">
+            <div className="label">Total Transactions</div>
+            <div className="value">{TODAY_SUMMARY.totalTransactions}</div>
+          </div>
+          <div className="mini-stat">
+            <div className="label">Total Quantity</div>
+            <div className="value">{TODAY_SUMMARY.totalQuantity.toFixed(2)} L</div>
+          </div>
+        </div>
+
+        <div className="section-label">Top Customers</div>
+        <div className="list-card">
+          {TODAY_SUMMARY.topCustomers.map(t => (
+            <div className="top-cust-row" key={t.name}>
+              <span className="n">{t.name}</span>
+              <span className="v">{inr(t.value)}</span>
+            </div>
+          ))}
+        </div>
+
+        <button className="btn-secondary" style={{width:"100%"}} onClick={() => go("credit-customers")}>View All Customers</button>
+      </div>
+      <BottomNav active="summary" onHome={() => go("home")} onDigital={() => go("digital")} onOps={() => go("ops")} onSummary={() => go("summary")} />
+    </Phone>
+  );
+}
+
+/* ---------- 4. Customer Overview ---------- */
+function CustomerOverviewScreen({ go, customer }) {
+  if (!customer) return null;
+  return (
+    <Phone>
+      <TopBar title={customer.name} sub={customer.code} onBack={() => go("credit-customers")} right={<button className="icon-btn">✏️</button>} />
+      <div className="content">
+        <div className="grid2-stat">
+          <div className="mini-stat">
+            <div className="label">Available Credit</div>
+            <div className="value">{inr(customer.limit - customer.outstanding)}</div>
+          </div>
+          <div className="mini-stat">
+            <div className="label">Credit Limit</div>
+            <div className="value">{inr(customer.limit)}</div>
+          </div>
+        </div>
+
+        <div className="info-card">
+          <div className="info-row"><span className="k">Current Outstanding</span><span className="v">{inr(customer.outstanding)}</span></div>
+          <div className="info-row"><span className="k">Last Transaction</span><span className="v">{customer.lastTxn}</span></div>
+          <div className="info-row"><span className="k">Total Sales (All Time)</span><span className="v">{inr(customer.totalSales)}</span></div>
+          <div className="info-row"><span className="k">Payments Made</span><span className="v">{inr(customer.paymentsMade)}</span></div>
+        </div>
+
+        <button className="btn-primary" onClick={() => go("select-fuel", { code: customer.code })}>New Sale</button>
+      </div>
+      <BottomNav active="ops" onHome={() => go("home")} onDigital={() => go("digital")} onOps={() => go("ops")} onSummary={() => go("summary")} />
+    </Phone>
+  );
+}
+
+/* ---------- 5. Select Fuel & Nozzle ---------- */
+function SelectFuelScreen({ go, customer, sale, setSale }) {
+  const [nozzleOpen, setNozzleOpen] = useState(false);
+  const nozzleOptions = NOZZLES_BY_FUEL[sale.fuel];
+  const currentNozzle = nozzleOptions.find(n => n.id === sale.nozzle) || nozzleOptions[0];
+
+  const chooseFuel = (fuelKey) => {
+    // Changing fuel resets the nozzle to that fuel's first nozzle, since a
+    // petrol nozzle can't dispense diesel.
+    setSale(s => ({ ...s, fuel: fuelKey, nozzle: NOZZLES_BY_FUEL[fuelKey][0].id }));
+    setNozzleOpen(false);
+  };
+
+  return (
+    <Phone>
+      <TopBar title="New Sale" sub={`${customer.name} (${customer.code})`} onBack={() => go("customer-overview", { code: customer.code })} />
+      <div className="content">
+        <div className="field-label" style={{marginTop:6}}>Select Fuel</div>
+        {FUELS.map(f => (
+          <div key={f.key} className={"fuel-card" + (sale.fuel === f.key ? " selected" : "")} onClick={() => chooseFuel(f.key)}>
+            <div className="left">
+              <div className="ic">{f.icon}</div>
+              <div>
+                <div className="name">{f.name}</div>
+                <div className="price">{inr(f.rate)} / L</div>
+              </div>
+            </div>
+            <div className={"radio" + (sale.fuel === f.key ? " on" : "")}>{sale.fuel === f.key ? "✓" : ""}</div>
+          </div>
+        ))}
+
+        <div className="field-label" style={{marginTop:16}}>Select Nozzle</div>
+        <div className="select-box" onClick={() => setNozzleOpen(o => !o)}>
+          <span>{currentNozzle.label}</span>
+          <span>{nozzleOpen ? "▴" : "▾"}</span>
+        </div>
+        {nozzleOpen && (
+          <div className="dropdown-list">
+            {nozzleOptions.map(n => (
+              <div
+                key={n.id}
+                className={"dropdown-item" + (n.id === currentNozzle.id ? " active" : "")}
+                onClick={() => { setSale(s => ({ ...s, nozzle: n.id })); setNozzleOpen(false); }}
+              >
+                <span>{n.label}</span>
+                {n.id === currentNozzle.id && <span>✓</span>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button className="btn-primary" style={{marginTop:10}} onClick={() => go("sale-details", { code: customer.code })}>Continue →</button>
+      </div>
+    </Phone>
+  );
+}
+
+/* ---------- 6. Enter Sale Details ---------- */
+function SaleDetailsScreen({ go, customer, sale, setSale }) {
+  const fuel = FUELS.find(f => f.key === sale.fuel);
+  const nozzleId = sale.nozzle;
+
+  const onAmountChange = (val) => {
+    const amt = parseFloat(val) || 0;
+    const qty = fuel.rate > 0 ? amt / fuel.rate : 0;
+    setSale(s => ({ ...s, amount: val, quantity: qty.toFixed(2) }));
+  };
+  const onQuantityChange = (val) => {
+    const qty = parseFloat(val) || 0;
+    const amt = qty * fuel.rate;
+    setSale(s => ({ ...s, quantity: val, amount: amt.toFixed(2) }));
+  };
+
+  return (
+    <Phone>
+      <TopBar title="New Sale" sub={`${customer.name} (${customer.code})`} onBack={() => go("select-fuel", { code: customer.code })} />
+      <div className="content">
+        <div className="field-label" style={{marginTop:6}}>&nbsp;</div>
+        <div style={{fontSize:13, color:"var(--ink-soft)", marginBottom:14}}>{fuel.name} • {nozzleId}</div>
+
+        <div className="field-box">
+          <div className="field-row">
+            <span className="lbl">Amount</span>
+            <input value={"₹ " + sale.amount} onChange={e => onAmountChange(e.target.value.replace(/[^\d.]/g,""))} />
+          </div>
+        </div>
+
+        <div className="field-box locked">
+          <div className="field-row">
+            <span className="lbl">Rate (Per Litre)</span>
+            <span className="static">{inr(fuel.rate)} / L 🔒</span>
+          </div>
+        </div>
+
+        <div className="field-box">
+          <div className="field-row">
+            <span className="lbl">Quantity</span>
+            <input value={sale.quantity + " L"} onChange={e => onQuantityChange(e.target.value.replace(/[^\d.]/g,""))} />
+          </div>
+        </div>
+
+        <p className="hint">You can edit Amount or Quantity.<br/>The other will adjust automatically.</p>
+
+        <button className="btn-primary" onClick={() => go("review-sale", { code: customer.code })}>Continue →</button>
+      </div>
+    </Phone>
+  );
+}
+
+/* ---------- 7. Review Sale ---------- */
+function ReviewSaleScreen({ go, customer, sale }) {
+  const fuel = FUELS.find(f => f.key === sale.fuel);
+  const nozzleId = sale.nozzle;
+  // Time is frozen at the moment the person reaches Review, not recalculated on every render,
+  // so it doesn't visibly tick while they're reading the screen.
+  const [reviewedAt] = useState(() => new Date());
+  return (
+    <Phone>
+      <TopBar title="Review Sale" sub={`${customer.name} (${customer.code})`} onBack={() => go("sale-details", { code: customer.code })} />
+      <div className="content">
+        <div className="info-card" style={{marginTop:6}}>
+          <div className="info-row"><span className="k">Amount</span><span className="v">{inr(parseFloat(sale.amount)||0)}</span></div>
+          <div className="info-row"><span className="k">Rate (Per Litre)</span><span className="v">{inr(fuel.rate)} / L</span></div>
+          <div className="info-row"><span className="k">Quantity</span><span className="v">{parseFloat(sale.quantity||0).toFixed(2)} L</span></div>
+          <div className="info-row"><span className="k">Payment Type</span><span className="v">Credit</span></div>
+          <div className="info-row"><span className="k">Date &amp; Time</span><span className="v">{formatDateTime(reviewedAt)}</span></div>
+          <div className="info-row"><span className="k">Operator</span><span className="v">{OPERATOR}</span></div>
+          <div className="info-row"><span className="k">Shift</span><span className="v">{SHIFT}</span></div>
+        </div>
+
+        <div className="row-btns">
+          <button className="btn-secondary" onClick={() => go("sale-details", { code: customer.code })}>Back</button>
+          <button className="btn-primary" style={{flex:1}} onClick={() => go("new-outstanding", { code: customer.code, confirmSale: true })}>Confirm Sale</button>
+        </div>
+      </div>
+    </Phone>
+  );
+}
+
+/* ---------- 8. New Outstanding ---------- */
+function NewOutstandingScreen({ go, customer, sale }) {
+  const amt = parseFloat(sale.amount) || 0;
+  const prev = customer.outstanding;
+  const next = prev + amt;
+  return (
+    <Phone>
+      <div className="content" style={{paddingTop:60}}>
+        <div className="center-page">
+          <div className="status-icon orange">🧾</div>
+          <div className="status-title">New Outstanding</div>
+        </div>
+
+        <div className="info-card" style={{marginTop:10}}>
+          <div className="info-row"><span className="k">Previous Outstanding</span><span className="v">{inr(prev)}</span></div>
+          <div className="info-row"><span className="k">Sale Amount</span><span className="v plus">+ {inr(amt)}</span></div>
+          <div className="info-row" style={{borderBottom:"none"}}><span className="k" style={{fontWeight:700,color:"var(--ink)"}}>New Outstanding</span><span className="v" style={{color:"var(--orange)",fontSize:18}}>{inr(next)}</span></div>
+        </div>
+
+        <div className="outstanding-note">This amount will be added to customer's outstanding balance.</div>
+
+        <button className="btn-primary" onClick={() => go("sale-success", { code: customer.code })}>Continue</button>
+      </div>
+    </Phone>
+  );
+}
+
+/* ---------- 9. Sale Completed ---------- */
+function SaleSuccessScreen({ go, customer, sale, txn, onDone }) {
+  const fuel = FUELS.find(f => f.key === sale.fuel);
+  return (
+    <Phone>
+      <div className="content" style={{paddingTop:50}}>
+        <div className="center-page">
+          <div className="status-icon">✓</div>
+          <div className="status-title">Sale Completed</div>
+          <div className="txn-id">Transaction ID<br/>{txn ? txn.id : "—"}</div>
+        </div>
+
+        <div className="info-card">
+          <div className="info-row"><span className="k">Amount</span><span className="v">{inr(parseFloat(sale.amount)||0)}</span></div>
+          <div className="info-row"><span className="k">Fuel</span><span className="v">{fuel.name}</span></div>
+          <div className="info-row"><span className="k">Quantity</span><span className="v">{parseFloat(sale.quantity||0).toFixed(2)} L</span></div>
+          <div className="info-row"><span className="k">Nozzle</span><span className="v">{sale.nozzle}</span></div>
+          <div className="info-row"><span className="k">Date &amp; Time</span><span className="v">{txn ? formatDateTime(txn.time) : "—"}</span></div>
+        </div>
+
+        <div className="row-btns" style={{marginTop:6}}>
+          <button className="btn-secondary" onClick={() => { onDone(); go("credit-customers"); }}>Return to Customers</button>
+          <button className="btn-primary" style={{flex:1}} onClick={() => { onDone(); go("home"); }}>Go to Home</button>
+        </div>
+      </div>
+    </Phone>
+  );
+}
+
+/* ---------- Digital Transactions ---------- */
+const DIGITAL_TXNS = [
+  { id: "UPI-4471", customer: "Walk-in", method: "UPI", amount: 2150.00, time: "09:42 AM" },
+  { id: "CRD-2290", customer: "Walk-in", method: "Card", amount: 4800.00, time: "10:05 AM" },
+  { id: "UPI-4472", customer: "Walk-in", method: "UPI", amount: 1050.00, time: "10:20 AM" },
+  { id: "UPI-4473", customer: "Walk-in", method: "UPI", amount: 3200.00, time: "10:51 AM" },
+];
+function DigitalTransactionsScreen({ go }) {
+  const total = DIGITAL_TXNS.reduce((s, t) => s + t.amount, 0);
+  return (
+    <Phone>
+      <TopBar title="Digital Transactions" onBack={() => go("home")} />
+      <div className="content">
+        <div className="stat-card">
+          <div className="label">Total Digital Sales Today</div>
+          <div className="value">{inr(total)}</div>
+        </div>
+        <div className="section-label">Recent Transactions</div>
+        <div className="list-card">
+          {DIGITAL_TXNS.map(t => (
+            <div className="top-cust-row" key={t.id}>
+              <span>
+                <span className="n">{t.method}</span>
+                <div style={{fontSize:11, color:"var(--ink-soft)", fontWeight:500}}>{t.id} · {t.time}</div>
+              </span>
+              <span className="v">{inr(t.amount)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <BottomNav active="digital" onHome={() => go("home")} onDigital={() => go("digital")} onOps={() => go("ops")} onSummary={() => go("summary")} />
+    </Phone>
+  );
+}
+
+/* ---------- Operations ---------- */
+const OPS_ITEMS = [
+  { icon: "🛢️", name: "Tank Levels", desc: "Check current stock per tank" },
+  { icon: "🔢", name: "Meter Readings", desc: "Record opening / closing readings" },
+  { icon: "💲", name: "Price Update", desc: "Update fuel prices for the station" },
+  { icon: "📦", name: "Stock & Deliveries", desc: "Log incoming fuel deliveries" },
+];
+function OperationsScreen({ go }) {
+  return (
+    <Phone>
+      <TopBar title="Operations" onBack={() => go("home")} />
+      <div className="content">
+        {OPS_ITEMS.map(o => (
+          <div className="menu-tile" key={o.name}>
+            <div className="ic">{o.icon}</div>
+            <div className="txt">
+              <div className="name">{o.name}</div>
+              <div className="desc">{o.desc}</div>
+            </div>
+            <span style={{color:"var(--ink-soft)"}}>›</span>
+          </div>
+        ))}
+      </div>
+      <BottomNav active="ops" onHome={() => go("home")} onDigital={() => go("digital")} onOps={() => go("ops")} onSummary={() => go("summary")} />
+    </Phone>
+  );
+}
+
+/* ---------- Summary (overall business, not just credit) ---------- */
+function SummaryScreen({ go, customers }) {
+  const creditTotal = TODAY_SUMMARY.totalCreditSales;
+  const digitalTotal = DIGITAL_TXNS.reduce((s, t) => s + t.amount, 0);
+  const cashTotal = 18650.00;
+  const grandTotal = creditTotal + digitalTotal + cashTotal;
+  const rows = [
+    { label: "Credit Sales", value: creditTotal, color: "var(--green)" },
+    { label: "Digital Sales", value: digitalTotal, color: "var(--orange)" },
+    { label: "Cash Sales", value: cashTotal, color: "#3B7DDB" },
+  ];
+  return (
+    <Phone>
+      <TopBar title="Today's Summary" onBack={() => go("home")} />
+      <div className="content">
+        <div className="stat-card">
+          <div className="label">Total Sales Today</div>
+          <div className="value">{inr(grandTotal)}</div>
+        </div>
+        <div className="section-label">Breakdown by Payment Type</div>
+        <div className="list-card">
+          {rows.map(r => (
+            <div className="breakdown-row" key={r.label}>
+              <span className="swatch" style={{background:r.color}}></span>
+              <span className="lbl">{r.label}</span>
+              <span className="val">{inr(r.value)}</span>
+            </div>
+          ))}
+        </div>
+        <button className="btn-secondary" style={{width:"100%"}} onClick={() => go("today-summary")}>View Credit Summary</button>
+      </div>
+      <BottomNav active="summary" onHome={() => go("home")} onDigital={() => go("digital")} onOps={() => go("ops")} onSummary={() => go("summary")} />
+    </Phone>
+  );
+}
+
+/* ---------- Add Customer ---------- */
+function AddCustomerScreen({ go, onAdd }) {
+  const [name, setName] = useState("");
+  const [code, setCode] = useState("");
+  const [limit, setLimit] = useState("");
+  const canSave = name.trim() && code.trim() && parseFloat(limit) > 0;
+
+  const save = () => {
+    if (!canSave) return;
+    onAdd({ code: code.trim(), name: name.trim(), outstanding: 0, limit: parseFloat(limit), lastTxn: "—", totalSales: 0, paymentsMade: 0 });
+    go("credit-customers");
+  };
+
+  return (
+    <Phone>
+      <TopBar title="Add Customer" onBack={() => go("credit-customers")} />
+      <div className="content">
+        <div className="field-label" style={{marginTop:6}}>Customer Name</div>
+        <input className="form-input" placeholder="e.g. Verma Logistics" value={name} onChange={e => setName(e.target.value)} />
+
+        <div className="field-label">Customer Code</div>
+        <input className="form-input" placeholder="e.g. VL-005" value={code} onChange={e => setCode(e.target.value)} />
+
+        <div className="field-label">Credit Limit (₹)</div>
+        <input className="form-input" placeholder="e.g. 30000" value={limit} onChange={e => setLimit(e.target.value.replace(/[^\d.]/g,""))} />
+
+        <button className="btn-primary" disabled={!canSave} onClick={save}>Save Customer</button>
+      </div>
+    </Phone>
+  );
+}
+
+/* ---------- Shift Status ---------- */
+function ShiftStatusScreen({ go }) {
+  return (
+    <Phone>
+      <TopBar title="Shift Status" onBack={() => go("home")} />
+      <div className="content">
+        <div className="stat-card">
+          <div className="label">Shift</div>
+          <div className="value" style={{fontSize:20}}>{SHIFT}</div>
+        </div>
+        <div className="info-card">
+          <div className="info-row"><span className="k">Operator</span><span className="v">{OPERATOR}</span></div>
+          <div className="info-row"><span className="k">Date</span><span className="v">{formatDate(new Date())}</span></div>
+          <div className="info-row"><span className="k">Window</span><span className="v">{SHIFT_WINDOW}</span></div>
+          <div className="info-row"><span className="k">Status</span><span className="v credit">Active</span></div>
+        </div>
+      </div>
+      <HomeBottomNav go={go} />
+    </Phone>
+  );
+}
+
+/* ---------- Close Shift ---------- */
+function CloseShiftScreen({ go, customers }) {
+  const creditTotal = TODAY_SUMMARY.totalCreditSales;
+  const digitalTotal = DIGITAL_TXNS.reduce((s, t) => s + t.amount, 0);
+  const cashTotal = 18650.00;
+  const [confirmed, setConfirmed] = useState(false);
+
+  if (confirmed) {
+    return (
+      <Phone>
+        <div className="content" style={{paddingTop:60}}>
+          <div className="center-page">
+            <div className="status-icon">✓</div>
+            <div className="status-title">Shift Closed</div>
+            <div className="status-sub">Your shift summary has been recorded.</div>
+          </div>
+          <button className="btn-primary" onClick={() => go("home")}>Go to Home</button>
+        </div>
+      </Phone>
+    );
   }
+
+  return (
+    <Phone>
+      <TopBar title="Close Shift" onBack={() => go("home")} />
+      <div className="content">
+        <div className="section-label">Shift Summary</div>
+        <div className="list-card">
+          <div className="top-cust-row"><span className="n">Credit Sales</span><span className="v">{inr(creditTotal)}</span></div>
+          <div className="top-cust-row"><span className="n">Digital Sales</span><span className="v">{inr(digitalTotal)}</span></div>
+          <div className="top-cust-row"><span className="n">Cash Sales</span><span className="v">{inr(cashTotal)}</span></div>
+        </div>
+        <div className="outstanding-note">Closing your shift will lock further sales until the next shift starts.</div>
+        <button className="btn-primary" onClick={() => setConfirmed(true)}>Confirm Close Shift</button>
+      </div>
+    </Phone>
+  );
 }
-function nav(){const items=navItems();return `<nav class="nav">${items.map(([key,icon,label])=>{let active=false;if(key==="home")active=state.screen==="home";if(key==="digital")active=moduleType()==="digital";if(key==="operations")active=moduleType()==="operations";if(key==="summary")active=moduleType()==="summary";return `<button class="${active?'active':''}" onclick="go('${key}')"><span>${icon}</span>${label}</button>`}).join("")}</nav>`}
-function header(title,back=true){return `<header class="header"><button class="icon-btn" onclick="${back?'back()':''}">${back?'‹':''}</button><div class="header-title">${title}</div><button class="icon-btn" aria-label="Notifications">♧</button></header>`}
-function shell(body,title,back=true){document.getElementById("app").innerHTML=`<div class="screen">${header(title,back)}<main class="content">${body}</main></div>${nav()}`}
-function go(key){const map={home:"home",credit:"credit",digital:"digital",operations:"operations",summary:"summary",shift:"shift",close:"close",profile:"profile"};state.screen=map[key]||"home";render()}
-function back(){const map={credit:"home",creditSummary:"credit",overview:"credit",fuel:"overview",sale:"fuel",review:"sale",outstanding:"review",success:"credit",addCustomer:"credit",digital:"home",digitalAdd:"digital",digitalReview:"digitalAdd",digitalSuccess:"digital",operations:"home",nat:"operations",expenses:"operations",others:"operations",operationSuccess:"operations",summary:"home",shift:"home",close:"home",profile:"home"};state.screen=map[state.screen]||"home";render()}
 
-function home(){shell(`<div class="home-top"><div><div class="home-name">Hello, Saleem</div><div class="active">Your Shift Is Active</div></div><div style="font-size:21px">♧</div></div><div class="card shift-card"><div><div class="shift-date">27 Aug 2026</div><div class="shift-time">09:00 AM – 09:00 PM</div></div><div class="count"><small>Ends In</small><strong>08h 42m</strong></div></div><div class="grid2"><div class="tile" onclick="go('credit')"><div class="tile-icon">♙</div><strong>Credit Customers</strong></div><div class="tile" onclick="go('digital')"><div class="tile-icon">▣</div><strong>Digital Transactions</strong></div><div class="tile" onclick="go('operations')"><div class="tile-icon">▤</div><strong>Operations</strong></div><div class="tile" onclick="go('summary')"><div class="tile-icon">◔</div><strong>Summary</strong></div></div>` ,"",false)}
+/* ---------- Profile ---------- */
+function ProfileScreen({ go }) {
+  return (
+    <Phone>
+      <TopBar title="Profile" onBack={() => go("home")} />
+      <div className="content">
+        <div className="profile-head">
+          <div className="profile-avatar">👤</div>
+          <div className="profile-name">{OPERATOR}</div>
+          <div className="profile-role">Fuel Station Operator</div>
+        </div>
+        <div className="info-card">
+          <div className="info-row"><span className="k">Current Shift</span><span className="v">{SHIFT}</span></div>
+          <div className="info-row"><span className="k">Shift Window</span><span className="v">{SHIFT_WINDOW}</span></div>
+          <div className="info-row"><span className="k">Status</span><span className="v credit">Active</span></div>
+        </div>
+      </div>
+      <HomeBottomNav go={go} />
+    </Phone>
+  );
+}
 
-function credit(){const q=state.search.toLowerCase();const filtered=customers.filter(c=>(c[0]+" "+c[1]).toLowerCase().includes(q));shell(`<h1>Credit Customers</h1><p class="sub">Search And Select A Customer.</p><div class="search-wrap"><span class="search-icon">⌕</span><input class="search" placeholder="Search Customer By Name Or Code" value="${state.search}" oninput="state.search=this.value;credit()"></div><div class="card" style="border-color:#a9c99b;cursor:pointer" onclick="state.screen='creditSummary';render()"><div style="display:flex;justify-content:space-between;align-items:center"><div><strong style="font-size:12px;color:var(--green)">Today's Summary</strong><div class="code">View Credit Sales Summary</div></div><span style="font-size:20px;color:var(--green)">›</span></div></div><div class="section-label">Recent Customers</div>${filtered.length?filtered.map(c=>`<div class="list-row" onclick="state.customer='${c[0]}';state.customerCode='${c[1]}';state.previousOutstanding=${c[2]===37550?12450:c[2]};state.screen='overview';render()"><div class="avatar">♙</div><div class="grow"><div class="name">${c[0]}</div><div class="code">${c[1]}</div></div><div class="money">${money(c[2])}<small>Outstanding</small></div></div>`).join(""):"<div class='card empty'>No Customers Found</div>"}<button class="btn primary" onclick="state.screen='addCustomer';render()">+ Add Customer</button>` ,"Credit Customers")}
-function creditSummary(){shell(`<h1>Today's Credit Summary</h1><p class="sub">Credit Sales Recorded During The Current Shift.</p><div class="card top-total"><div class="label">Total Credit Sales</div><div class="value">${money(124850)}</div></div><div class="stat-grid"><div class="stat"><small>Total Transactions</small><strong>18</strong></div><div class="stat"><small>Total Quantity</small><strong>1,248.65 L</strong></div></div><div class="section-label">Top Customers</div>${[["Arun Traders",45600],["Sharma Transport",32450],["Kumar Enterprises",18760],["Others",28040]].map(x=>`<div class="list-row" style="cursor:default"><div class="grow"><div class="name">${x[0]}</div></div><div class="money">${money(x[1])}</div></div>`).join("")}<button class="btn outline" onclick="state.screen='credit';render()">View All Customers</button>` ,"Today's Credit Summary")}
-function overview(){shell(`<h1>${state.customer}</h1><p class="sub">${state.customerCode}</p><div class="balance"><div><small>Available Credit</small><strong class="green">${money(37550)}</strong></div><div><small>Credit Limit</small><strong>${money(50000)}</strong></div></div><div class="card">${[["Current Outstanding",money(state.previousOutstanding)],["Last Transaction","25 Aug 2026"],["Total Sales (All Time)",money(124850)],["Payments Made",money(112400)]].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div><button class="btn primary" onclick="state.screen='fuel';render()">New Sale</button>` ,"Customer Overview")}
-function fuel(){shell(`<h1>New Sale</h1><p class="sub">${state.customer} (${state.customerCode})</p><div class="section-label">Select Fuel</div><div class="choice ${state.fuel==='Petrol'?'selected':''}" onclick="state.fuel='Petrol';state.rate=105.20;render()"><div class="choice-left"><div class="fuel-icon">♨</div><div><strong>Petrol</strong><small>₹105.20 / L</small></div></div><div class="check">${state.fuel==='Petrol'?'●':'○'}</div></div><div class="choice ${state.fuel==='Diesel'?'selected':''}" onclick="state.fuel='Diesel';state.rate=92.35;render()"><div class="choice-left"><div class="fuel-icon">♨</div><div><strong>Diesel</strong><small>₹92.35 / L</small></div></div><div class="check">${state.fuel==='Diesel'?'●':'○'}</div></div><div class="section-label">Select Nozzle</div><div class="select-box"><span>${state.nozzle} - ${state.fuel}</span><span>⌄</span></div><button class="btn primary" onclick="state.screen='sale';render()">Continue</button>` ,"New Sale")}
-function sale(){shell(`<h1>New Sale</h1><p class="sub">${state.customer} (${state.customerCode})</p><p class="sub">${state.fuel} · ${state.nozzle}</p><label class="field-label">Amount</label><input id="amount" class="field amount-field" type="number" step="0.01" value="${state.amount.toFixed(2)}" oninput="state.amount=parseFloat(this.value)||0;state.quantity=state.rate?state.amount/state.rate:0;syncSaleFields()"><label class="field-label">Rate (Per Litre)</label><input class="field readonly" value="${money(state.rate)} / L" readonly><label class="field-label">Quantity</label><input id="quantity" class="field" type="number" step="0.01" value="${state.quantity.toFixed(2)}" oninput="state.quantity=parseFloat(this.value)||0;state.amount=state.quantity*state.rate;syncSaleFields()"><div class="helper">You Can Edit Amount Or Quantity. The Other Value Adjusts Automatically.</div><button class="btn primary" onclick="state.screen='review';render()">Continue</button>` ,"New Sale")}
-function syncSaleFields(){const a=document.getElementById("amount"),q=document.getElementById("quantity");if(a)a.value=Number(state.amount).toFixed(2);if(q)q.value=Number(state.quantity).toFixed(2)}
-function review(){shell(`<h1>Review Sale</h1><p class="sub">${state.customer} (${state.customerCode})</p><p class="sub">${state.fuel} · ${state.nozzle}</p><div class="card review-card">${[["Amount",money(state.amount)],["Rate (Per Litre)",money(state.rate)+" / L"],["Quantity",qty(state.quantity)],["Payment Type","Credit"],["Date & Time","27 Aug 2026, 10:15 AM"],["Operator","Saleem"],["Shift","Current Shift"]].map(x=>`<div class="review-row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div><div class="grid2"><button class="btn outline" onclick="state.screen='sale';render()">Back</button><button class="btn primary" onclick="state.screen='outstanding';render()">Confirm Sale</button></div>` ,"Review Sale")}
-function outstanding(){const n=state.previousOutstanding+state.amount;shell(`<div class="outstanding"><div class="circle">♧</div><h2>New Outstanding</h2><p class="sub">This Sale Will Be Added To The Customer's Outstanding Balance.</p></div><div class="card"><div class="row"><span>Previous Outstanding</span><strong>${money(state.previousOutstanding)}</strong></div><div class="row"><span>Sale Amount</span><strong>+ ${money(state.amount)}</strong></div><div class="row"><span>New Outstanding</span><strong class="orange">${money(n)}</strong></div></div><div class="notice">The New Outstanding Amount Will Be Added To ${state.customer}'s Outstanding Balance.</div><button class="btn primary" onclick="state.screen='success';render()">Continue</button>` ,"New Outstanding")}
-function success(){shell(`<div class="success"><div class="circle">✓</div><h2>Sale Completed</h2><p class="sub success-note">The Credit Sale Has Been Recorded Successfully.</p><div class="success-card">${[["Transaction ID","TX-270826-1001"],["Amount",money(state.amount)],["Fuel",state.fuel],["Quantity",qty(state.quantity)],["Nozzle",state.nozzle],["Date & Time","27 Aug 2026, 10:15 AM"]].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div></div><div class="success-actions"><button class="btn outline" onclick="state.screen='credit';render()">Return to Customers</button><button class="btn primary" onclick="state.screen='home';render()">Go to Home</button></div>` ,"Sale Completed")}
-function addCustomer(){shell(`<h1>Add Customer</h1><p class="sub">Create A New Credit Customer.</p><label class="field-label">Customer Name</label><input class="field" placeholder="Enter Customer Name"><label class="field-label">Customer Code</label><input class="field" placeholder="Enter Customer Code"><label class="field-label">Credit Limit</label><input class="field" type="number" placeholder="₹0.00"><button class="btn primary" onclick="state.screen='credit';render()">Save</button>` ,"Add Customer")}
+/* ---------- App shell / router ---------- */
+function App() {
+  const [screen, setScreen] = useState("home");
+  const [selectedCode, setSelectedCode] = useState(null);
+  const [customers, setCustomers] = useState(CUSTOMERS_INITIAL);
+  const [sale, setSale] = useState({ fuel: "petrol", nozzle: "N1", amount: "1052.00", quantity: "10.00" });
+  const [txnSeq, setTxnSeq] = useState(1); // increments with each completed sale, feeds the transaction ID
+  const [lastTxn, setLastTxn] = useState(null); // { id, time } for the most recently confirmed sale
 
-function digital(){shell(`<h1>Digital Transactions</h1><div class="card top-total"><div class="label">Today's Digital Collection</div><div class="value">${money(47250)}</div></div><div class="stat-grid"><div class="stat"><small>UPI</small><strong>${money(28650)}</strong></div><div class="stat"><small>Card</small><strong>${money(15200)}</strong></div><div class="stat"><small>Bank</small><strong>${money(3400)}</strong></div></div><button class="btn primary" onclick="state.screen='digitalAdd';render()">Add Transactions</button><button class="btn outline" onclick="state.screen='digitalSuccess';render()">View Transactions</button>` ,"Digital Transactions")}
-function digitalAdd(){shell(`<h1>Add Transactions</h1><p class="sub">Enter Today's Digital Transaction Totals.</p><label class="field-label">UPI Payments</label><input class="field" value="₹28,650.00"><label class="field-label">Card Payments</label><input class="field" value="₹15,200.00"><label class="field-label">Bank Payments</label><input class="field" value="₹3,400.00"><div class="card top-total"><div class="label">Total Digital Collection</div><div class="value">${money(47250)}</div></div><button class="btn primary" onclick="state.screen='digitalReview';render()">Review</button>` ,"Add Transactions")}
-function digitalReview(){shell(`<h1>Review</h1><p class="sub">Please Review Today's Digital Transactions.</p><div class="card">${[["UPI Payments",money(28650)],["Card Payments",money(15200)],["Bank Payments",money(3400)]].map(x=>`<div class="review-row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}<div class="review-row"><span class="total">Total Digital Collection</span><strong class="total">${money(47250)}</strong></div></div><div class="notice">Once Confirmed, These Transactions Will Be Recorded For The Current Shift.</div><div class="grid2"><button class="btn outline" onclick="state.screen='digitalAdd';render()">Back</button><button class="btn primary" onclick="state.screen='digitalSuccess';render()">Confirm</button></div>` ,"Review")}
-function digitalSuccess(){shell(`<div class="success"><div class="circle">✓</div><h2>Saved</h2><p class="sub success-note">Today's Digital Transactions Have Been Recorded Successfully.</p><div class="success-card"><div class="row"><span>Total Digital Collection</span><strong class="total">${money(47250)}</strong></div></div></div><button class="btn primary" onclick="state.screen='digital';render()">View Transactions</button><button class="btn outline" onclick="state.screen='home';render()">Go to Home</button>` ,"Saved")}
+  const go = (next, params = {}) => {
+    if (params.code) setSelectedCode(params.code);
+    // Generate the real transaction record exactly once, at the moment the sale is confirmed,
+    // so the ID/timestamp shown on New Outstanding and Sale Completed match each other.
+    if (params.confirmSale) {
+      const now = new Date();
+      setLastTxn({ id: makeTxnId(now, txnSeq), time: now });
+      setTxnSeq(seq => seq + 1);
+    }
+    setScreen(next);
+    window.scrollTo(0,0);
+  };
 
-function operations(){shell(`<h1>Operations</h1><p class="sub">Record Non-Sales Entries For The Current Shift.</p><div class="grid2"><div class="tile" onclick="state.screen='nat';render()"><div class="tile-icon">◫</div><strong>NAT</strong></div><div class="tile" onclick="state.screen='expenses';render()"><div class="tile-icon">₹</div><strong>Expenses</strong></div><div class="tile" onclick="state.screen='others';render()"><div class="tile-icon">＋</div><strong>Others</strong></div></div>` ,"Operations")}
-function operationForm(title,placeholder){shell(`<h1>${title}</h1><p class="sub">Add The ${title} Amount For The Current Shift.</p><label class="field-label">Amount</label><input class="field amount-field" type="number" placeholder="${placeholder}"><label class="field-label">Remarks</label><input class="field" placeholder="Enter Remarks"><button class="btn primary" onclick="state.screen='operationSuccess';render()">Save</button>` ,title)}
-function operationSuccess(){shell(`<div class="success"><div class="circle">✓</div><h2>Saved</h2><p class="sub success-note">The Operation Has Been Recorded Successfully.</p></div><button class="btn primary" onclick="state.screen='operations';render()">Return to Operations</button><button class="btn outline" onclick="state.screen='home';render()">Go to Home</button>` ,"Saved")}
+  const customer = useMemo(() => customers.find(c => c.code === selectedCode), [customers, selectedCode]);
 
-function summary(){shell(`<h1>Summary</h1><p class="sub">Current Shift Sales And Collection Overview.</p><div class="card top-total"><div class="label">Today's Total Sales</div><div class="value">${money(24850)}</div></div><div class="stat-grid"><div class="stat"><small>Credit Sales</small><strong>${money(124850)}</strong></div><div class="stat"><small>Digital Collection</small><strong>${money(47250)}</strong></div><div class="stat"><small>Transactions</small><strong>186</strong></div><div class="stat"><small>Fuel Volume</small><strong>2,486 L</strong></div></div><div class="section-label">Current Shift</div><div class="card">${[["Shift","09:00 AM – 09:00 PM"],["Status","Active"],["Operator","Saleem"]].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div>` ,"Summary")}
-function shift(){shell(`<h1>Shift Status</h1><div class="notice"><strong class="green">Shift Is Active</strong></div><div class="card">${[["Date","27 Aug 2026"],["Shift Time","09:00 AM – 09:00 PM"],["Status","Active"]].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div>` ,"Shift Status")}
-function closeShift(){shell(`<h1>Close Shift</h1><p class="sub">Review Required Information Before Closing The Current Shift.</p><div class="card">${[["Current Shift","09:00 AM – 09:00 PM"],["Sales Recorded",money(24850)],["Digital Collection",money(47250)],["Credit Sales",money(124850)]].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div><div class="notice">Closing Shift Will Lock Current Shift Entries. Complete Required Reconciliation Before Final Confirmation.</div><button class="btn primary" disabled>Close Shift</button>` ,"Close Shift")}
-function profile(){shell(`<h1>Profile</h1><div class="card">${[["Name","Saleem"],["Role","Salesman"],["Employee ID","EMP00123"]].map(x=>`<div class="row"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("")}</div><button class="btn outline">Security</button><button class="btn outline">Help & Support</button>` ,"Profile")}
+  const applySaleToOutstanding = () => {
+    const amt = parseFloat(sale.amount) || 0;
+    const dateLabel = lastTxn ? formatDate(lastTxn.time) : formatDate(new Date());
+    setCustomers(cs => cs.map(c => c.code === selectedCode ? { ...c, outstanding: c.outstanding + amt, lastTxn: dateLabel } : c));
+  };
 
-function render(){switch(state.screen){case"home":home();break;case"credit":credit();break;case"creditSummary":creditSummary();break;case"overview":overview();break;case"fuel":fuel();break;case"sale":sale();break;case"review":review();break;case"outstanding":outstanding();break;case"success":success();break;case"addCustomer":addCustomer();break;case"digital":digital();break;case"digitalAdd":digitalAdd();break;case"digitalReview":digitalReview();break;case"digitalSuccess":digitalSuccess();break;case"operations":operations();break;case"nat":operationForm("NAT","₹0.00");break;case"expenses":operationForm("Expenses","₹0.00");break;case"others":operationForm("Others","₹0.00");break;case"operationSuccess":operationSuccess();break;case"summary":summary();break;case"shift":shift();break;case"close":closeShift();break;case"profile":profile();break;default:state.screen="home";home()}}
-render();
+  const addCustomer = (newCust) => {
+    setCustomers(cs => [newCust, ...cs]);
+  };
+
+  const resetDemo = () => {
+    setCustomers(CUSTOMERS_INITIAL);
+    setSale({ fuel: "petrol", nozzle: "N1", amount: "1052.00", quantity: "10.00" });
+    setTxnSeq(1);
+    setLastTxn(null);
+    setScreen("home");
+  };
+
+  let view;
+  switch (screen) {
+    case "home": view = <HomeScreenFixed go={go} />; break;
+    case "credit-customers": view = <CreditCustomersScreen go={go} customers={customers} />; break;
+    case "today-summary": view = <TodaySummaryScreen go={go} />; break;
+    case "customer-overview": view = <CustomerOverviewScreen go={go} customer={customer} />; break;
+    case "select-fuel": view = <SelectFuelScreen go={go} customer={customer} sale={sale} setSale={setSale} />; break;
+    case "sale-details": view = <SaleDetailsScreen go={go} customer={customer} sale={sale} setSale={setSale} />; break;
+    case "review-sale": view = <ReviewSaleScreen go={go} customer={customer} sale={sale} />; break;
+    case "new-outstanding": view = <NewOutstandingScreen go={go} customer={customer} sale={sale} />; break;
+    case "sale-success": view = <SaleSuccessScreen go={go} customer={customer} sale={sale} txn={lastTxn} onDone={applySaleToOutstanding} />; break;
+    case "digital": view = <DigitalTransactionsScreen go={go} />; break;
+    case "ops": view = <OperationsScreen go={go} />; break;
+    case "summary": view = <SummaryScreen go={go} customers={customers} />; break;
+    case "add-customer": view = <AddCustomerScreen go={go} onAdd={addCustomer} />; break;
+    case "shift-status": view = <ShiftStatusScreen go={go} />; break;
+    case "close-shift": view = <CloseShiftScreen go={go} customers={customers} />; break;
+    case "profile": view = <ProfileScreen go={go} />; break;
+    default: view = <HomeScreenFixed go={go} />;
+  }
+
+  return (
+    <div>
+      {view}
+      <a className="reset" onClick={resetDemo}>Reset demo data</a>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
