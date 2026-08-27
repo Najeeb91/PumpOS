@@ -1,1 +1,62 @@
-<!doctype html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/><title>PumpOS Core MVP</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PumpOS Core MVP</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f6f1;color:#18212b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+button,input{font:inherit}.app{max-width:520px;min-height:100vh;margin:auto;background:#f7f6f1}
+header{height:64px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e4e2da;background:#faf9f5}
+.brand{display:flex;gap:10px;align-items:center}.logo{width:32px;height:32px;border-radius:10px;background:#5b9f3a;color:white;display:grid;place-items:center;font-weight:800}.brand b{display:block;font-size:18px}.brand small{color:#68717c;font-size:10px}
+.roles{display:flex;gap:5px;padding:10px 12px;border-bottom:1px solid #e4e2da;background:#faf9f5}.roles button{flex:1;border:0;background:#eceae3;color:#626b75;border-radius:9px;padding:9px 5px;font-size:11px;font-weight:650}.roles button.active{background:white;color:#1b2732;box-shadow:0 1px 5px #0001}
+main{padding:18px 16px 88px}.head{display:flex;gap:10px;align-items:flex-start;margin-bottom:15px}.back{border:0;background:transparent;padding:3px;font-size:20px}.head h1{font-size:22px;margin:0 0 3px;letter-spacing:-.3px}.head p{margin:0;color:#69727d;font-size:12px}
+.card{background:#fff;border:1px solid #e3e1d9;border-radius:14px;padding:15px;margin-bottom:11px;box-shadow:0 2px 10px #1b263008}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat small{display:block;color:#68717c;font-size:10px}.stat strong{display:block;font-size:17px;margin-top:5px}.shift{display:flex;justify-content:space-between;align-items:center}.shift small{display:block;color:#68717c;margin-top:4px;font-size:11px}.badge{background:#edf7e8;color:#41872c;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:750}
+.primary,.secondary{width:100%;height:49px;border-radius:12px;font-size:14px;font-weight:750}.primary{border:1px solid #5b9f3a;background:#5b9f3a;color:#fff}.secondary{border:1px solid #b7bcb6;background:#fff;color:#1d2731;margin-top:2px}.big{margin:4px 0 18px}
+.action{display:flex;justify-content:space-between;align-items:center}.action small{display:block;color:#68717c;font-size:11px;margin-top:4px}
+label{display:block;font-size:11px;font-weight:750;margin:11px 0 6px}.choice{display:flex;align-items:center;gap:10px;border:1px solid #dbe7d6;background:#f6faf4;border-radius:11px;padding:12px}.choice .grow{flex:1}.choice small{display:block;color:#68717c;margin-top:2px}
+input{width:100%;height:48px;border:1px solid #deddd6;border-radius:11px;padding:0 12px;font-size:16px;background:#fff}.payments{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.payments button{height:41px;border:1px solid #deddd6;background:#fff;border-radius:9px;font-size:10px}.payments button.selected{border-color:#5b9f3a;background:#f0f8ec;font-weight:750}
+.total{display:flex;justify-content:space-between;align-items:center;padding:16px 0}.total strong{font-size:20px;color:#41872c}.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #eeece7;font-size:12px}.row:last-child{border-bottom:0}.row span{color:#69727d}.green{color:#41872c}
+.hero{display:flex;gap:12px;align-items:center}.circle{width:45px;height:45px;border-radius:50%;background:#edf7e8;color:#41872c;display:grid;place-items:center;font-size:20px}.hero small{color:#69727d;font-size:10px}.hero strong{display:block;margin-top:3px;font-size:16px}
+.notice{background:#f1f4f0;border-radius:10px;padding:11px;margin:12px 0;font-size:11px;line-height:1.4}.owner{background:#fff;border:1px solid #d9e5d3;border-radius:14px;padding:17px;margin-bottom:11px}.owner small{color:#69727d;font-size:10px}.owner strong{display:block;font-size:28px;color:#41872c;margin:4px 0}.owner span{font-size:11px;color:#69727d}
+.audit{padding:9px 0;border-bottom:1px solid #eeece7;font-size:11px}.audit:last-child{border:0}.muted{color:#69727d;font-size:12px}
+.flow{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:53px;background:#fff;border-top:1px solid #e4e2da;display:flex;align-items:center;justify-content:center;gap:4px;font-size:9px;color:#69727d;z-index:4}.flow span{padding:6px 4px;border-radius:6px}.flow .on{background:#edf7e8;color:#41872c;font-weight:750}
+.toast{position:fixed;top:75px;left:50%;transform:translateX(-50%);background:#18212b;color:white;padding:9px 12px;border-radius:9px;font-size:11px;z-index:10;display:none}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="toast" class="toast"></div>
+<script>
+const initial={id:"TX-270826-1001",fuel:"Petrol",nozzle:"N1",quantity:10,rate:105.20,amount:1052,payment:"Cash",operator:"Saleem",status:"Draft"};
+let sale={...initial},role="salesman",screen="home",events=[];
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(n);
+function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1800)}
+function setRole(r){role=r;screen="home";render()}
+function submitSale(){sale.status="Submitted";events.unshift("Sale submitted by Salesman");role="manager";screen="home";toast("Sale submitted");render()}
+function verify(){sale.status="Verified";events.unshift("Sale verified by Manager");toast("Transaction verified");render()}
+function lock(){sale.status="Locked";events.unshift("Reconciliation complete — record locked");role="owner";screen="home";toast("Record locked");render()}
+function reset(){sale={...initial};events=[];role="salesman";screen="home";render()}
+function row(a,b,green=false){return '<div class="row"><span>'+a+'</span><b class="'+(green?"green":"")+'">'+b+'</b></div>'}
+function shell(title,sub,body,back){return '<main><div class="head">'+(back?'<button class="back" onclick="screen=\\'home\\';render()">‹</button>':'')+'<div><h1>'+title+'</h1><p>'+sub+'</p></div></div>'+body+'</main>'}
+function salesman(){
+ if(screen==="sale")return shell("New Sale","Petrol • Pump 1 / Nozzle N1",
+ '<div class="card"><label>Fuel</label><div class="choice"><div>⛽</div><div class="grow"><b>Petrol</b><small>₹105.20 / L</small></div><b>✓</b></div><label>Quantity</label><input id="qty" type="number" min="0" step=".01" value="'+sale.quantity+'" oninput="sale.quantity=Number(this.value)||0;sale.amount=sale.quantity*sale.rate;document.getElementById(\\'amt\\').textContent=money(sale.amount)"><label>Payment type</label><div class="payments">'+["Cash","UPI","Card","Credit"].map(p=>'<button class="'+(sale.payment===p?"selected":"")+'" onclick="sale.payment=\\''+p+'\\';render()">'+p+'</button>').join("")+'</div><div class="total"><span>Sale amount</span><strong id="amt">'+money(sale.amount)+'</strong></div><button class="primary" onclick="submitSale()">Review & Submit →</button></div>',true);
+ return shell("Hello, Saleem","Your shift is active",
+ '<div class="card shift"><div><b>Morning Shift</b><small>27 Aug 2026 • 09:00–21:00</small></div><span class="badge">Open</span></div><div class="grid"><div class="card stat"><small>Today’s sales</small><strong>'+money(sale.status==="Draft"?0:sale.amount)+'</strong></div><div class="card stat"><small>Fuel sold</small><strong>'+ (sale.status==="Draft"?"0.00":sale.quantity.toFixed(2)) +' L</strong></div></div><button class="primary big" onclick="screen=\\'sale\\';render()">＋ New Sale</button><div class="card action"><div><b>Meter Reading</b><small>Record current nozzle reading</small></div><span>›</span></div><div class="card action"><div><b>Shift Status</b><small>Open • Opening cash ₹10,000</small></div><span>›</span></div></main>',false)
+}
+function manager(){
+ return shell("Manager Verification","Submitted transaction",
+ '<div class="card hero"><div class="circle">✓</div><div><small>Status</small><strong>'+sale.status+'</strong></div></div><div class="card">'+row("Transaction",sale.id)+row("Fuel / Nozzle",sale.fuel+" / "+sale.nozzle)+row("Quantity",sale.quantity.toFixed(2)+" L")+row("Payment",sale.payment)+row("Amount",money(sale.amount),true)+row("Operator",sale.operator)+(sale.status==="Submitted"?'<button class="primary" onclick="verify()">✓ Verify Transaction</button>':sale.status==="Verified"?'<button class="primary" onclick="lock()">🔒 Reconcile & Lock</button>': '<div class="notice">✓ Record is locked and read-only.</div>')+'</div>',false)
+}
+function owner(){
+ return shell("Owner Dashboard","Verified business activity",
+ '<div class="owner"><small>Verified sales today</small><strong>'+money(sale.status==="Locked"?sale.amount:0)+'</strong><span>'+ (sale.status==="Locked"?"Locked & reconciled":"No verified sales yet") +'</span></div><div class="grid"><div class="card stat"><small>Fuel sold</small><strong>'+(sale.status==="Locked"?sale.quantity.toFixed(2):"0.00")+' L</strong></div><div class="card stat"><small>Transactions</small><strong>'+(sale.status==="Locked"?"1":"0")+'</strong></div></div><div class="card"><b>Latest Transaction</b>'+row("ID",sale.id)+row("Operator",sale.operator)+row("Payment",sale.payment)+row("Amount",money(sale.amount),true)+'</div><div class="card"><b>Audit Trail</b>'+(events.length?events.map(e=>'<div class="audit">• '+e+'</div>').join(""):'<p class="muted">Complete the core flow to populate the audit trail.</p>')+'</div><button class="secondary" onclick="reset()">Reset Demo</button>',false)
+}
+function render(){
+ $("app").innerHTML='<div class="app"><header><div class="brand"><div class="logo">◆</div><div><b>PumpOS</b><small>Core MVP • '+(role==="salesman"?"Execute":role==="manager"?"Verify":"Monitor")+'</small></div></div><span>☰</span></header><div class="roles">'+["salesman","manager","owner"].map(r=>'<button class="'+(role===r?"active":"")+'" onclick="setRole(\\''+r+'\\')">'+r[0].toUpperCase()+r.slice(1)+'</button>').join("")+'</div>'+(role==="salesman"?salesman():role==="manager"?manager():owner())+'<div class="flow"><span class="'+(sale.status==="Draft"?"on":"")+'">Record</span>›<span class="'+(sale.status!=="Draft"?"on":"")+'">Submit</span>›<span class="'+(["Verified","Locked"].includes(sale.status)?"on":"")+'">Verify</span>›<span class="'+(sale.status==="Locked"?"on":"")+'">Reconcile</span>›<span class="'+(sale.status==="Locked"?"on":"")+'">Owner</span></div></div>';
+}
+render();
+</script>
+</body>
+</html>
