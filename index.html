@@ -3,53 +3,98 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PumpOS Owner — Operations</title>
+<title>PumpOS Owner Operations</title>
 <style>
 :root{--bg:#F8F7F2;--navy:#1a2332;--green:#5FA83E;--gray:#5a6472;--border:#e5e3da;--white:#fff;--amber:#b87931;--red:#b94b43}
-*{box-sizing:border-box}body{margin:0;background:#e7e5df;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:var(--navy)}
-.app{width:min(390px,100%);min-height:100vh;margin:auto;background:var(--bg)}.screen{min-height:100vh;padding-bottom:88px}
-header{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#faf9f5;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:4}
-header b{font-size:17px}header button{border:0;background:none;color:var(--navy);font-size:22px}
-main{padding:18px 16px}h1{font-size:25px;line-height:1.15;margin:0 0 5px;font-weight:800}h2{font-size:15px;margin:0}.sub{font-size:11px;color:var(--gray);margin:0;line-height:1.5}
-.tabs{display:flex;gap:6px;margin:14px 0;overflow:auto}.tabs button{border:1px solid var(--border);background:white;border-radius:10px;padding:8px 11px;font-size:10px;font-weight:750;white-space:nowrap}.tabs .active{background:var(--navy);color:#fff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric,.card,.row{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 2px 10px #1a23320a}.metric{padding:13px}.metric small{display:block;font-size:10px;color:var(--gray)}.metric strong{display:block;font-size:17px;margin-top:5px}
-.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.card{padding:14px;margin-top:12px}.section{font-size:12px;font-weight:800;margin:18px 0 8px}.row{padding:11px 12px;margin:8px 0;display:flex;align-items:center;justify-content:space-between;font-size:11px;cursor:pointer}.row small{display:block;color:var(--gray);font-size:9px;margin-top:3px}.row strong{text-align:right}
-.kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0eee8;font-size:11px}.kv:last-child{border:0}
+*{box-sizing:border-box}body{margin:0;background:#ddd;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:var(--navy)}
+#app{width:390px;max-width:100%;min-height:100vh;margin:auto;background:var(--bg)}
+header{height:62px;background:#faf9f5;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:2}
+header b{font-size:17px}header button{border:0;background:transparent;font-size:23px;color:var(--navy)}
+main{padding:18px 16px 92px}h1{font-size:25px;margin:0 0 5px}h2{font-size:15px;margin:0 0 8px}.sub{font-size:11px;color:var(--gray);margin:0}
+.tabs{display:flex;gap:6px;margin:14px 0;overflow:auto}.tabs button{border:1px solid var(--border);background:#fff;border-radius:10px;padding:8px 11px;font-size:10px;font-weight:700;white-space:nowrap}.tabs .active{background:var(--navy);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric,.card,.item{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 2px 10px #1a23320b}.metric{padding:13px}.metric small{display:block;color:var(--gray);font-size:10px}.metric strong{display:block;font-size:17px;margin-top:5px}.card{padding:14px;margin-top:12px}.item{min-height:52px;margin:8px 0;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;font-size:11px;cursor:pointer}.item small{display:block;color:var(--gray);font-size:9px;margin-top:3px}.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.section{font-size:12px;font-weight:800;margin:18px 0 8px}.kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0eee8;font-size:11px}.kv:last-child{border:0}
 .btn{width:100%;height:48px;border-radius:13px;margin-top:10px;font-weight:800}.primary{border:0;background:var(--green);color:#fff}.outline{border:1px solid #aeb4b2;background:#fff;color:var(--navy)}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100%);height:78px;background:#fff;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);z-index:10}.nav button{border:0;background:#fff;color:#69727c;font-size:8px;font-weight:750}.nav span{display:block;font-size:17px;line-height:22px}.nav .active{color:var(--green)}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:390px;max-width:100%;height:78px;background:#fff;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);z-index:5}.bottom button{border:0;background:#fff;color:#69727c;font-size:8px;font-weight:700}.bottom span{display:block;font-size:17px;height:24px}.bottom .active{color:var(--green)}
+input[type=date]{width:100%;height:44px;border:1px solid var(--border);border-radius:11px;background:#fff;padding:0 9px}
 </style>
 </head>
-<body><div class="app" id="app"></div>
+<body>
+<div id="app"></div>
 <script>
 let page="overview",period="Today";
-const nav=[["home","⌂","Home"],["reports","▥","Reports"],["alerts","!","Alerts"],["settings","⚙","Settings"],["profile","♙","Profile"]];
-function navBar(){return '<nav class="nav">'+nav.map(n=>'<button class="'+(n[0]=="home"?'active':'')+'" onclick="goHome()"><span>'+n[1]+'</span>'+n[2]+'</button>').join("")+'</nav>'}
-function shell(title,body){document.getElementById("app").innerHTML='<div class="screen"><header><button onclick="page='overview';render()">‹</button><b>'+title+'</b><button>♙</button></header><main>'+body+'</main></div>'+navBar()}
-function goHome(){location.href="index.html"}
-function tabs(){return '<div class="tabs">'+["Today","This Week","This Month","Custom"].map(x=>'<button class="'+(period==x?'active':'')+'" onclick="'+(x=="Custom"?'customRange()':'period=''+x+'';render()')+'">'+x+'</button>').join("")+'</div>'}
-function overview(){shell("Operations",'<h1>Operations overview</h1><p class="sub">Owner monitoring · '+period+'</p>'+tabs()+
+function bottom(){
+return '<div class="bottom"><button class="active" onclick="page=\'overview\';render()"><span>⌂</span>Home</button><button onclick="page=\'overview\';render()"><span>▥</span>Reports</button><button onclick="page=\'exceptions\';render()"><span>!</span>Alerts</button><button><span>⚙</span>Settings</button><button><span>♙</span>Profile</button></div>';
+}
+function frame(title,body){
+document.getElementById("app").innerHTML='<header><button onclick="page=\'overview\';render()">‹</button><b>'+title+'</b><button>♙</button></header><main>'+body+'</main>'+bottom();
+}
+function tabs(){
+return '<div class="tabs">'+["Today","This Week","This Month","Custom"].map(function(x){
+return '<button class="'+(period===x?'active':'')+'" onclick="'+(x==="Custom"?"custom()":"period='"+x+"';render()")+'">'+x+'</button>';
+}).join("")+'</div>';
+}
+function overview(){
+frame("Operations",
+'<h1>Operations overview</h1><p class="sub">Owner monitoring · '+period+'</p>'+tabs()+
 '<div class="grid"><div class="metric"><small>Active shifts</small><strong>3</strong></div><div class="metric"><small>Salesmen active</small><strong>3</strong></div><div class="metric"><small>Pumps online</small><strong class="green">4 / 4</strong></div><div class="metric"><small>Pending issues</small><strong class="amber">2</strong></div></div>'+
-'<div class="card"><h2>Station status</h2><div class="row"><span>Current shifts<small>Salesman A · B · C</small></span><strong class="green">Open</strong></div><div class="row"><span>Pump network<small>All machines connected</small></span><strong class="green">Normal</strong></div><div class="row"><span>Meter readings<small>One variance requires review</small></span><strong class="amber">Review</strong></div></div>'+
+'<div class="card"><h2>Station status</h2>'+
+'<div class="item"><span>Current shifts<small>Salesman A · B · C</small></span><b class="green">Open</b></div>'+
+'<div class="item"><span>Pump network<small>All machines connected</small></span><b class="green">Normal</b></div>'+
+'<div class="item"><span>Meter readings<small>One variance requires review</small></span><b class="amber">Review</b></div></div>'+
 '<div class="section">Operations</div>'+
-'<div class="row" onclick="page='shifts';render()"><span>Shift monitoring<small>Current staff activity</small></span><strong>›</strong></div>'+
-'<div class="row" onclick="page='pumps';render()"><span>Pump & meter monitoring<small>Machines, readings, variance</small></span><strong>›</strong></div>'+
-'<div class="row" onclick="page='expenses';render()"><span>Expenses<small>Station operating expenses</small></span><strong>›</strong></div>'+
-'<div class="row" onclick="page='other';render()"><span>Other operations<small>Operational items and adjustments</small></span><strong>›</strong></div>'+
-'<div class="row" onclick="page='exceptions';render()"><span>Exceptions & alerts<small>Items requiring owner attention</small></span><strong class="amber">2</strong></div>'+
-'<div class="row" onclick="page='audit';render()"><span>Audit history<small>Operational changes</small></span><strong>›</strong></div>')}
-function shifts(){shell("Shift monitoring",'<h1>Current shifts</h1><p class="sub">Live owner view</p>'+
-[['Salesman A','07:02 AM','₹1,82,450'],['Salesman B','08:14 AM','₹1,54,200'],['Salesman C','09:03 AM','₹1,49,600']].map(x=>'<div class="row"><span>'+x[0]+'<small>Started '+x[1]+' · Sales '+x[2]+'</small></span><strong class="green">Open</strong></div>').join("")+
-'<div class="section">Shift controls</div><div class="row"><span>Unclosed previous shifts<small>None</small></span><strong class="green">0</strong></div><button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
-function pumps(){shell("Pump & meter",'<h1>Pump & meter</h1><p class="sub">Machine monitoring · '+period+'</p>'+
-[['M1','Petrol · 18,420.40 L','0.00 L'],['M2','Diesel · 21,845.10 L','1.75 L variance'],['M3','Petrol · 15,208.60 L','0.00 L'],['M4','Diesel · 19,436.10 L','0.00 L']].map(x=>'<div class="row"><span>'+x[0]+' · Online<small>'+x[1]+'</small></span><strong class="'+(x[2].includes("variance")?'amber':'green')+'">'+x[2]+'</strong></div>').join("")+
-'<div class="card"><h2>Reading integrity</h2><div class="kv"><span>Opening readings</span><b>Verified</b></div><div class="kv"><span>Current readings</span><b>Updated</b></div><div class="kv"><span>Variance</span><b class="amber">1.75 L</b></div></div><button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
-function expenses(){shell("Expenses",'<h1>Expense overview</h1><p class="sub">Owner monitoring · '+period+'</p><div class="grid"><div class="metric"><small>Total expenses</small><strong>₹12,400</strong></div><div class="metric"><small>Pending approval</small><strong class="amber">₹2,850</strong></div></div><div class="section">Recent expenses</div>'+
-[['Station maintenance','₹4,500','Approved'],['Cleaning & supplies','₹2,100','Approved'],['Utilities','₹3,000','Approved'],['Other operations','₹2,850','Pending']].map(x=>'<div class="row"><span>'+x[0]+'<small>'+x[2]+'</small></span><strong>'+x[1]+'</strong></div>').join("")+
-'<button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
-function other(){shell("Other operations",'<h1>Other operations</h1><p class="sub">Owner monitoring</p>'+[['Station issue','Canopy light inspection','Open'],['Stock check','Lubricants reviewed','Completed'],['Operational adjustment','Price board update','Completed']].map(x=>'<div class="row"><span>'+x[0]+'<small>'+x[1]+'</small></span><strong>'+x[2]+'</strong></div>').join("")+'<button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
-function exceptions(){shell("Exceptions & alerts",'<h1>Owner attention</h1><p class="sub">Operational exceptions requiring review</p><div class="row"><span>Meter variance<small>M2 · 1.75 L</small></span><strong class="amber">Review</strong></div><div class="row"><span>Pending expense<small>Other operations · ₹2,850</small></span><strong class="amber">Review</strong></div><div class="section">Resolved</div><div class="row"><span>Previous shift closure<small>Resolved · 26 Aug</small></span><strong class="green">Closed</strong></div><button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
-function audit(){shell("Audit history",'<h1>Audit history</h1><p class="sub">Operations · recent activity</p>'+[['27 Aug · 11:24 AM','Meter reading recorded','M2 · Owner review pending'],['27 Aug · 10:15 AM','Expense added','Other operations · ₹2,850'],['27 Aug · 09:03 AM','Shift started','Salesman C'],['26 Aug · 08:10 PM','Shift closed','Salesman B · Verified']].map(x=>'<div class="row"><span>'+x[0]+'<small>'+x[1]+'</small></span><strong>'+x[2]+'</strong></div>').join("")+'<button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
-function customRange(){shell("Custom operations",'<h1>Custom date range</h1><p class="sub">Select a monitoring period</p><div class="card"><div class="section">From date</div><input type="date" style="width:100%;height:44px;border:1px solid var(--border);border-radius:11px"><div class="section">To date</div><input type="date" style="width:100%;height:44px;border:1px solid var(--border);border-radius:11px"><button class="btn primary" onclick="period='Custom';render()">Apply date range</button></div>')}
-function render(){if(page=="overview")overview();else if(page=="shifts")shifts();else if(page=="pumps")pumps();else if(page=="expenses")expenses();else if(page=="other")other();else if(page=="exceptions")exceptions();else if(page=="audit")audit()}
+'<div class="item" onclick="page=\'shifts\';render()"><span>Shift monitoring<small>Current staff activity</small></span><b>›</b></div>'+
+'<div class="item" onclick="page=\'pumps\';render()"><span>Pump & meter monitoring<small>Machines, readings, variance</small></span><b>›</b></div>'+
+'<div class="item" onclick="page=\'expenses\';render()"><span>Expenses<small>Station operating expenses</small></span><b>›</b></div>'+
+'<div class="item" onclick="page=\'other\';render()"><span>Other operations<small>Operational items and adjustments</small></span><b>›</b></div>'+
+'<div class="item" onclick="page=\'exceptions\';render()"><span>Exceptions & alerts<small>Owner attention required</small></span><b class="amber">2</b></div>'+
+'<div class="item" onclick="page=\'audit\';render()"><span>Audit history<small>Operational changes</small></span><b>›</b></div>');
+}
+function shifts(){
+frame("Shift monitoring",'<h1>Current shifts</h1><p class="sub">Live owner view</p>'+
+[['Salesman A','07:02 AM','₹1,82,450'],['Salesman B','08:14 AM','₹1,54,200'],['Salesman C','09:03 AM','₹1,49,600']].map(function(x){return '<div class="item"><span>'+x[0]+'<small>Started '+x[1]+' · Sales '+x[2]+'</small></span><b class="green">Open</b></div>';}).join("")+
+'<div class="section">Shift controls</div><div class="item"><span>Unclosed previous shifts<small>None</small></span><b class="green">0</b></div><button class="btn outline" onclick="page=\'overview\';render()">Back to operations</button>');
+}
+function pumps(){
+frame("Pump & meter",'<h1>Pump & meter</h1><p class="sub">Machine monitoring · '+period+'</p>'+
+[['M1','Petrol · 18,420.40 L','0.00 L'],['M2','Diesel · 21,845.10 L','1.75 L variance'],['M3','Petrol · 15,208.60 L','0.00 L'],['M4','Diesel · 19,436.10 L','0.00 L']].map(function(x){return '<div class="item"><span>'+x[0]+' · Online<small>'+x[1]+'</small></span><b class="'+(x[2].indexOf("variance")>=0?"amber":"green")+'">'+x[2]+'</b></div>';}).join("")+
+'<div class="card"><h2>Reading integrity</h2><div class="kv"><span>Opening readings</span><b>Verified</b></div><div class="kv"><span>Current readings</span><b>Updated</b></div><div class="kv"><span>Variance</span><b class="amber">1.75 L</b></div></div><button class="btn outline" onclick="page=\'overview\';render()">Back to operations</button>');
+}
+function expenses(){
+frame("Expenses",'<h1>Expense overview</h1><p class="sub">Owner monitoring · '+period+'</p><div class="grid"><div class="metric"><small>Total expenses</small><strong>₹12,400</strong></div><div class="metric"><small>Pending approval</small><strong class="amber">₹2,850</strong></div></div><div class="section">Recent expenses</div>'+
+[['Station maintenance','₹4,500','Approved'],['Cleaning & supplies','₹2,100','Approved'],['Utilities','₹3,000','Approved'],['Other operations','₹2,850','Pending']].map(function(x){return '<div class="item"><span>'+x[0]+'<small>'+x[2]+'</small></span><b>'+x[1]+'</b></div>';}).join("")+
+'<button class="btn outline" onclick="page=\'overview\';render()">Back to operations</button>');
+}
+function other(){
+frame("Other operations",'<h1>Other operations</h1><p class="sub">Owner monitoring</p>'+
+[['Station issue','Canopy light inspection','Open'],['Stock check','Lubricants reviewed','Completed'],['Operational adjustment','Price board update','Completed']].map(function(x){return '<div class="item"><span>'+x[0]+'<small>'+x[1]+'</small></span><b>'+x[2]+'</b></div>';}).join("")+
+'<button class="btn outline" onclick="page=\'overview\';render()">Back to operations</button>');
+}
+function exceptions(){
+frame("Exceptions & alerts",'<h1>Owner attention</h1><p class="sub">Operational exceptions requiring review</p>'+
+'<div class="item"><span>Meter variance<small>M2 · 1.75 L</small></span><b class="amber">Review</b></div>'+
+'<div class="item"><span>Pending expense<small>Other operations · ₹2,850</small></span><b class="amber">Review</b></div>'+
+'<div class="section">Resolved</div><div class="item"><span>Previous shift closure<small>Resolved · 26 Aug</small></span><b class="green">Closed</b></div>'+
+'<button class="btn outline" onclick="page=\'overview\';render()">Back to operations</button>');
+}
+function audit(){
+frame("Audit history",'<h1>Audit history</h1><p class="sub">Operations · recent activity</p>'+
+[['27 Aug · 11:24 AM','Meter reading recorded','M2 · Review pending'],['27 Aug · 10:15 AM','Expense added','Other operations · ₹2,850'],['27 Aug · 09:03 AM','Shift started','Salesman C'],['26 Aug · 08:10 PM','Shift closed','Salesman B · Verified']].map(function(x){return '<div class="item"><span>'+x[0]+'<small>'+x[1]+'</small></span><b>'+x[2]+'</b></div>';}).join("")+
+'<button class="btn outline" onclick="page=\'overview\';render()">Back to operations</button>');
+}
+function custom(){
+frame("Custom operations",'<h1>Custom date range</h1><p class="sub">Select a monitoring period</p><div class="card"><div class="section">From date</div><input type="date"><div class="section">To date</div><input type="date"><button class="btn primary" onclick="period=\'Custom\';render()">Apply date range</button></div>');
+}
+function render(){
+if(page==="overview")overview();
+else if(page==="shifts")shifts();
+else if(page==="pumps")pumps();
+else if(page==="expenses")expenses();
+else if(page==="other")other();
+else if(page==="exceptions")exceptions();
+else if(page==="audit")audit();
+else overview();
+}
 render();
-</script></body></html>
+</script>
+</body>
+</html>
