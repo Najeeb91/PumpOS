@@ -3,112 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PumpOS Owner — Credit Customers</title>
+<title>PumpOS Owner — Operations</title>
 <style>
-:root{--bg:#F8F7F2;--n:#1a2332;--g:#5FA83E;--s:#5a6472;--l:#e5e3da;--w:#fff;--a:#b87931;--r:#b94b43}
-*{box-sizing:border-box}body{margin:0;background:#e7e5df;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:var(--n)}
-.app{max-width:390px;min-height:100vh;margin:auto;background:var(--bg)}.screen{min-height:100vh;padding-bottom:84px}
-header{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--l);background:#faf9f5;position:sticky;top:0;z-index:5}
-header b{font-size:17px}header button{border:0;background:none;font-size:22px;color:var(--n)}
-main{padding:18px 16px}h1{font-size:25px;margin:0 0 5px;font-weight:800}h2{font-size:16px;margin:0}.sub{font-size:11px;color:var(--s);margin:0;line-height:1.5}
-.tabs{display:flex;gap:6px;margin:14px 0;overflow:auto}.tabs button{background:#fff;border:1px solid var(--l);border-radius:10px;padding:8px 11px;font-size:10px;font-weight:750;white-space:nowrap}.tabs .on{background:var(--n);color:#fff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric,.card,.row,.search{background:#fff;border:1px solid var(--l);border-radius:14px;box-shadow:0 2px 10px #1a23320a}.metric{padding:13px}.metric small{font-size:10px;color:var(--s)}.metric strong{display:block;font-size:17px;margin-top:5px}.green{color:var(--g)}.warn{color:var(--a)}.red{color:var(--r)}
-.card{padding:14px;margin-top:12px}.section{font-size:12px;font-weight:800;margin:18px 0 8px}.row{padding:11px 12px;margin:8px 0;font-size:11px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.row small{display:block;color:var(--s);font-size:9px;margin-top:3px}.row strong{text-align:right}
-.search{display:flex;align-items:center;padding:0 12px;height:46px;margin-top:13px}.search input{border:0;outline:0;width:100%;font-size:12px;background:transparent;margin-left:8px}
-.badge{font-size:9px;padding:4px 7px;border-radius:8px;background:#f0f7ed;color:var(--g);font-weight:800}.badge.warn{background:#fff7ec;color:var(--a)}.badge.red{background:#fff1ef;color:var(--r)}
+:root{--bg:#F8F7F2;--navy:#1a2332;--green:#5FA83E;--gray:#5a6472;--border:#e5e3da;--white:#fff;--amber:#b87931;--red:#b94b43}
+*{box-sizing:border-box}body{margin:0;background:#e7e5df;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:var(--navy)}
+.app{width:min(390px,100%);min-height:100vh;margin:auto;background:var(--bg)}.screen{min-height:100vh;padding-bottom:88px}
+header{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#faf9f5;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:4}
+header b{font-size:17px}header button{border:0;background:none;color:var(--navy);font-size:22px}
+main{padding:18px 16px}h1{font-size:25px;line-height:1.15;margin:0 0 5px;font-weight:800}h2{font-size:15px;margin:0}.sub{font-size:11px;color:var(--gray);margin:0;line-height:1.5}
+.tabs{display:flex;gap:6px;margin:14px 0;overflow:auto}.tabs button{border:1px solid var(--border);background:white;border-radius:10px;padding:8px 11px;font-size:10px;font-weight:750;white-space:nowrap}.tabs .active{background:var(--navy);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric,.card,.row{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 2px 10px #1a23320a}.metric{padding:13px}.metric small{display:block;font-size:10px;color:var(--gray)}.metric strong{display:block;font-size:17px;margin-top:5px}
+.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.card{padding:14px;margin-top:12px}.section{font-size:12px;font-weight:800;margin:18px 0 8px}.row{padding:11px 12px;margin:8px 0;display:flex;align-items:center;justify-content:space-between;font-size:11px;cursor:pointer}.row small{display:block;color:var(--gray);font-size:9px;margin-top:3px}.row strong{text-align:right}
 .kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0eee8;font-size:11px}.kv:last-child{border:0}
-.btn{width:100%;height:48px;border-radius:13px;margin-top:10px;font-weight:800}.primary{background:var(--g);color:#fff;border:0}.outline{background:#fff;color:var(--n);border:1px solid #aeb4b2}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100%);height:78px;background:#fff;border-top:1px solid var(--l);display:grid;grid-template-columns:repeat(5,1fr);z-index:20}.nav button{border:0;background:#fff;color:#69727c;font-size:8px;font-weight:750}.nav span{display:block;font-size:17px;line-height:22px}.nav .on{color:var(--g)}
+.btn{width:100%;height:48px;border-radius:13px;margin-top:10px;font-weight:800}.primary{border:0;background:var(--green);color:#fff}.outline{border:1px solid #aeb4b2;background:#fff;color:var(--navy)}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100%);height:78px;background:#fff;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);z-index:10}.nav button{border:0;background:#fff;color:#69727c;font-size:8px;font-weight:750}.nav span{display:block;font-size:17px;line-height:22px}.nav .active{color:var(--green)}
 </style>
 </head>
 <body><div class="app" id="app"></div>
 <script>
-let page="overview",tab="Today";
+let page="overview",period="Today";
 const nav=[["home","⌂","Home"],["reports","▥","Reports"],["alerts","!","Alerts"],["settings","⚙","Settings"],["profile","♙","Profile"]];
-
-function navBar(){return '<nav class="nav">'+nav.map(x=>`<button class="${x[0]=="home"?"on":""}" onclick="home()"><span>${x[1]}</span>${x[2]}</button>`).join("")+'</nav>'}
-function shell(title,body){document.getElementById("app").innerHTML=`<div class="screen"><header><button onclick="home()">‹</button><b>${title}</b><button>♙</button></header><main>${body}</main></div>${navBar()}`}
-function home(){location.href="index.html"}
-function tabs(){return '<div class="tabs">'+["Today","This Week","This Month"].map(x=>`<button class="${tab==x?"on":""}" onclick="tab='${x}';render()">${x}</button>`).join("")+'</div>'}
-function render(){
- if(page=="overview")overview();
- if(page=="list")list();
- if(page=="customer")customer();
- if(page=="ledger")ledger();
- if(page=="controls")controls();
- if(page=="audit")audit();
-}
-function overview(){shell("Credit Customers",`
-<h1>Credit Overview</h1><p class="sub">Owner Monitoring · ${tab}</p>${tabs()}
-<div class="grid">
-<div class="metric"><small>Total Outstanding</small><strong class="red">₹16,43,750</strong></div>
-<div class="metric"><small>Today's Credit</small><strong>₹87,500</strong></div>
-<div class="metric"><small>Overdue Amount</small><strong class="warn">₹2,18,400</strong></div>
-<div class="metric"><small>Active Customers</small><strong>38</strong></div>
-</div>
-<div class="card"><h2>Credit Health</h2>
-<div class="row"><span>Within Limit<small>34 Customers</small></span><strong class="green">89%</strong></div>
-<div class="row"><span>Near Limit<small>2 Customers</small></span><strong class="warn">5%</strong></div>
-<div class="row"><span>Over Limit<small>2 Customers</small></span><strong class="red">6%</strong></div>
-</div>
-<div class="section">Customers</div>
-<div class="search">⌕<input placeholder="Search Customer" onclick="page='list';render()"></div>
-<div class="row" onclick="page='list';render()"><span>View All Customers<small>38 Active Credit Customers</small></span><strong>›</strong></div>
-<div class="section">Owner Attention</div>
-<div class="row" onclick="page='customer';render()"><span>Arun Traders<small>Outstanding ₹74,800 · Limit ₹70,000</small></span><strong class="red">Over Limit</strong></div>`)}
-function list(){shell("Credit Customers",`
-<h1>Customer List</h1><p class="sub">Search And Monitor Credit Accounts</p>
-<div class="search">⌕<input placeholder="Search Customer"></div>
-<div class="section">Active Customers</div>
-${[["Arun Traders","₹74,800","₹70,000","Over Limit"],["Khan Auto Parts","₹42,500","₹75,000","Within Limit"],["Sharma Transport","₹68,200","₹80,000","Within Limit"],["Metro Logistics","₹91,450","₹1,00,000","Near Limit"],["Royal Transport","₹24,600","₹50,000","Within Limit"]].map(x=>`
-<div class="row" onclick="page='customer';render()"><span>${x[0]}<small>Outstanding ${x[1]} · Limit ${x[2]}</small></span>
-<strong class="${x[3]=='Over Limit'?'red':x[3]=='Near Limit'?'warn':'green'}">${x[3]}</strong></div>`).join("")}`)}
-function customer(){shell("Customer Overview",`
-<h1>Arun Traders</h1><p class="sub">Credit Account · Active</p>
-<div class="grid">
-<div class="metric"><small>Outstanding</small><strong class="red">₹74,800</strong></div>
-<div class="metric"><small>Credit Limit</small><strong>₹70,000</strong></div>
-<div class="metric"><small>Available</small><strong class="red">−₹4,800</strong></div>
-<div class="metric"><small>Last Payment</small><strong>₹20,000</strong></div>
-</div>
-<div class="card">
-<div class="kv"><span>Last Transaction</span><b>27 Aug · ₹6,250</b></div>
-<div class="kv"><span>Last Payment</span><b>24 Aug · ₹20,000</b></div>
-<div class="kv"><span>Credit Status</span><b class="red">Over Limit</b></div>
-</div>
-<div class="section">Account</div>
-<div class="row" onclick="page='ledger';render()"><span>Complete Credit Ledger<small>Credit Sales And Payments</small></span><strong>›</strong></div>
-<div class="row" onclick="page='controls';render()"><span>Credit Limit & Status<small>Owner Controls</small></span><strong>›</strong></div>
-<div class="row" onclick="page='audit';render()"><span>Audit History<small>Changes And Approvals</small></span><strong>›</strong></div>
-<button class="btn outline" onclick="page='list';render()">Back to Customers</button>`)}
-function ledger(){shell("Credit Ledger",`
-<h1>Arun Traders</h1><p class="sub">Complete Credit Ledger</p>
-<div class="card">
-<div class="kv"><span>Opening Outstanding</span><b>₹68,550</b></div>
-<div class="kv"><span>Credit Sales</span><b>₹26,250</b></div>
-<div class="kv"><span>Payments</span><b class="green">−₹20,000</b></div>
-<div class="kv"><span>Current Outstanding</span><b class="red">₹74,800</b></div>
-</div>
-<div class="section">Recent Entries</div>
-${[["27 Aug · Credit Sale","Diesel · 62.50 L · Salesman A","₹6,250"],["26 Aug · Credit Sale","Petrol · 35.00 L · Salesman B","₹3,500"],["24 Aug · Payment","Recorded By Manager","−₹20,000"],["22 Aug · Credit Sale","Diesel · 72.00 L · Salesman A","₹7,200"],["20 Aug · Credit Sale","Petrol · 41.00 L · Salesman C","₹4,100"]].map(x=>`<div class="row"><span>${x[0]}<small>${x[1]}</small></span><strong>${x[2]}</strong></div>`).join("")}
-<button class="btn outline" onclick="page='customer';render()">Back to Customer</button>`)}
-function controls(){shell("Credit Controls",`
-<h1>Credit Limit & Status</h1><p class="sub">Owner Control · Arun Traders</p>
-<div class="card">
-<div class="kv"><span>Current Limit</span><b>₹70,000</b></div>
-<div class="kv"><span>Outstanding</span><b class="red">₹74,800</b></div>
-<div class="kv"><span>Available</span><b class="red">−₹4,800</b></div>
-<div class="kv"><span>Credit Status</span><b class="red">Over Limit</b></div>
-</div>
-<div class="section">Owner Actions</div>
-<button class="btn primary" onclick="alert('Credit limit change requires reason, confirmation and an audit record.')">Edit Credit Limit</button>
-<button class="btn outline" onclick="alert('Credit account locked. Audit record created.')">Lock Credit</button>
-<button class="btn outline" onclick="alert('Credit status disabled. Audit record created.')">Disable Credit</button>
-<p style="font-size:9px;color:var(--s);margin-top:10px">Sensitive changes require reason, confirmation and an audit record.</p>
-<button class="btn outline" onclick="page='customer';render()">Back to Customer</button>`)}
-function audit(){shell("Audit History",`
-<h1>Audit History</h1><p class="sub">Arun Traders · Credit Account</p>
-${[["27 Aug · 11:24 AM","Credit Sale Recorded","Salesman A · ₹6,250"],["26 Aug · 04:18 PM","Credit Limit Reviewed","Manager · No Change"],["24 Aug · 01:42 PM","Payment Recorded","Manager · ₹20,000"],["20 Aug · 09:12 AM","Credit Account Updated","Owner · Approved"]].map(x=>`<div class="row"><span>${x[0]}<small>${x[1]}</small></span><strong>${x[2]}</strong></div>`).join("")}
-<button class="btn outline" onclick="page='customer';render()">Back to Customer</button>`)}
+function navBar(){return '<nav class="nav">'+nav.map(n=>'<button class="'+(n[0]=="home"?'active':'')+'" onclick="goHome()"><span>'+n[1]+'</span>'+n[2]+'</button>').join("")+'</nav>'}
+function shell(title,body){document.getElementById("app").innerHTML='<div class="screen"><header><button onclick="page='overview';render()">‹</button><b>'+title+'</b><button>♙</button></header><main>'+body+'</main></div>'+navBar()}
+function goHome(){location.href="index.html"}
+function tabs(){return '<div class="tabs">'+["Today","This Week","This Month","Custom"].map(x=>'<button class="'+(period==x?'active':'')+'" onclick="'+(x=="Custom"?'customRange()':'period=''+x+'';render()')+'">'+x+'</button>').join("")+'</div>'}
+function overview(){shell("Operations",'<h1>Operations overview</h1><p class="sub">Owner monitoring · '+period+'</p>'+tabs()+
+'<div class="grid"><div class="metric"><small>Active shifts</small><strong>3</strong></div><div class="metric"><small>Salesmen active</small><strong>3</strong></div><div class="metric"><small>Pumps online</small><strong class="green">4 / 4</strong></div><div class="metric"><small>Pending issues</small><strong class="amber">2</strong></div></div>'+
+'<div class="card"><h2>Station status</h2><div class="row"><span>Current shifts<small>Salesman A · B · C</small></span><strong class="green">Open</strong></div><div class="row"><span>Pump network<small>All machines connected</small></span><strong class="green">Normal</strong></div><div class="row"><span>Meter readings<small>One variance requires review</small></span><strong class="amber">Review</strong></div></div>'+
+'<div class="section">Operations</div>'+
+'<div class="row" onclick="page='shifts';render()"><span>Shift monitoring<small>Current staff activity</small></span><strong>›</strong></div>'+
+'<div class="row" onclick="page='pumps';render()"><span>Pump & meter monitoring<small>Machines, readings, variance</small></span><strong>›</strong></div>'+
+'<div class="row" onclick="page='expenses';render()"><span>Expenses<small>Station operating expenses</small></span><strong>›</strong></div>'+
+'<div class="row" onclick="page='other';render()"><span>Other operations<small>Operational items and adjustments</small></span><strong>›</strong></div>'+
+'<div class="row" onclick="page='exceptions';render()"><span>Exceptions & alerts<small>Items requiring owner attention</small></span><strong class="amber">2</strong></div>'+
+'<div class="row" onclick="page='audit';render()"><span>Audit history<small>Operational changes</small></span><strong>›</strong></div>')}
+function shifts(){shell("Shift monitoring",'<h1>Current shifts</h1><p class="sub">Live owner view</p>'+
+[['Salesman A','07:02 AM','₹1,82,450'],['Salesman B','08:14 AM','₹1,54,200'],['Salesman C','09:03 AM','₹1,49,600']].map(x=>'<div class="row"><span>'+x[0]+'<small>Started '+x[1]+' · Sales '+x[2]+'</small></span><strong class="green">Open</strong></div>').join("")+
+'<div class="section">Shift controls</div><div class="row"><span>Unclosed previous shifts<small>None</small></span><strong class="green">0</strong></div><button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
+function pumps(){shell("Pump & meter",'<h1>Pump & meter</h1><p class="sub">Machine monitoring · '+period+'</p>'+
+[['M1','Petrol · 18,420.40 L','0.00 L'],['M2','Diesel · 21,845.10 L','1.75 L variance'],['M3','Petrol · 15,208.60 L','0.00 L'],['M4','Diesel · 19,436.10 L','0.00 L']].map(x=>'<div class="row"><span>'+x[0]+' · Online<small>'+x[1]+'</small></span><strong class="'+(x[2].includes("variance")?'amber':'green')+'">'+x[2]+'</strong></div>').join("")+
+'<div class="card"><h2>Reading integrity</h2><div class="kv"><span>Opening readings</span><b>Verified</b></div><div class="kv"><span>Current readings</span><b>Updated</b></div><div class="kv"><span>Variance</span><b class="amber">1.75 L</b></div></div><button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
+function expenses(){shell("Expenses",'<h1>Expense overview</h1><p class="sub">Owner monitoring · '+period+'</p><div class="grid"><div class="metric"><small>Total expenses</small><strong>₹12,400</strong></div><div class="metric"><small>Pending approval</small><strong class="amber">₹2,850</strong></div></div><div class="section">Recent expenses</div>'+
+[['Station maintenance','₹4,500','Approved'],['Cleaning & supplies','₹2,100','Approved'],['Utilities','₹3,000','Approved'],['Other operations','₹2,850','Pending']].map(x=>'<div class="row"><span>'+x[0]+'<small>'+x[2]+'</small></span><strong>'+x[1]+'</strong></div>').join("")+
+'<button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
+function other(){shell("Other operations",'<h1>Other operations</h1><p class="sub">Owner monitoring</p>'+[['Station issue','Canopy light inspection','Open'],['Stock check','Lubricants reviewed','Completed'],['Operational adjustment','Price board update','Completed']].map(x=>'<div class="row"><span>'+x[0]+'<small>'+x[1]+'</small></span><strong>'+x[2]+'</strong></div>').join("")+'<button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
+function exceptions(){shell("Exceptions & alerts",'<h1>Owner attention</h1><p class="sub">Operational exceptions requiring review</p><div class="row"><span>Meter variance<small>M2 · 1.75 L</small></span><strong class="amber">Review</strong></div><div class="row"><span>Pending expense<small>Other operations · ₹2,850</small></span><strong class="amber">Review</strong></div><div class="section">Resolved</div><div class="row"><span>Previous shift closure<small>Resolved · 26 Aug</small></span><strong class="green">Closed</strong></div><button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
+function audit(){shell("Audit history",'<h1>Audit history</h1><p class="sub">Operations · recent activity</p>'+[['27 Aug · 11:24 AM','Meter reading recorded','M2 · Owner review pending'],['27 Aug · 10:15 AM','Expense added','Other operations · ₹2,850'],['27 Aug · 09:03 AM','Shift started','Salesman C'],['26 Aug · 08:10 PM','Shift closed','Salesman B · Verified']].map(x=>'<div class="row"><span>'+x[0]+'<small>'+x[1]+'</small></span><strong>'+x[2]+'</strong></div>').join("")+'<button class="btn outline" onclick="page='overview';render()">Back to operations</button>')}
+function customRange(){shell("Custom operations",'<h1>Custom date range</h1><p class="sub">Select a monitoring period</p><div class="card"><div class="section">From date</div><input type="date" style="width:100%;height:44px;border:1px solid var(--border);border-radius:11px"><div class="section">To date</div><input type="date" style="width:100%;height:44px;border:1px solid var(--border);border-radius:11px"><button class="btn primary" onclick="period='Custom';render()">Apply date range</button></div>')}
+function render(){if(page=="overview")overview();else if(page=="shifts")shifts();else if(page=="pumps")pumps();else if(page=="expenses")expenses();else if(page=="other")other();else if(page=="exceptions")exceptions();else if(page=="audit")audit()}
 render();
 </script></body></html>
