@@ -3,12 +3,48 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PumpOS</title>
+<title>PumpOS Owner</title>
 <link rel="stylesheet" href="src/shared/pumpos.css">
 </head>
 <body>
 <div id="app"></div>
 <script src="src/shared/app.js"></script>
+<script src="src/modules/owner/owner.js"></script>
 <script src="src/modules/owner/operations.js"></script>
+<script>
+function ownerHome(){
+  PumpOS.frame("Owner",
+  '<h1>Good evening</h1><p class="sub">Asian Filling Station · Owner view</p>'+
+  '<div class="tabs"><button class="active">Today</button><button>This Week</button><button>This Month</button><button>Custom</button></div>'+
+  '<div class="grid">'+
+  '<div class="metric"><small>Today sales</small><strong>₹4,86,250</strong></div>'+
+  '<div class="metric"><small>Fuel volume</small><strong>59,910 L</strong></div>'+
+  '<div class="metric"><small>Digital collections</small><strong>₹2,14,680</strong></div>'+
+  '<div class="metric"><small>Credit outstanding</small><strong class="amber">₹1,28,400</strong></div>'+
+  '</div>'+
+  '<div class="card"><h2>Today at a glance</h2>'+
+  '<div class="item" onclick="ownerSalesmen()"><span>Salesmen<small>3 active · all shifts open</small></span><b class="green">Normal</b></div>'+
+  '<div class="item" onclick="ownerDigital()"><span>Digital transactions<small>₹2,14,680 collected</small></span><b class="green">Updated</b></div>'+
+  '<div class="item" onclick="ownerCredit()"><span>Credit customers<small>₹1,28,400 outstanding</small></span><b class="amber">Review</b></div>'+
+  '<div class="item" onclick="ownerPumps()"><span>Pumps & meters<small>4 online · 1 variance</small></span><b class="amber">Review</b></div>'+
+  '</div>'+
+  '<div class="section">Owner monitoring</div>'+
+  '<div class="item" onclick="ownerOperations()"><span>Operations<small>Station activity and controls</small></span><b>›</b></div>'+
+  '<div class="item" onclick="ownerSummary()"><span>Summary<small>Today, weekly, monthly or custom</small></span><b>›</b></div>'+
+  '<div class="item" onclick="ownerAlerts()"><span>Exceptions & alerts<small>2 items require attention</small></span><b class="amber">2</b></div>'+
+  '<div class="item" onclick="ownerAudit()"><span>Audit history<small>Recent changes and approvals</small></span><b>›</b></div>'+
+  '<div class="section">Controls</div>'+
+  '<div class="item" onclick="ownerSettings()"><span>Settings<small>Permissions and operational controls</small></span><b>›</b></div>');
+}
+function ownerOperations(){renderOwnerOperations()}
+function ownerSalesmen(){PumpOS.frame("Salesmen",'<h1>Salesmen</h1><p class="sub">Current station activity</p><div class="item"><span>Salesman A<small>Shift open · ₹1,82,450</small></span><b class="green">Active</b></div><div class="item"><span>Salesman B<small>Shift open · ₹1,54,200</small></span><b class="green">Active</b></div><div class="item"><span>Salesman C<small>Shift open · ₹1,49,600</small></span><b class="green">Active</b></div><button class="btn outline" onclick="ownerHome()">Back to home</button>')}
+function ownerDigital(){PumpOS.frame("Digital transactions",'<h1>Digital collections</h1><p class="sub">Owner monitoring · Today</p><div class="grid"><div class="metric"><small>Total</small><strong>₹2,14,680</strong></div><div class="metric"><small>Transactions</small><strong>86</strong></div></div><div class="section">By bank</div><div class="item"><span>Bank collections<small>Verified transactions</small></span><b>₹2,14,680</b></div><div class="item"><span>Pending review<small>No unresolved bank mismatch</small></span><b class="green">₹0</b></div><button class="btn outline" onclick="ownerHome()">Back to home</button>')}
+function ownerCredit(){PumpOS.frame("Credit customers",'<h1>Credit customers</h1><p class="sub">Owner monitoring · Today</p><div class="grid"><div class="metric"><small>Outstanding</small><strong class="amber">₹1,28,400</strong></div><div class="metric"><small>Active accounts</small><strong>18</strong></div></div><div class="section">Attention</div><div class="item"><span>Due today<small>4 customers</small></span><b class="amber">₹18,600</b></div><div class="item"><span>Overdue<small>2 customers</small></span><b class="red">₹12,400</b></div><button class="btn outline" onclick="ownerHome()">Back to home</button>')}
+function ownerSummary(){PumpOS.frame("Summary",'<h1>Business summary</h1><p class="sub">Choose a period</p><div class="tabs"><button class="active">Today</button><button>This Week</button><button>This Month</button><button>Custom</button></div><div class="grid"><div class="metric"><small>Sales</small><strong>₹4,86,250</strong></div><div class="metric"><small>Volume</small><strong>59,910 L</strong></div><div class="metric"><small>Digital</small><strong>₹2,14,680</strong></div><div class="metric"><small>Credit</small><strong>₹1,28,400</strong></div></div><div class="card"><h2>Performance</h2><div class="kv"><span>Cash collections</span><b>₹2,71,570</b></div><div class="kv"><span>Digital collections</span><b>₹2,14,680</b></div><div class="kv"><span>Credit sales</span><b>₹1,28,400</b></div></div><button class="btn outline" onclick="ownerHome()">Back to home</button>')}
+function ownerAlerts(){PumpOS.frame("Exceptions & alerts",'<h1>Owner attention</h1><p class="sub">Items requiring review</p><div class="item"><span>M2 meter variance<small>1.75 L variance</small></span><b class="amber">Review</b></div><div class="item"><span>Credit overdue<small>2 customers · ₹12,400</small></span><b class="red">Review</b></div><button class="btn outline" onclick="ownerHome()">Back to home</button>')}
+function ownerAudit(){PumpOS.frame("Audit history",'<h1>Recent activity</h1><p class="sub">Owner audit trail</p><div class="item"><span>Meter reading recorded<small>27 Aug · M2</small></span><b>Review</b></div><div class="item"><span>Salesman shift started<small>27 Aug · Salesman C</small></span><b>Recorded</b></div><div class="item"><span>Credit transaction added<small>27 Aug · Customer account</small></span><b>Recorded</b></div><button class="btn outline" onclick="ownerHome()">Back to home</button>')}
+function ownerSettings(){PumpOS.frame("Settings",'<h1>Owner controls</h1><p class="sub">Permissions and module controls</p><div class="section">Module controls</div><div class="item"><span>Salesman module<small>Enabled</small></span><b class="green">On</b></div><div class="item"><span>Credit customers<small>Enabled</small></span><b class="green">On</b></div><div class="item"><span>Digital transactions<small>Enabled</small></span><b class="green">On</b></div><div class="item"><span>Meter readings<small>Enabled</small></span><b class="green">On</b></div><div class="section">Permissions</div><div class="item"><span>Manage permissions<small>Owner only</small></span><b>›</b></div><div class="item"><span>Lock / disable options<small>Owner controlled</small></span><b>›</b></div><button class="btn outline" onclick="ownerHome()">Back to home</button>')}
+ownerHome();
+</script>
 </body>
 </html>
