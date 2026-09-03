@@ -1,0 +1,101 @@
+{
+  "station": {
+    "name": "Demo Station"
+  },
+  "products": [
+    {
+      "code": "MS",
+      "name": "Motor Spirit",
+      "active": true,
+      "sellingRate": 90.0
+    },
+    {
+      "code": "HSD",
+      "name": "High Speed Diesel",
+      "active": true,
+      "sellingRate": 82.0
+    }
+  ],
+  "tanks": [
+    {
+      "name": "Tank 1",
+      "product": "MS",
+      "capacityL": 20000,
+      "openingStockL": 12450,
+      "openingDipMm": 684,
+      "active": true
+    },
+    {
+      "name": "Tank 2",
+      "product": "HSD",
+      "capacityL": 20000,
+      "openingStockL": 10900,
+      "openingDipMm": 642,
+      "active": true
+    }
+  ],
+  "machines": [
+    {
+      "name": "M1",
+      "active": true,
+      "nozzles": [
+        {
+          "name": "N1",
+          "product": "MS",
+          "tank": "Tank 1",
+          "active": true
+        },
+        {
+          "name": "N2",
+          "product": "HSD",
+          "tank": "Tank 2",
+          "active": true
+        }
+      ]
+    }
+  ],
+  "dipCharts": {
+    "Tank 1": {
+      "version": "V1",
+      "points": [
+        [
+          600,
+          10850
+        ],
+        [
+          650,
+          11800
+        ],
+        [
+          684,
+          12450
+        ],
+        [
+          700,
+          12850
+        ]
+      ]
+    },
+    "Tank 2": {
+      "version": "V1",
+      "points": [
+        [
+          600,
+          10100
+        ],
+        [
+          642,
+          10900
+        ],
+        [
+          650,
+          11080
+        ],
+        [
+          700,
+          11900
+        ]
+      ]
+    }
+  }
+}
