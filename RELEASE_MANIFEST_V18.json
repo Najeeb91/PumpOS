@@ -1,0 +1,15 @@
+{
+  "version": "18.0.0",
+  "name": "PumpOS Production Hardening",
+  "based_on": "V17",
+  "scope": [
+    "security configuration",
+    "deployment readiness",
+    "financial integrity acceptance tests",
+    "mobile acceptance checklist",
+    "backup and recovery checklist",
+    "production smoke test"
+  ],
+  "status": "hardening-ready",
+  "important": "Production readiness still requires execution of integration/E2E tests against the configured PostgreSQL environment."
+}

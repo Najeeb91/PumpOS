@@ -1,0 +1,16 @@
+{
+  "version": "22.0.0",
+  "name": "PumpOS Production Candidate",
+  "status": "production-candidate",
+  "source_of_truth": "PumpOS",
+  "onboarding": "Install \u2192 Create Owner \u2192 Station Details \u2192 Products \u2192 Tanks \u2192 Machines & Nozzles \u2192 Optional Team Setup \u2192 Station Ready \u2192 Owner Dashboard",
+  "roles": [
+    "OWNER",
+    "MANAGER",
+    "SALESMAN"
+  ],
+  "mobile_first": true,
+  "neon_database": true,
+  "vercel_ready": true,
+  "notes": "Consolidated production candidate built from the latest PumpOS operational modules. GitHub source remains user-controlled; this package is the clean source bundle for Najeeb91/PumpOS."
+}

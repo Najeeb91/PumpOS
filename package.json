@@ -1,0 +1,19 @@
+{
+  "name": "pumpos",
+  "version": "22.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node --check src/server.js",
+    "test": "node --test",
+    "db:init": "psql \"postgres://pumpos:pumpos@localhost:5432/pumpos\" -f db/schema.sql",
+    "db:seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1"
+  }
+}

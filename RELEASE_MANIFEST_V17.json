@@ -1,0 +1,15 @@
+{
+  "version": "17.0.0",
+  "name": "PumpOS Final Operational Completion",
+  "focus": [
+    "meter_reconciliation",
+    "fuel_stock_reconciliation",
+    "delivery_shortage_recovery",
+    "owner_internal_transactions",
+    "controlled_shift_close",
+    "immutable_audit",
+    "owner_control"
+  ],
+  "principle": "Salesman \u2192 Manager \u2192 Reconciliation \u2192 Owner",
+  "production_note": "Requires real environment configuration, security review, integration/E2E tests and deployment acceptance."
+}

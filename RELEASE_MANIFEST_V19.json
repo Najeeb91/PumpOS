@@ -1,0 +1,8 @@
+{
+  "version": "19.0.0",
+  "name": "PumpOS Tank & Fuel Configuration",
+  "status": "configuration-ready",
+  "purpose": "Establish station fuel topology before end-to-end operational testing",
+  "syntax_checked_js_files": 2,
+  "syntax_errors": 0
+}

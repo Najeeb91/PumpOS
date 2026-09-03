@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pumpos
+      POSTGRES_USER: pumpos
+      POSTGRES_PASSWORD: pumpos
+    ports:
+      - "5432:5432"
+    volumes:
+      - pumpos_pg:/var/lib/postgresql/data
+volumes:
+  pumpos_pg:

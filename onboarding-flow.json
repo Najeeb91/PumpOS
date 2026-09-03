@@ -1,0 +1,31 @@
+{
+  "version": "20.0.0",
+  "required": [
+    "owner",
+    "station",
+    "products",
+    "tanks",
+    "machines_nozzles"
+  ],
+  "optional": [
+    "manager",
+    "salesman"
+  ],
+  "steps": [
+    "create_owner",
+    "station_details",
+    "products",
+    "tanks",
+    "machines_nozzles",
+    "optional_team_setup",
+    "station_ready",
+    "owner_dashboard"
+  ],
+  "team_setup": {
+    "allow_skip": true,
+    "roles": [
+      "manager",
+      "salesman"
+    ]
+  }
+}
