@@ -1,0 +1,22 @@
+import pg from 'pg';
+import bcrypt from 'bcryptjs';
+const {Pool}=pg;
+const pool=new Pool({connectionString:process.env.DATABASE_URL||'postgres://pumpos:pumpos@localhost:5432/pumpos'});
+const hash=await bcrypt.hash('123456',10);
+const c=await pool.connect();
+try{await c.query('BEGIN');
+ const st=(await c.query("INSERT INTO stations(name) VALUES('Demo Pump Station') ON CONFLICT DO NOTHING RETURNING id")).rows[0] || (await c.query("SELECT id FROM stations WHERE name='Demo Pump Station' LIMIT 1")).rows[0];
+ const users=[['Owner','9000000001','OWNER'],['Manager','9000000002','MANAGER'],['Salesman','9000000003','SALESMAN']];
+ for(const [name,mobile,role] of users)await c.query(`INSERT INTO users(station_id,name,mobile,password_hash,role) VALUES($1,$2,$3,$4,$5) ON CONFLICT(station_id,mobile) DO UPDATE SET password_hash=EXCLUDED.password_hash,role=EXCLUDED.role,active=true`,[st.id,name,mobile,hash,role]);
+ const ms=(await c.query("INSERT INTO products(station_id,code,name) VALUES($1,'MS','Petrol') ON CONFLICT(station_id,code) DO UPDATE SET name='Petrol' RETURNING id",[st.id])).rows[0];
+ const hsd=(await c.query("INSERT INTO products(station_id,code,name) VALUES($1,'HSD','Diesel') ON CONFLICT(station_id,code) DO UPDATE SET name='Diesel' RETURNING id",[st.id])).rows[0];
+ for(const [pid,name] of [[ms.id,'MS Tank'],[hsd.id,'HSD Tank']])await c.query('INSERT INTO tanks(station_id,product_id,name,capacity_l) SELECT $1,$2,$3,30000 WHERE NOT EXISTS(SELECT 1 FROM tanks WHERE station_id=$1 AND product_id=$2)',[st.id,pid,name]);
+ const m1=(await c.query("INSERT INTO machines(station_id,code,name) VALUES($1,'M1','Machine 1') ON CONFLICT(station_id,code) DO UPDATE SET name='Machine 1' RETURNING id",[st.id])).rows[0];
+ const m2=(await c.query("INSERT INTO machines(station_id,code,name) VALUES($1,'M2','Machine 2') ON CONFLICT(station_id,code) DO UPDATE SET name='Machine 2' RETURNING id",[st.id])).rows[0];
+ for(const [mid,code,pid] of [[m1.id,'N1',ms.id],[m1.id,'N2',hsd.id],[m2.id,'N1',ms.id],[m2.id,'N2',hsd.id]]) await c.query("INSERT INTO nozzles(station_id,machine_id,code,product_id,opening_meter) VALUES($1,$2,$3,$4,0) ON CONFLICT(machine_id,code) DO NOTHING",[st.id,mid,code,pid]);
+ for(const name of ['ABC Transport','City Fleet']) await c.query("INSERT INTO credit_customers(station_id,name) SELECT $1,$2 WHERE NOT EXISTS(SELECT 1 FROM credit_customers WHERE station_id=$1 AND name=$2)",[st.id,name]);
+ for(const [pid,rate] of [[ms.id,90],[hsd.id,88]]) await c.query("INSERT INTO product_rates(station_id,product_id,selling_rate) VALUES($1,$2,$3) ON CONFLICT(station_id,product_id) DO UPDATE SET selling_rate=EXCLUDED.selling_rate",[st.id,pid,rate]);
+ const bank=(await c.query("INSERT INTO bank_accounts(station_id,name,account_mask,opening_balance) SELECT $1,'Primary Bank','•••• 0001',0 WHERE NOT EXISTS(SELECT 1 FROM bank_accounts WHERE station_id=$1) RETURNING id",[st.id])).rows[0];
+ for(const [pid,cost,qty] of [[ms.id,85,10000],[hsd.id,78,10000]])await c.query(`INSERT INTO inventory_layers(station_id,product_id,quantity_received_l,quantity_remaining_l,cost_per_l) SELECT $1,$2,$3,$3,$4 WHERE NOT EXISTS(SELECT 1 FROM inventory_layers WHERE station_id=$1 AND product_id=$2 AND delivery_id IS NULL)`,[st.id,pid,qty,cost]);
+ await c.query('COMMIT'); console.log('Seed complete. Demo passwords are 123456.');
+}catch(e){await c.query('ROLLBACK');console.error(e);process.exitCode=1;}finally{c.release();await pool.end();}
