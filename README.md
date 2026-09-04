@@ -35,3 +35,4 @@ npm start
 ```
 
 V16 is an integrated MVP architecture, not a claim of production readiness. Before real financial deployment, add managed PostgreSQL, secrets management, TLS, MFA/OTP, rate limiting, backups, monitoring, migration tooling and full automated integration/E2E tests.
+PumpOS Production Build
